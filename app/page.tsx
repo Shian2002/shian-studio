@@ -1,10 +1,25 @@
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import Services from "@/components/Services";
+import Portfolio from "@/components/Portfolio";
+import TechStack from "@/components/TechStack";
+import About from "@/components/About";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
+
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-navy">
-      <main className="text-center">
-        <h1 className="text-4xl font-bold text-gradient">SHIAN Studio</h1>
-        <p className="mt-4 text-lg text-gray-400">Coming Soon</p>
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <Services />
+        <Portfolio />
+        <TechStack />
+        <About />
+        <Contact />
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
