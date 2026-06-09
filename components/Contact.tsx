@@ -15,7 +15,8 @@ export default function Contact() {
     const data = new FormData(form);
 
     try {
-      const res = await fetch("https://formspree.io/f/PLACEHOLDER_FORM_ID", {
+      const formId = process.env.NEXT_PUBLIC_FORMSPREE_ID || "PLACEHOLDER_FORM_ID";
+      const res = await fetch(`https://formspree.io/f/${formId}`, {
         method: "POST",
         body: data,
         headers: { Accept: "application/json" },
@@ -74,10 +75,11 @@ export default function Contact() {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">
+                  <label htmlFor="name" className="text-xs text-gray-500 mb-1 block">
                     Your Name *
                   </label>
                   <input
+                    id="name"
                     name="name"
                     type="text"
                     required
@@ -86,10 +88,11 @@ export default function Contact() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">
+                  <label htmlFor="email" className="text-xs text-gray-500 mb-1 block">
                     Email *
                   </label>
                   <input
+                    id="email"
                     name="email"
                     type="email"
                     required
@@ -164,6 +167,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === "sending"}
+                aria-label="Send message"
                 className="w-full py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
               >
                 {status === "sending" ? (
@@ -187,7 +191,9 @@ export default function Contact() {
             📧 hello@shian.studio
           </a>
           <a
-            href="#"
+            href="https://calendly.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-surface px-4 py-2 rounded-lg text-sm text-gray-400 border border-white/5 hover:border-white/20 transition-colors"
           >
             📅 Book a Call

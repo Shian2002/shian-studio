@@ -40,6 +40,7 @@ export default function VideoCard({
           <button
             onClick={() => setPlaying(true)}
             className="absolute inset-0 flex items-center justify-center group cursor-pointer"
+            aria-label="Play video"
           >
             <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-200">
               <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">

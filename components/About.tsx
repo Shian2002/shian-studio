@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TRUST_SIGNALS, BIO_EN, BIO_ZH, SOCIAL_LINKS } from "@/lib/constants";
+import { TRUST_SIGNALS, BIO_EN, BIO_ZH } from "@/lib/constants";
 import TrustCard from "./TrustCard";
+import SocialLinks from "./SocialLinks";
 
 export default function About() {
   return (
@@ -42,32 +43,7 @@ export default function About() {
               ))}
             </div>
 
-            <div className="flex gap-4 mt-8 justify-center lg:justify-start">
-              <a
-                href={SOCIAL_LINKS.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors text-sm"
-              >
-                GitHub
-              </a>
-              <a
-                href={SOCIAL_LINKS.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors text-sm"
-              >
-                X / Twitter
-              </a>
-              <a
-                href={SOCIAL_LINKS.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors text-sm"
-              >
-                YouTube
-              </a>
-            </div>
+            <SocialLinks className="flex gap-4 mt-8 justify-center lg:justify-start" iconClassName="text-gray-400 hover:text-white transition-colors" />
           </motion.div>
         </div>
       </div>

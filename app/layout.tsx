@@ -33,12 +33,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "SHIAN Studio",
+    images: [
+      {
+        url: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SHIAN%20Studio%20dark%20tech%20brand%20banner%20with%20blue%20gradient%20abstract%20geometry%20minimalist%20professional&image_size=landscape_16_9",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "SHIAN Studio — Digital Product Studio",
     description:
       "Custom websites, mini programs, and SaaS products. Fast delivery powered by AI.",
+    images: [
+      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SHIAN%20Studio%20dark%20tech%20brand%20banner%20with%20blue%20gradient%20abstract%20geometry%20minimalist%20professional&image_size=landscape_16_9",
+    ],
   },
   robots: {
     index: true,

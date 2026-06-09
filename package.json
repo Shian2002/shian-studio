@@ -12,8 +12,7 @@
     "framer-motion": "^12.40.0",
     "next": "14.2.29",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-lite-youtube-embed": "^3.6.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^20",
