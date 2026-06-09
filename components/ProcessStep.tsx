@@ -7,7 +7,8 @@ interface ProcessStepProps {
   title: string;
   description: string;
   step: number;
-  isLast: boolean;
+  index?: number;
+  isLast?: boolean;
 }
 
 const stepColors = [
@@ -17,34 +18,31 @@ const stepColors = [
   { text: "text-purple", bg: "bg-purple/10", border: "border-purple/30" },
 ];
 
-export default function ProcessStep({ icon, title, description, step, isLast }: ProcessStepProps) {
+export default function ProcessStep({ icon, title, description, step, index = 0, isLast }: ProcessStepProps) {
   const color = stepColors[step - 1] || stepColors[0];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: step * 0.15, duration: 0.4 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
       whileHover={{ y: -4 }}
-      className="relative flex flex-col items-center text-center"
+      className="relative bg-surface/40 border border-white/5 hover:border-white/15 rounded-2xl p-6 transition-all duration-300"
     >
-      <div className={`min-w-[140px] p-4 bg-surface rounded-xl border border-white/5 hover:border-white/15 transition-all duration-300`}>
-        <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${color.bg} ${color.border} border mb-3`}>
-          <span className={`text-xs font-bold ${color.text}`}>{step}</span>
-        </div>
-        <div className="text-3xl mb-2">{icon}</div>
-        <div className={`text-xs font-semibold ${color.text} mb-1 uppercase tracking-wider`}>
-          Step {step}
-        </div>
-        <div className="text-sm text-white font-medium">{title}</div>
-        <div className="text-xs text-gray-500 mt-1">{description}</div>
+      <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${color.bg} ${color.border} border mb-4 text-lg`}>
+        {icon}
       </div>
-
+      <div className={`inline-flex items-center justify-center w-6 h-6 rounded-full ${color.bg} ${color.border} border mb-3`}>
+        <span className={`text-[10px] font-bold ${color.text}`}>{String(step).padStart(2, "0")}</span>
+      </div>
+      <h3 className="text-lg font-semibold text-white mb-2">
+        {title}
+      </h3>
+      <p className="text-sm text-gray-400 leading-relaxed">
+        {description}
+      </p>
       {!isLast && (
-        <div className="hidden lg:flex absolute top-1/2 -right-3 items-center">
-          <span className="w-6 h-px bg-white/10" />
-        </div>
+        <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px bg-gradient-to-r from-white/10 to-transparent" aria-hidden="true" />
       )}
     </motion.div>
   );

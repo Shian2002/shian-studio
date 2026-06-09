@@ -13,12 +13,12 @@ import HireBadge from "@/components/HireBadge";
 export default function Home() {
   return (
     <>
-      <Navbar />
       <ScrollProgress />
-      <div className="fixed top-20 right-6 z-40">
+      <Navbar />
+      <div className="fixed top-20 right-6 z-40 hidden md:block">
         <HireBadge />
       </div>
-      <main>
+      <main id="main-content">
         <Hero />
         <Services />
         <Portfolio />

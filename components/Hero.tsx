@@ -5,66 +5,96 @@ import { BRAND } from "@/lib/constants";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section
+      id="hero"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-navy via-[#0a0a1a] to-[#1a0a2e]" />
-      <div className="absolute inset-0 opacity-30" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[128px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple/20 rounded-full blur-[128px] animate-pulse delay-1000" />
+
+      <div
+        className="absolute inset-0 opacity-[0.07]"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+
+      <div className="absolute inset-0 opacity-50" aria-hidden="true">
+        <div className="absolute top-1/3 left-1/4 w-[32rem] h-[32rem] bg-accent/20 rounded-full blur-[128px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[28rem] h-[28rem] bg-purple/15 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: "1.5s" }} />
       </div>
 
-      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <motion.span
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-400 mb-8"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-mint animate-pulse" />
+          Available for freelance projects
+        </motion.span>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-5xl md:text-7xl font-extralight tracking-brand text-white mb-4"
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="text-5xl md:text-7xl lg:text-8xl font-extralight tracking-brand text-white mb-6 leading-tight"
         >
-          {BRAND.name}
+          Build <span className="bg-gradient-to-r from-accent via-purple to-mint bg-clip-text text-transparent">faster</span>.
+          <br />
+          Ship <span className="italic font-light">smarter</span>.
         </motion.h1>
-
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="w-16 h-0.5 bg-mint mx-auto mb-4"
-        />
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-sm md:text-base tracking-widest text-mint uppercase mb-6"
+          className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          {BRAND.subtitle}
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="text-lg md:text-xl text-gray-300 italic mb-10"
-        >
-          &ldquo;{BRAND.tagline}&rdquo;
+          {BRAND.name} Studio builds production-ready websites, mini programs, and SaaS products —
+          powered by AI for maximum speed, quality, and affordability.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <a
             href="#portfolio"
-            className="px-8 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/80 hover:shadow-[0_0_30px_rgba(74,158,255,0.3)] transition-all duration-300"
+            className="px-8 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/80 hover:shadow-[0_0_40px_rgba(74,158,255,0.35)] transition-all duration-300"
           >
             View My Work
           </a>
           <a
-            href="#contact"
-            className="px-8 py-3 rounded-lg border border-white/20 text-white font-medium hover:bg-white/5 hover:border-white/40 transition-all duration-300"
+            href="#services"
+            className="px-8 py-3 rounded-lg border border-white/15 text-white font-medium hover:bg-white/5 hover:border-white/30 transition-all duration-300"
           >
-            Get a Quote
+            See Pricing
           </a>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
+          className="mt-16 flex flex-wrap justify-center gap-x-8 gap-y-3 text-xs text-gray-500 uppercase tracking-widest"
+        >
+          <span>Next.js</span>
+          <span className="text-gray-700">·</span>
+          <span>React</span>
+          <span className="text-gray-700">·</span>
+          <span>Node.js</span>
+          <span className="text-gray-700">·</span>
+          <span>Python</span>
+          <span className="text-gray-700">·</span>
+          <span>Mini Programs</span>
+          <span className="text-gray-700">·</span>
+          <span>SaaS</span>
         </motion.div>
       </div>
 
@@ -75,8 +105,12 @@ export default function Hero() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         aria-hidden="true"
       >
-        <div className="w-5 h-8 rounded-full border-2 border-white/20 flex justify-center pt-1">
-          <div className="w-1 h-2 bg-white/40 rounded-full animate-bounce" />
+        <div className="w-6 h-10 rounded-full border border-white/15 flex justify-center pt-2">
+          <motion.div
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="w-1 h-2 bg-white/50 rounded-full"
+          />
         </div>
       </motion.div>
     </section>
