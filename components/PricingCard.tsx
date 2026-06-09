@@ -13,11 +13,11 @@ interface PricingCardProps {
   features: readonly string[];
 }
 
-const colorMap: Record<string, { border: string; badge: string; text: string }> = {
-  mint: { border: "border-mint/40", badge: "text-mint", text: "text-mint" },
-  accent: { border: "border-accent/60", badge: "text-accent", text: "text-accent" },
-  purple: { border: "border-purple/40", badge: "text-purple", text: "text-purple" },
-  amber: { border: "border-amber/40", badge: "text-amber", text: "text-amber" },
+const colorMap: Record<string, { border: string; badgeBg: string; badgeText: string; text: string }> = {
+  mint: { border: "border-mint/40", badgeBg: "bg-mint/10", badgeText: "text-mint", text: "text-mint" },
+  accent: { border: "border-accent/60", badgeBg: "bg-accent/10", badgeText: "text-accent", text: "text-accent" },
+  purple: { border: "border-purple/40", badgeBg: "bg-purple/10", badgeText: "text-purple", text: "text-purple" },
+  amber: { border: "border-amber/40", badgeBg: "bg-amber/10", badgeText: "text-amber", text: "text-amber" },
 };
 
 export default function PricingCard({
@@ -34,22 +34,26 @@ export default function PricingCard({
 
   return (
     <motion.div
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.3 }}
       className={`relative flex flex-col rounded-xl p-6 bg-surface ${
         highlight
-          ? `border-2 ${colors.border} shadow-lg`
-          : "border border-white/5"
-      }`}
+          ? `border-2 ${colors.border} shadow-lg shadow-accent/10`
+          : "border border-white/5 hover:border-white/15"
+      } transition-all duration-300`}
     >
       {highlight && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className={`text-xs px-3 py-1 rounded-full bg-accent/20 ${colors.badge}`}>
+          <span className={`text-xs px-3 py-1 rounded-full ${colors.badgeBg} ${colors.badgeText} border ${colors.border}`}>
             ⭐ Recommended
           </span>
         </div>
       )}
 
-      <div className={`text-xs tracking-widest uppercase ${colors.badge} mb-2`}>
+      <div className={`text-xs tracking-widest uppercase ${colors.text} mb-2`}>
         {name}
       </div>
       <p className="text-sm text-gray-400 mb-4">{description}</p>
@@ -86,7 +90,7 @@ export default function PricingCard({
           href="#contact"
           className={`block text-center py-3 rounded-lg font-medium transition-all duration-200 ${
             highlight
-              ? "bg-accent text-white hover:bg-accent/80"
+              ? "bg-accent text-white hover:bg-accent/80 hover:shadow-lg hover:shadow-accent/20"
               : "bg-white/5 text-white hover:bg-white/10"
           }`}
         >

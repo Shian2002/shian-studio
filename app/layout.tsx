@@ -13,7 +13,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SHIAN Studio — Digital Product Studio | AI-Powered Full-Stack Development",
+  metadataBase: new URL("https://shian.studio"),
+  title: {
+    default: "SHIAN Studio — Digital Product Studio | AI-Powered Full-Stack Development",
+    template: "%s | SHIAN Studio",
+  },
   description:
     "SHIAN Studio builds production-ready websites, mini programs, and SaaS products. Full-stack development powered by AI — fast, reliable, affordable.",
   keywords: [
@@ -25,17 +29,37 @@ export const metadata: Metadata = {
     "SaaS development",
     "SHIAN Studio",
   ],
-  authors: [{ name: "Shian" }],
+  authors: [{ name: "Shian", url: "https://shian.studio" }],
+  creator: "Shian",
+  publisher: "SHIAN Studio",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "SHIAN Studio — Your AI-Powered Full-Stack Partner",
-    description:
-      "Custom websites, mini programs, and SaaS products. Fast delivery powered by AI.",
     type: "website",
     locale: "en_US",
     siteName: "SHIAN Studio",
+    url: "https://shian.studio",
+    title: "SHIAN Studio — Your AI-Powered Full-Stack Partner",
+    description:
+      "Custom websites, mini programs, and SaaS products. Fast delivery powered by AI.",
     images: [
       {
         url: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SHIAN%20Studio%20dark%20tech%20brand%20banner%20with%20blue%20gradient%20abstract%20geometry%20minimalist%20professional&image_size=landscape_16_9",
+        width: 1200,
+        height: 630,
+        alt: "SHIAN Studio",
       },
     ],
   },
@@ -44,13 +68,15 @@ export const metadata: Metadata = {
     title: "SHIAN Studio — Digital Product Studio",
     description:
       "Custom websites, mini programs, and SaaS products. Fast delivery powered by AI.",
+    creator: "@shian_dev",
     images: [
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SHIAN%20Studio%20dark%20tech%20brand%20banner%20with%20blue%20gradient%20abstract%20geometry%20minimalist%20professional&image_size=landscape_16_9",
+      {
+        url: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SHIAN%20Studio%20dark%20tech%20brand%20banner%20with%20blue%20gradient%20abstract%20geometry%20minimalist%20professional&image_size=landscape_16_9",
+        width: 1200,
+        height: 630,
+        alt: "SHIAN Studio",
+      },
     ],
-  },
-  robots: {
-    index: true,
-    follow: true,
   },
 };
 

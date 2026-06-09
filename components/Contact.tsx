@@ -4,6 +4,9 @@ import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PROJECT_TYPES, BUDGET_RANGES, SOCIAL_LINKS } from "@/lib/constants";
 
+const EMAIL_URL = SOCIAL_LINKS.email;
+const CALENDLY_URL = "https://calendly.com";
+
 export default function Contact() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
@@ -104,10 +107,11 @@ export default function Contact() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">
+                  <label htmlFor="project_type" className="text-xs text-gray-500 mb-1 block">
                     Project Type *
                   </label>
                   <select
+                    id="project_type"
                     name="project_type"
                     required
                     className="w-full bg-surface border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors appearance-none"
@@ -124,10 +128,11 @@ export default function Contact() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">
+                  <label htmlFor="budget" className="text-xs text-gray-500 mb-1 block">
                     Budget Range *
                   </label>
                   <select
+                    id="budget"
                     name="budget"
                     required
                     className="w-full bg-surface border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-accent/50 transition-colors appearance-none"
@@ -146,10 +151,11 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label htmlFor="message" className="text-xs text-gray-500 mb-1 block">
                   Tell me about your project *
                 </label>
                 <textarea
+                  id="message"
                   name="message"
                   required
                   rows={4}
@@ -185,13 +191,13 @@ export default function Contact() {
 
         <div className="flex gap-4 justify-center mt-8 flex-wrap">
           <a
-            href={SOCIAL_LINKS.email}
+            href={EMAIL_URL}
             className="bg-surface px-4 py-2 rounded-lg text-sm text-gray-400 border border-white/5 hover:border-white/20 transition-colors"
           >
             📧 hello@shian.studio
           </a>
           <a
-            href="https://calendly.com"
+            href={CALENDLY_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-surface px-4 py-2 rounded-lg text-sm text-gray-400 border border-white/5 hover:border-white/20 transition-colors"

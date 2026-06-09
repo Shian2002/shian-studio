@@ -29,11 +29,13 @@ export default function TechStack() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="px-4 py-2 rounded-lg border border-white/5 text-sm"
+              transition={{ delay: i * 0.05, duration: 0.3 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              className="px-4 py-2 rounded-lg border border-white/5 text-sm cursor-default"
               style={{
                 backgroundColor: `${tech.color}08`,
                 color: tech.color,
+                boxShadow: `0 0 0 0 ${tech.color}00`,
               }}
             >
               {tech.name}
