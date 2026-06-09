@@ -3,31 +3,81 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
-  variable: "--font-inter",
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
-  title: "SHIAN Studio",
-  description: "Personal portfolio and business card",
+  title: "SHIAN Studio — Digital Product Studio | AI-Powered Full-Stack Development",
+  description:
+    "SHIAN Studio builds production-ready websites, mini programs, and SaaS products. Full-stack development powered by AI — fast, reliable, affordable.",
+  keywords: [
+    "full-stack developer",
+    "custom development",
+    "AI-powered development",
+    "website development",
+    "mini program",
+    "SaaS development",
+    "SHIAN Studio",
+  ],
+  authors: [{ name: "Shian" }],
+  openGraph: {
+    title: "SHIAN Studio — Your AI-Powered Full-Stack Partner",
+    description:
+      "Custom websites, mini programs, and SaaS products. Fast delivery powered by AI.",
+    type: "website",
+    locale: "en_US",
+    siteName: "SHIAN Studio",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SHIAN Studio — Digital Product Studio",
+    description:
+      "Custom websites, mini programs, and SaaS products. Fast delivery powered by AI.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
-    >
-      <body>{children}</body>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ProfessionalService",
+              name: "SHIAN Studio",
+              description:
+                "AI-powered full-stack custom development studio",
+              url: "https://shian.studio",
+              priceRange: "$499 - $5000+",
+              areaServed: "Worldwide",
+              serviceType: [
+                "Web Development",
+                "Mini Program Development",
+                "SaaS Development",
+              ],
+            }),
+          }}
+        />
+      </head>
+      <body className="font-sans bg-[#0a0a0a] text-gray-200 antialiased">
+        {children}
+      </body>
     </html>
   );
 }
