@@ -10,7 +10,7 @@ export default function Contact() {
   const { t } = useLanguage();
 
   return (
-    <section id="contact" aria-label={t("nav.contact") as string} className="py-24 px-6 bg-th-bg">
+    <section id="contact" aria-label={t("nav.contact") as string} className="py-16 px-6 bg-th-bg">
       <div className="max-w-3xl mx-auto text-center">
         <HireBadge />
 

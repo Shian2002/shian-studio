@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -134,7 +134,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .device-frame .frame-hdr{padding:8px 12px;background:var(--bg3);font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
 .device-frame .frame-hdr .dots{display:flex;gap:4px;margin-right:6px}
 .device-frame .frame-hdr .dots span{width:8px;height:8px;border-radius:50%}
-.device-frame .frame-screen{display:flex;align-items:center;justify-content:center;background:#111;position:relative;overflow:hidden}
+.device-frame .frame-screen{background:#111;position:relative;overflow:hidden}
 .device-frame .frame-screen .preview{width:100%;height:100%;display:flex;flex-direction:column;padding:12px;gap:8px}
 .preview-nav{height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700}
 .preview-hero{flex:1;background:linear-gradient(135deg,var(--bg3),var(--bg4));border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
@@ -372,10 +372,10 @@ function T(key){
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function afterLangChange(){
+  applyStaticI18n();
   var pageEl=document.querySelector('.page.active');
   var p=pageEl?pageEl.id.replace('page-',''):'dashboard';
   var titles={dashboard:T('nav.dashboard'),projects:T('nav.projects'),editor:T('nav.editor'),build:T('nav.builds'),devices:T('nav.devices'),team:T('nav.team'),analytics:T('nav.analytics'),settings:T('nav.settings')};
@@ -387,11 +387,39 @@ function afterLangChange(){
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:#ccc;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#6366f1':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:#ccc;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#6366f1':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');
   if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+function applyStaticI18n(){
+  var titles=document.querySelectorAll('.nav-sec-title');
+  if(titles[0])titles[0].textContent=T('nav.main');
+  if(titles[1])titles[1].textContent=T('nav.tools');
+  var navKeys={dashboard:'dashboard',projects:'projects',editor:'editor',build:'builds',devices:'devices',team:'team',analytics:'analytics',settings:'settings'};
+  document.querySelectorAll('.nav-item[data-page]').forEach(function(item){
+    var page=item.dataset.page;
+    var icon=item.querySelector('.icon');
+    var badge=item.querySelector('.badge');
+    item.innerHTML=(icon?icon.outerHTML:'')+(T('nav.'+(navKeys[page]||page)))+(badge?badge.outerHTML:'');
+  });
+  var footer=document.querySelector('.sidebar-ft');
+  if(footer){
+    var top=footer.querySelector('div');
+    if(top)top.innerHTML='<span>'+T('sidebar.version')+'</span><span style="color:var(--green)">● '+T('sidebar.online')+'</span>';
+    var meta=footer.querySelectorAll('div')[1];
+    if(meta)meta.innerHTML='<span style="opacity:.7">'+T('sidebar.buildsToday')+': 3</span><span style="opacity:.7">|</span><span style="opacity:.7">'+T('sidebar.api')+': 45ms</span>';
+    var btn=footer.querySelector('button');
+    if(btn)btn.textContent=T('sidebar.newProject');
+    var copy=footer.querySelectorAll('div')[2];
+    if(copy)copy.textContent=T('sidebar.copyright');
+  }
+  var pageEl=document.querySelector('.page.active');
+  var p=pageEl?pageEl.id.replace('page-',''):'dashboard';
+  var titleKeys={dashboard:'dashboard',projects:'projects',editor:'editor',build:'builds',devices:'devices',team:'team',analytics:'analytics',settings:'settings'};
+  var pageTitle=document.getElementById('pageTitle');
+  if(pageTitle)pageTitle.textContent=T('nav.'+(titleKeys[p]||p));
 }
 var I18N = {
   en: {
@@ -406,7 +434,9 @@ var I18N = {
     analytics: {totalDownloads:'Total Downloads',activeUsers:'Active Users',uptime:'Uptime',avgLoadTime:'Avg Load Time',monthUp1:'↑ 18% this month',monthUp2:'↑ 24% this month',up03:'↑ 0.3%',down15:'↓ 15% faster',downloadsByPlatform:'Downloads by Platform',userGrowth:'User Growth',performanceMetrics:'Performance Metrics',live:'Live',fcp:'First Contentful Paint',tti:'Time to Interactive',bundleSize:'Bundle Size',lighthouse:'Lighthouse Score',errorRate:'Error Rate',apiLatency:'API Latency',memoryUsage:'Memory Usage',cacheHitRate:'Cache Hit Rate',frameRate:'Frame Rate',cpuUsage:'CPU Usage',dbQueries:'DB Queries',refresh:'↻ Refresh'},
     settings: {projectSettings:'Project Settings',ciCdConfig:'CI/CD Configuration',envVariables:'Environment Variables',notifications:'Notifications',dangerZone:'Danger Zone',about:'About',keyboardShortcuts:'Keyboard Shortcuts',projectName:'Project Name',version:'Version',buildCommand:'Build Command',outputDirectory:'Output Directory',saveSettings:'Save Settings',ciProvider:'CI Provider',branch:'Branch',autoDeploy:'Auto-deploy on push',saveCiCd:'Save CI/CD',key:'Key',value:'Value',addVariable:'+ Add Variable',saveVariables:'Save Variables',clearBuildHistory:'Clear Build History',clearBuildHistoryDesc:'Remove all past build records',clearAll:'Clear All',resetEditorFiles:'Reset Editor Files',resetEditorFilesDesc:'Restore default code templates',reset:'Reset',resetAllData:'Reset All Data',resetAllDataDesc:'Clear all localStorage data and start fresh',resetEverything:'Reset Everything',cancel:'Cancel',build:'Build',engine:'Engine',license:'License',repository:'Repository',navigatePages:'Navigate pages',newProject:'New project',triggerBuild:'Trigger build',saveFile:'Save file',deleteProject:'Delete Project',areYouSure:'Are you sure you want to delete',cannotUndo:'This action cannot be undone.',saveChanges:'Save Changes'},
     modal: {newProject:'New Project',editProject:'Edit Project',deleteProject:'Delete Project',triggerBuild:'Trigger Build',resetAllData:'Reset All Data',cancel:'Cancel',createProject:'Create Project',saveChanges:'Save Changes',delete:'Delete',resetEverything:'Reset Everything'},
-    common: {search:'Search...'}
+    notif: {buildComplete:'Build Complete',deploySuccess:'Deploy Success',errorAlert:'Error Alert',teamUpdates:'Team Updates',weeklyReport:'Weekly Report',pullRequestReviews:'Pull Request Reviews',securityAlerts:'Security Alerts',buildCompleteDesc:'Get notified when a build finishes',deploySuccessDesc:'Alert on successful deployments',errorAlertDesc:'Immediate notification for errors and crashes',teamUpdatesDesc:'Team member activity updates',weeklyReportDesc:'Weekly project summary via email',pullRequestReviewsDesc:'PR review requests and approvals',securityAlertsDesc:'Security vulnerability notifications'},
+    toast: {refreshingAnalytics:'Refreshing analytics data...',analyticsRefreshed:'Analytics data refreshed',projectNameRequired:'Project name is required',selectPlatform:'Select at least one platform',projectCreated:'Project created',projectUpdated:'Project updated',projectDeleted:'Project deleted',buildStarted:'Build started',buildCompleted:'Build completed!',buildFailed:'Build failed',downloadPreparing:'Preparing download',downloadStarted:'download started',retryingBuild:'Retrying build',retryCompleted:'Retry build completed successfully!',projectSettingsSaved:'Project settings saved',ciSaved:'CI/CD configuration saved',variableRemoved:'Variable removed',envSaved:'Environment variables saved',buildHistoryCleared:'Build history cleared',editorReset:'Editor files reset to defaults. Refresh to see changes.',allDataReset:'All data has been reset. Reloading...'},
+    common: {search:'Search...',project:'Project',platform:'Platform'}
   },
   zh: {
     nav: {main:'主菜单',tools:'工具',dashboard:'仪表盘',projects:'项目',editor:'代码编辑器',builds:'构建系统',devices:'设备预览',team:'团队',analytics:'分析',settings:'设置'},
@@ -420,7 +450,9 @@ var I18N = {
     analytics: {totalDownloads:'总下载量',activeUsers:'活跃用户',uptime:'运行时间',avgLoadTime:'平均加载时间',monthUp1:'↑ 本月增长 18%',monthUp2:'↑ 本月增长 24%',up03:'↑ 0.3%',down15:'↓ 快了 15%',downloadsByPlatform:'各平台下载量',userGrowth:'用户增长',performanceMetrics:'性能指标',live:'实时',fcp:'首次内容绘制',tti:'可交互时间',bundleSize:'打包体积',lighthouse:'Lighthouse 评分',errorRate:'错误率',apiLatency:'API 延迟',memoryUsage:'内存使用',cacheHitRate:'缓存命中率',frameRate:'帧率',cpuUsage:'CPU 使用率',dbQueries:'数据库查询',refresh:'↻ 刷新'},
     settings: {projectSettings:'项目设置',ciCdConfig:'CI/CD 配置',envVariables:'环境变量',notifications:'通知设置',dangerZone:'危险区域',about:'关于',keyboardShortcuts:'快捷键',projectName:'项目名称',version:'版本',buildCommand:'构建命令',outputDirectory:'输出目录',saveSettings:'保存设置',ciProvider:'CI 提供商',branch:'分支',autoDeploy:'推送时自动部署',saveCiCd:'保存 CI/CD',key:'键',value:'值',addVariable:'+ 添加变量',saveVariables:'保存变量',clearBuildHistory:'清除构建历史',clearBuildHistoryDesc:'删除所有历史构建记录',clearAll:'全部清除',resetEditorFiles:'重置编辑器文件',resetEditorFilesDesc:'恢复默认代码模板',reset:'重置',resetAllData:'重置所有数据',resetAllDataDesc:'清除所有本地存储数据，重新开始',resetEverything:'重置全部',cancel:'取消',build:'构建',engine:'引擎',license:'许可证',repository:'仓库',navigatePages:'页面导航',newProject:'新建项目',triggerBuild:'触发构建',saveFile:'保存文件',deleteProject:'删除项目',areYouSure:'确定要删除',cannotUndo:'此操作不可撤销。',saveChanges:'保存更改'},
     modal: {newProject:'新建项目',editProject:'编辑项目',deleteProject:'删除项目',triggerBuild:'触发构建',resetAllData:'重置所有数据',cancel:'取消',createProject:'创建项目',saveChanges:'保存更改',delete:'删除',resetEverything:'重置全部'},
-    common: {search:'搜索...'}
+    notif: {buildComplete:'构建完成',deploySuccess:'部署成功',errorAlert:'错误提醒',teamUpdates:'团队动态',weeklyReport:'周报',pullRequestReviews:'拉取请求评审',securityAlerts:'安全提醒',buildCompleteDesc:'构建完成时通知',deploySuccessDesc:'部署成功时提醒',errorAlertDesc:'错误和崩溃立即通知',teamUpdatesDesc:'团队成员活动更新',weeklyReportDesc:'每周通过邮件发送项目摘要',pullRequestReviewsDesc:'PR 评审请求和批准提醒',securityAlertsDesc:'安全漏洞通知'},
+    toast: {refreshingAnalytics:'正在刷新分析数据...',analyticsRefreshed:'分析数据已刷新',projectNameRequired:'项目名称必填',selectPlatform:'请至少选择一个平台',projectCreated:'项目已创建',projectUpdated:'项目已更新',projectDeleted:'项目已删除',buildStarted:'构建已开始',buildCompleted:'构建完成！',buildFailed:'构建失败',downloadPreparing:'正在准备下载',downloadStarted:'下载已开始',retryingBuild:'正在重试构建',retryCompleted:'重试构建成功完成！',projectSettingsSaved:'项目设置已保存',ciSaved:'CI/CD 配置已保存',variableRemoved:'变量已删除',envSaved:'环境变量已保存',buildHistoryCleared:'构建历史已清除',editorReset:'编辑器文件已重置为默认值，刷新后查看。',allDataReset:'所有数据已重置，正在重新加载...'},
+    common: {search:'搜索...',project:'项目',platform:'平台'}
   },
   ja: {
     nav: {main:'メインメニュー',tools:'ツール',dashboard:'ダッシュボード',projects:'プロジェクト',editor:'コードエディタ',builds:'ビルドシステム',devices:'デバイスプレビュー',team:'チーム',analytics:'分析',settings:'設定'},
@@ -434,7 +466,9 @@ var I18N = {
     analytics: {totalDownloads:'総ダウンロード数',activeUsers:'アクティブユーザー',uptime:'稼働率',avgLoadTime:'平均読み込み時間',monthUp1:'↑ 今月 18% 増',monthUp2:'↑ 今月 24% 増',up03:'↑ 0.3%',down15:'↓ 15% 高速化',downloadsByPlatform:'プラットフォーム別ダウンロード',userGrowth:'ユーザー成長',performanceMetrics:'パフォーマンス指標',live:'ライブ',fcp:'First Contentful Paint',tti:'Time to Interactive',bundleSize:'バンドルサイズ',lighthouse:'Lighthouse スコア',errorRate:'エラー率',apiLatency:'API レイテンシ',memoryUsage:'メモリ使用量',cacheHitRate:'キャッシュヒット率',frameRate:'フレームレート',cpuUsage:'CPU 使用率',dbQueries:'DB クエリ',refresh:'↻ 更新'},
     settings: {projectSettings:'プロジェクト設定',ciCdConfig:'CI/CD 設定',envVariables:'環境変数',notifications:'通知設定',dangerZone:'危険ゾーン',about:'について',keyboardShortcuts:'ショートカットキー',projectName:'プロジェクト名',version:'バージョン',buildCommand:'ビルドコマンド',outputDirectory:'出力ディレクトリ',saveSettings:'設定を保存',ciProvider:'CI プロバイダー',branch:'ブランチ',autoDeploy:'プッシュ時に自動デプロイ',saveCiCd:'CI/CD を保存',key:'キー',value:'値',addVariable:'+ 変数を追加',saveVariables:'変数を保存',clearBuildHistory:'ビルド履歴をクリア',clearBuildHistoryDesc:'過去のビルド記録をすべて削除',clearAll:'すべてクリア',resetEditorFiles:'エディタファイルをリセット',resetEditorFilesDesc:'デフォルトのコードテンプレートを復元',reset:'リセット',resetAllData:'すべてのデータをリセット',resetAllDataDesc:'すべてのローカルストレージデータを消去して再開',resetEverything:'すべてリセット',cancel:'キャンセル',build:'ビルド',engine:'エンジン',license:'ライセンス',repository:'リポジトリ',navigatePages:'ページ移動',newProject:'新規プロジェクト',triggerBuild:'ビルドをトリガー',saveFile:'ファイル保存',deleteProject:'プロジェクトを削除',areYouSure:'本当に削除しますか',cannotUndo:'この操作は元に戻せません。',saveChanges:'変更を保存'},
     modal: {newProject:'新規プロジェクト',editProject:'プロジェクトを編集',deleteProject:'プロジェクトを削除',triggerBuild:'ビルドをトリガー',resetAllData:'すべてのデータをリセット',cancel:'キャンセル',createProject:'プロジェクトを作成',saveChanges:'変更を保存',delete:'削除',resetEverything:'すべてリセット'},
-    common: {search:'検索...'}
+    notif: {buildComplete:'ビルド完了',deploySuccess:'デプロイ成功',errorAlert:'エラー通知',teamUpdates:'チーム更新',weeklyReport:'週次レポート',pullRequestReviews:'プルリクエストレビュー',securityAlerts:'セキュリティ通知',buildCompleteDesc:'ビルド完了時に通知',deploySuccessDesc:'デプロイ成功時に通知',errorAlertDesc:'エラーとクラッシュを即時通知',teamUpdatesDesc:'チームメンバーの活動更新',weeklyReportDesc:'週次プロジェクト概要をメール送信',pullRequestReviewsDesc:'PRレビュー依頼と承認通知',securityAlertsDesc:'セキュリティ脆弱性通知'},
+    toast: {refreshingAnalytics:'分析データを更新中...',analyticsRefreshed:'分析データを更新しました',projectNameRequired:'プロジェクト名は必須です',selectPlatform:'少なくとも1つのプラットフォームを選択してください',projectCreated:'プロジェクトを作成しました',projectUpdated:'プロジェクトを更新しました',projectDeleted:'プロジェクトを削除しました',buildStarted:'ビルドを開始しました',buildCompleted:'ビルド完了！',buildFailed:'ビルド失敗',downloadPreparing:'ダウンロードを準備中',downloadStarted:'ダウンロードを開始しました',retryingBuild:'ビルドを再試行中',retryCompleted:'再試行ビルドが成功しました！',projectSettingsSaved:'プロジェクト設定を保存しました',ciSaved:'CI/CD設定を保存しました',variableRemoved:'変数を削除しました',envSaved:'環境変数を保存しました',buildHistoryCleared:'ビルド履歴をクリアしました',editorReset:'エディタファイルをデフォルトに戻しました。更新して確認してください。',allDataReset:'すべてのデータをリセットしました。再読み込み中...'},
+    common: {search:'検索...',project:'プロジェクト',platform:'プラットフォーム'}
   },
   ko: {
     nav: {main:'메인 메뉴',tools:'도구',dashboard:'대시보드',projects:'프로젝트',editor:'코드 에디터',builds:'빌드 시스템',devices:'기기 미리보기',team:'팀',analytics:'분석',settings:'설정'},
@@ -448,7 +482,9 @@ var I18N = {
     analytics: {totalDownloads:'총 다운로드',activeUsers:'활성 사용자',uptime:'가동률',avgLoadTime:'평균 로드 시간',monthUp1:'↑ 이번 달 18% 증가',monthUp2:'↑ 이번 달 24% 증가',up03:'↑ 0.3%',down15:'↓ 15% 단축',downloadsByPlatform:'플랫폼별 다운로드',userGrowth:'사용자 성장',performanceMetrics:'성능 지표',live:'실시간',fcp:'최초 콘텐츠 표시',tti:'상호작용 가능 시간',bundleSize:'번들 크기',lighthouse:'Lighthouse 점수',errorRate:'오류율',apiLatency:'API 지연 시간',memoryUsage:'메모리 사용량',cacheHitRate:'캐시 적중률',frameRate:'프레임 속도',cpuUsage:'CPU 사용량',dbQueries:'DB 쿼리',refresh:'↻ 새로고침'},
     settings: {projectSettings:'프로젝트 설정',ciCdConfig:'CI/CD 설정',envVariables:'환경 변수',notifications:'알림 설정',dangerZone:'위험 구역',about:'정보',keyboardShortcuts:'키보드 단축키',projectName:'프로젝트명',version:'버전',buildCommand:'빌드 명령어',outputDirectory:'출력 디렉토리',saveSettings:'설정 저장',ciProvider:'CI 제공자',branch:'브랜치',autoDeploy:'푸시 시 자동 배포',saveCiCd:'CI/CD 저장',key:'키',value:'값',addVariable:'+ 변수 추가',saveVariables:'변수 저장',clearBuildHistory:'빌드 기록 지우기',clearBuildHistoryDesc:'모든 과거 빌드 기록 제거',clearAll:'전체 지우기',resetEditorFiles:'에디터 파일 초기화',resetEditorFilesDesc:'기본 코드 템플릿 복원',reset:'초기화',resetAllData:'모든 데이터 초기화',resetAllDataDesc:'모든 로컬 저장소 데이터를 지우고 새로 시작',resetEverything:'전체 초기화',cancel:'취소',build:'빌드',engine:'엔진',license:'라이선스',repository:'저장소',navigatePages:'페이지 이동',newProject:'새 프로젝트',triggerBuild:'빌드 트리거',saveFile:'파일 저장',deleteProject:'프로젝트 삭제',areYouSure:'정말 삭제하시겠습니까',cannotUndo:'이 작업은 되돌릴 수 없습니다.',saveChanges:'변경사항 저장'},
     modal: {newProject:'새 프로젝트',editProject:'프로젝트 편집',deleteProject:'프로젝트 삭제',triggerBuild:'빌드 트리거',resetAllData:'모든 데이터 초기화',cancel:'취소',createProject:'프로젝트 생성',saveChanges:'변경사항 저장',delete:'삭제',resetEverything:'전체 초기화'},
-    common: {search:'검색...'}
+    notif: {buildComplete:'빌드 완료',deploySuccess:'배포 성공',errorAlert:'오류 알림',teamUpdates:'팀 업데이트',weeklyReport:'주간 리포트',pullRequestReviews:'풀 리퀘스트 리뷰',securityAlerts:'보안 알림',buildCompleteDesc:'빌드가 완료되면 알림',deploySuccessDesc:'배포 성공 시 알림',errorAlertDesc:'오류와 충돌을 즉시 알림',teamUpdatesDesc:'팀 멤버 활동 업데이트',weeklyReportDesc:'주간 프로젝트 요약 이메일',pullRequestReviewsDesc:'PR 리뷰 요청과 승인 알림',securityAlertsDesc:'보안 취약점 알림'},
+    toast: {refreshingAnalytics:'분석 데이터를 새로고침 중...',analyticsRefreshed:'분석 데이터가 새로고침되었습니다',projectNameRequired:'프로젝트명은 필수입니다',selectPlatform:'플랫폼을 하나 이상 선택하세요',projectCreated:'프로젝트가 생성되었습니다',projectUpdated:'프로젝트가 업데이트되었습니다',projectDeleted:'프로젝트가 삭제되었습니다',buildStarted:'빌드가 시작되었습니다',buildCompleted:'빌드 완료!',buildFailed:'빌드 실패',downloadPreparing:'다운로드 준비 중',downloadStarted:'다운로드가 시작되었습니다',retryingBuild:'빌드 재시도 중',retryCompleted:'재시도 빌드가 성공했습니다!',projectSettingsSaved:'프로젝트 설정이 저장되었습니다',ciSaved:'CI/CD 설정이 저장되었습니다',variableRemoved:'변수가 제거되었습니다',envSaved:'환경 변수가 저장되었습니다',buildHistoryCleared:'빌드 기록이 지워졌습니다',editorReset:'에디터 파일이 기본값으로 초기화되었습니다. 새로고침하여 확인하세요.',allDataReset:'모든 데이터가 초기화되었습니다. 다시 로드 중...'},
+    common: {search:'검색...',project:'프로젝트',platform:'플랫폼'}
   }
 };
 var APP = (function(){
@@ -596,9 +632,9 @@ var APP = (function(){
     var actionsEl = document.getElementById('pageActions');
     actionsEl.innerHTML = '';
     if(page==='projects') actionsEl.innerHTML = '<button class="btn btn-primary" onclick="APP.showNewProject()">'+T("sidebar.newProject")+'</button>';
-    if(page==='editor') actionsEl.innerHTML = '<span style="font-size:11px;color:var(--text3)">Auto-saved</span> <span class="kbd">Ctrl+S</span>';
-    if(page==='build') actionsEl.innerHTML = '<button class="btn btn-primary" onclick="APP.triggerBuild()">▶ Trigger Build</button> <span class="kbd">Ctrl+B</span>';
-    if(page==='analytics') actionsEl.innerHTML = '<button class="btn btn-secondary" onclick="APP.refreshAnalytics()">↻ Refresh</button>';
+    if(page==='editor') actionsEl.innerHTML = '<span style="font-size:11px;color:var(--text3)">'+T("editor.autoSaved")+'</span> <span class="kbd">Ctrl+S</span>';
+    if(page==='build') actionsEl.innerHTML = '<button class="btn btn-primary" onclick="APP.triggerBuild()">'+T("build.triggerBuild")+'</button> <span class="kbd">Ctrl+B</span>';
+    if(page==='analytics') actionsEl.innerHTML = '<button class="btn btn-secondary" onclick="APP.refreshAnalytics()">'+T("analytics.refresh")+'</button>';
     var renderers = {dashboard:renderDashboard,projects:renderProjects,editor:renderEditor,build:renderBuild,devices:renderDevices,team:renderTeam,analytics:renderAnalytics,settings:renderSettings};
     if(renderers[page]) renderers[page]();
   }
@@ -627,7 +663,7 @@ var APP = (function(){
       +'<div class="card"><div class="card-hdr">'+T("dashboard.platformDistribution")+'</div><div class="card-body"><canvas id="pieChart" width="320" height="240"></canvas></div></div>'
       +'</div>'
       +'<div class="section-divider"></div>'
-      +'<div class="section-title">'+T("dashboard.systemStatus")+' <span class="st-badge">Live</span></div>'
+      +'<div class="section-title">'+T("dashboard.systemStatus")+' <span class="st-badge">'+T("dashboard.live")+'</span></div>'
       +'<div id="systemStatus" style="margin-bottom:16px"><div style="color:var(--text3);font-size:11px">'+T("dashboard.loading")+'</div></div>'
       +'<div class="section-divider"></div>'
       +'<div class="section-title">'+T("dashboard.activeProjects")+' <span class="st-badge">'+projects.filter(function(p){return p.status!=='deployed'}).length+''+T("dashboard.active")+'</span></div>'
@@ -696,7 +732,7 @@ var APP = (function(){
       +['all','active','dev','testing','deployed'].map(function(s){return '<div class="device-ctrl-btn'+(s==='all'?' active':'')+'" data-status="'+s+'" onclick="APP.filterByStatus(\''+s+'\')">'+(s==='all'?T('projects.all'):s==='dev'?T('projects.dev'):s==='active'?T('projects.active'):T('projects.'+s))+' <span style="opacity:.6">'+statusCounts[s]+'</span></div>'}).join('')
       +'</div></div>'
       +'<div class="proj-grid" id="projGrid">'
-      +(projects.length===0?'<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-msg">No projects yet</div><div class="empty-hint">Click "New Project" to get started</div></div>'
+      +(projects.length===0?'<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-msg">'+T("projects.noProjects")+'</div><div class="empty-hint">'+T("projects.noProjectsHint")+'</div></div>'
       : projects.map(function(p){
         return renderProjectCard(p);
       }).join(''))
@@ -816,7 +852,7 @@ var APP = (function(){
       +'</div>'
       +'<div>'
       +'<div class="card" style="margin-bottom:16px"><div class="card-hdr">'+T("build.buildLog")+' <span style="font-size:10px;color:var(--text3);font-weight:400">'+T("build.realTime")+'</span></div><div class="card-body"><div class="build-log-box" id="buildLog">'
-      +'[INFO] CrossForge Build System v2.4.1\n[INFO] Node.js v20.11.0 | npm v10.2.4\n[INFO] Flutter 3.22.0 | Dart 3.4.0\n[INFO] ──────────────────────────────\n[INFO] Ready to build\n[INFO] Select a platform or trigger a new build to start.\n[INFO] Build artifacts will appear in the history table below.\n[INFO] ──────────────────────────────\n[WARN] No recent builds found in cache\n[INFO] Tip: Use Ctrl+B to quick-build the last configuration'
+      +'[INFO] CrossForge '+T("nav.builds")+' v2.4.1\n[INFO] Node.js v20.11.0 | npm v10.2.4\n[INFO] Flutter 3.22.0 | Dart 3.4.0\n[INFO] ──────────────────────────────\n[INFO] '+T("build.readyToBuild")+'\n[INFO] '+T("build.noBuildsQueue")+'\n[INFO] ──────────────────────────────'
       +'</div></div></div>'
       +'<div class="card"><div class="card-hdr">'+T("build.buildHistory")+'</div><div class="card-body">'
       +'<div class="filter-tabs">'
@@ -842,10 +878,10 @@ var APP = (function(){
       {name:'Desktop',w:1024,h:768,icon:'🖥️',color:'#3b82f6',type:'Desktop'}
     ];
     el.innerHTML = '<div class="device-controls">'
-      +'<div class="device-ctrl-btn active" onclick="APP.setOrientation(\'portrait\',this)">Portrait</div>'
-      +'<div class="device-ctrl-btn" onclick="APP.setOrientation(\'landscape\',this)">Landscape</div>'
+      +'<div class="device-ctrl-btn active" onclick="APP.setOrientation(\'portrait\',this)">'+T('device.portrait')+'</div>'
+      +'<div class="device-ctrl-btn" onclick="APP.setOrientation(\'landscape\',this)">'+T('device.landscape')+'</div>'
       +'<div style="flex:1"></div>'
-      +'<div class="search-bar"><span style="color:var(--text3);font-size:12px">🔍</span><input type="text" placeholder="Preview URL: localhost:3000" style="width:220px"></div>'
+      +'<div class="search-bar"><span style="color:var(--text3);font-size:12px">🔍</span><input type="text" placeholder="'+T('device.previewUrl')+'" style="width:220px"></div>'
       +'</div>'
       +'<div class="device-grid">'
       + devices.map(function(d){
@@ -855,9 +891,9 @@ var APP = (function(){
         return '<div class="device-frame">'
           +'<div class="frame-hdr"><div class="dots"><span style="background:#ef4444"></span><span style="background:#f59e0b"></span><span style="background:#22c55e"></span></div>'+d.name+' <span style="color:var(--text3);font-weight:400">('+dw+'×'+dh+')</span></div>'
           +'<div class="frame-screen" style="height:'+Math.round(dh*scale+40)+'px">'
-          +'<div class="preview" style="width:'+dw+'px;height:'+dh+'px;transform:scale('+scale+');transform-origin:top left">'
+          +'<div class="preview" style="position:absolute;left:50%;top:20px;width:'+dw+'px;height:'+dh+'px;transform:translateX(-50%) scale('+scale+');transform-origin:top center">'
           +'<div class="preview-nav">'+esc(projects[0].name)+'</div>'
-          +'<div class="preview-hero"><div class="ph-title">Welcome Back</div><div class="ph-btn"></div></div>'
+          +'<div class="preview-hero"><div class="ph-title">'+T('device.welcomeBack')+'</div><div class="ph-btn"></div></div>'
           +'<div class="preview-cards"><div class="pc"></div><div class="pc"></div><div class="pc"></div></div>'
           +'</div></div></div>';
       }).join('')
@@ -915,37 +951,37 @@ var APP = (function(){
   function renderAnalytics(){
     var el = document.getElementById('page-analytics');
     el.innerHTML = '<div class="metrics-grid" style="margin-bottom:20px">'
-      +'<div class="metric-card"><div class="m-val">24.8K</div><div class="m-label">Total Downloads</div><div class="m-change up">↑ 18% this month</div></div>'
-      +'<div class="metric-card"><div class="m-val">12.3K</div><div class="m-label">Active Users</div><div class="m-change up">↑ 24% this month</div></div>'
-      +'<div class="metric-card"><div class="m-val">98.7%</div><div class="m-label">Uptime</div><div class="m-change up">↑ 0.3%</div></div>'
-      +'<div class="metric-card"><div class="m-val">1.2s</div><div class="m-label">Avg Load Time</div><div class="m-change up">↓ 15% faster</div></div>'
+      +'<div class="metric-card"><div class="m-val">24.8K</div><div class="m-label">'+T("analytics.totalDownloads")+'</div><div class="m-change up">'+T("analytics.monthUp1")+'</div></div>'
+      +'<div class="metric-card"><div class="m-val">12.3K</div><div class="m-label">'+T("analytics.activeUsers")+'</div><div class="m-change up">'+T("analytics.monthUp2")+'</div></div>'
+      +'<div class="metric-card"><div class="m-val">98.7%</div><div class="m-label">'+T("analytics.uptime")+'</div><div class="m-change up">'+T("analytics.up03")+'</div></div>'
+      +'<div class="metric-card"><div class="m-val">1.2s</div><div class="m-label">'+T("analytics.avgLoadTime")+'</div><div class="m-change up">'+T("analytics.down15")+'</div></div>'
       +'</div>'
       +'<div class="analytics-grid">'
-      +'<div class="chart-card"><div class="card-hdr">Downloads by Platform</div><div style="padding:14px"><canvas id="barChart" width="480" height="260"></canvas></div></div>'
-      +'<div class="chart-card"><div class="card-hdr">User Growth</div><div style="padding:14px"><canvas id="lineChart" width="480" height="260"></canvas></div></div>'
+      +'<div class="chart-card"><div class="card-hdr">'+T("analytics.downloadsByPlatform")+'</div><div style="padding:14px"><canvas id="barChart" width="480" height="260"></canvas></div></div>'
+      +'<div class="chart-card"><div class="card-hdr">'+T("analytics.userGrowth")+'</div><div style="padding:14px"><canvas id="lineChart" width="480" height="260"></canvas></div></div>'
       +'</div>'
-      +'<div class="section-title" style="margin-top:20px">Performance Metrics <span class="st-badge">Live</span></div>'
+      +'<div class="section-title" style="margin-top:20px">'+T("analytics.performanceMetrics")+' <span class="st-badge">'+T("analytics.live")+'</span></div>'
       +'<div class="perf-grid">'
-      +'<div class="perf-item"><div class="pi-label">First Contentful Paint</div><div class="pi-value">0.8s</div><div class="pi-bar"><div class="pi-fill" style="width:80%;background:var(--green)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Time to Interactive</div><div class="pi-value">1.2s</div><div class="pi-bar"><div class="pi-fill" style="width:72%;background:var(--accent)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Bundle Size</div><div class="pi-value">248 KB</div><div class="pi-bar"><div class="pi-fill" style="width:62%;background:var(--cyan)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Lighthouse Score</div><div class="pi-value">94/100</div><div class="pi-bar"><div class="pi-fill" style="width:94%;background:var(--green)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Error Rate</div><div class="pi-value">0.12%</div><div class="pi-bar"><div class="pi-fill" style="width:8%;background:var(--green)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">API Latency</div><div class="pi-value">45ms</div><div class="pi-bar"><div class="pi-fill" style="width:55%;background:var(--blue)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Memory Usage</div><div class="pi-value">128 MB</div><div class="pi-bar"><div class="pi-fill" style="width:45%;background:var(--orange)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Cache Hit Rate</div><div class="pi-value">92%</div><div class="pi-bar"><div class="pi-fill" style="width:92%;background:var(--green)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">Frame Rate</div><div class="pi-value">60 FPS</div><div class="pi-bar"><div class="pi-fill" style="width:100%;background:var(--green)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">CPU Usage</div><div class="pi-value">23%</div><div class="pi-bar"><div class="pi-fill" style="width:23%;background:var(--cyan)"></div></div></div>'
-      +'<div class="perf-item"><div class="pi-label">DB Queries</div><div class="pi-value">12ms avg</div><div class="pi-bar"><div class="pi-fill" style="width:35%;background:var(--accent)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.fcp")+'</div><div class="pi-value">0.8s</div><div class="pi-bar"><div class="pi-fill" style="width:80%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.tti")+'</div><div class="pi-value">1.2s</div><div class="pi-bar"><div class="pi-fill" style="width:72%;background:var(--accent)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.bundleSize")+'</div><div class="pi-value">248 KB</div><div class="pi-bar"><div class="pi-fill" style="width:62%;background:var(--cyan)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.lighthouse")+'</div><div class="pi-value">94/100</div><div class="pi-bar"><div class="pi-fill" style="width:94%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.errorRate")+'</div><div class="pi-value">0.12%</div><div class="pi-bar"><div class="pi-fill" style="width:8%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.apiLatency")+'</div><div class="pi-value">45ms</div><div class="pi-bar"><div class="pi-fill" style="width:55%;background:var(--blue)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.memoryUsage")+'</div><div class="pi-value">128 MB</div><div class="pi-bar"><div class="pi-fill" style="width:45%;background:var(--orange)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.cacheHitRate")+'</div><div class="pi-value">92%</div><div class="pi-bar"><div class="pi-fill" style="width:92%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.frameRate")+'</div><div class="pi-value">60 FPS</div><div class="pi-bar"><div class="pi-fill" style="width:100%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.cpuUsage")+'</div><div class="pi-value">23%</div><div class="pi-bar"><div class="pi-fill" style="width:23%;background:var(--cyan)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">'+T("analytics.dbQueries")+'</div><div class="pi-value">12ms avg</div><div class="pi-bar"><div class="pi-fill" style="width:35%;background:var(--accent)"></div></div></div>'
       +'</div>';
     setTimeout(function(){ drawBarChart(); drawLineChart(); }, 50);
   }
 
   function refreshAnalytics(){
-    toast('Refreshing analytics data...','info');
+    toast(T('toast.refreshingAnalytics'),'info');
     setTimeout(function(){
       renderAnalytics();
-      toast('Analytics data refreshed','success');
+      toast(T('toast.analyticsRefreshed'),'success');
     }, 800);
   }
 
@@ -1028,79 +1064,69 @@ var APP = (function(){
     var el = document.getElementById('page-settings');
     var s = settings;
     el.innerHTML = ''
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Project Settings <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
-      +'<div class="form-row"><div class="form-group"><label>Project Name</label><input type="text" id="s_projName" value="'+esc(s.projectName)+'"></div><div class="form-group"><label>Version</label><input type="text" value="2.1.0" disabled></div></div>'
-      +'<div class="form-row"><div class="form-group"><label>Build Command</label><input type="text" id="s_buildCmd" value="'+esc(s.buildCmd)+'"></div><div class="form-group"><label>Output Directory</label><input type="text" id="s_outputDir" value="'+esc(s.outputDir)+'"></div></div>'
-      +'<button class="btn btn-primary" onclick="APP.saveProjectSettings()">Save Settings</button>'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.projectSettings")+' <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="form-row"><div class="form-group"><label>'+T("settings.projectName")+'</label><input type="text" id="s_projName" value="'+esc(s.projectName)+'"></div><div class="form-group"><label>'+T("settings.version")+'</label><input type="text" value="2.1.0" disabled></div></div>'
+      +'<div class="form-row"><div class="form-group"><label>'+T("settings.buildCommand")+'</label><input type="text" id="s_buildCmd" value="'+esc(s.buildCmd)+'"></div><div class="form-group"><label>'+T("settings.outputDirectory")+'</label><input type="text" id="s_outputDir" value="'+esc(s.outputDir)+'"></div></div>'
+      +'<button class="btn btn-primary" onclick="APP.saveProjectSettings()">'+T("settings.saveSettings")+'</button>'
       +'</div></div>'
 
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">CI/CD Configuration <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
-      +'<div class="form-row"><div class="form-group"><label>CI Provider</label><select id="s_ciProvider"><option value="github"'+(s.ciProvider==='github'?' selected':'')+'>GitHub Actions</option><option value="gitlab"'+(s.ciProvider==='gitlab'?' selected':'')+'>GitLab CI</option><option value="jenkins"'+(s.ciProvider==='jenkins'?' selected':'')+'>Jenkins</option><option value="circle"'+(s.ciProvider==='circle'?' selected':'')+'>CircleCI</option></select></div>'
-      +'<div class="form-group"><label>Branch</label><input type="text" id="s_branch" value="'+esc(s.branch)+'"></div></div>'
-      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="font-size:12px;color:var(--text2)">Auto-deploy on push</span><div class="toggle'+(s.autoDeploy?' on':'')+'" id="s_autoDeploy" onclick="this.classList.toggle(\'on\')"></div></div>'
-      +'<button class="btn btn-primary" onclick="APP.saveCIConfig()">Save CI/CD</button>'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.ciCdConfig")+' <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="form-row"><div class="form-group"><label>'+T("settings.ciProvider")+'</label><select id="s_ciProvider"><option value="github"'+(s.ciProvider==='github'?' selected':'')+'>GitHub Actions</option><option value="gitlab"'+(s.ciProvider==='gitlab'?' selected':'')+'>GitLab CI</option><option value="jenkins"'+(s.ciProvider==='jenkins'?' selected':'')+'>Jenkins</option><option value="circle"'+(s.ciProvider==='circle'?' selected':'')+'>CircleCI</option></select></div>'
+      +'<div class="form-group"><label>'+T("settings.branch")+'</label><input type="text" id="s_branch" value="'+esc(s.branch)+'"></div></div>'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="font-size:12px;color:var(--text2)">'+T("settings.autoDeploy")+'</span><div class="toggle'+(s.autoDeploy?' on':'')+'" id="s_autoDeploy" onclick="this.classList.toggle(\'on\')"></div></div>'
+      +'<button class="btn btn-primary" onclick="APP.saveCIConfig()">'+T("settings.saveCiCd")+'</button>'
       +'</div></div>'
 
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Environment Variables <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
-      +'<table class="env-table"><thead><tr><th>Key</th><th>Value</th><th></th></tr></thead><tbody id="envBody">'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.envVariables")+' <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<table class="env-table"><thead><tr><th>'+T("settings.key")+'</th><th>'+T("settings.value")+'</th><th></th></tr></thead><tbody id="envBody">'
       + s.envVars.map(function(ev,i){return '<tr><td><input value="'+esc(ev.key)+'" data-idx="'+i+'" data-field="key"></td><td><input value="'+esc(ev.value)+'" data-idx="'+i+'" data-field="value"></td><td><button class="btn btn-sm btn-danger" onclick="APP.removeEnv('+i+')">✕</button></td></tr>'}).join('')
       +'</tbody></table>'
-      +'<button class="btn btn-secondary" style="margin-top:10px" onclick="APP.addEnv()">+ Add Variable</button>'
-      +'<button class="btn btn-primary" style="margin-top:10px;margin-left:8px" onclick="APP.saveEnvVars()">Save Variables</button>'
+      +'<button class="btn btn-secondary" style="margin-top:10px" onclick="APP.addEnv()">'+T("settings.addVariable")+'</button>'
+      +'<button class="btn btn-primary" style="margin-top:10px;margin-left:8px" onclick="APP.saveEnvVars()">'+T("settings.saveVariables")+'</button>'
       +'</div></div>'
 
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Notifications <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.notifications")+' <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
       + Object.keys(s.notifications).map(function(k){
-        var label = k.replace(/([A-Z])/g,' $1').replace(/^./,function(c){return c.toUpperCase()});
-        var descs = {
-          buildComplete:'Get notified when a build finishes',
-          deploySuccess:'Alert on successful deployments',
-          errorAlert:'Immediate notification for errors and crashes',
-          teamUpdates:'Team member activity updates',
-          weeklyReport:'Weekly project summary via email',
-          pullRequestReviews:'PR review requests and approvals',
-          securityAlerts:'Security vulnerability notifications'
-        };
-        return '<div class="notif-row"><div><div class="n-label">'+label+'</div><div class="n-desc">'+(descs[k]||'')+'</div></div><div class="toggle'+(s.notifications[k]?' on':'')+'" data-notif="'+k+'" onclick="APP.toggleNotif(this,\''+k+'\')"></div></div>';
+        return '<div class="notif-row"><div><div class="n-label">'+T('notif.'+k)+'</div><div class="n-desc">'+T('notif.'+k+'Desc')+'</div></div><div class="toggle'+(s.notifications[k]?' on':'')+'" data-notif="'+k+'" onclick="APP.toggleNotif(this,\''+k+'\')"></div></div>';
       }).join('')
       +'</div></div>'
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Danger Zone <span style="color:var(--red)">⚠</span></div><div class="sec-body">'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.dangerZone")+' <span style="color:var(--red)">⚠</span></div><div class="sec-body">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,80,.3)">'
-      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">Clear Build History</div><div style="font-size:10px;color:var(--text3)">Remove all past build records</div></div>'
-      +'<button class="btn btn-sm btn-danger" onclick="APP.clearBuildHistory()">Clear All</button></div>'
+      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">'+T("settings.clearBuildHistory")+'</div><div style="font-size:10px;color:var(--text3)">'+T("settings.clearBuildHistoryDesc")+'</div></div>'
+      +'<button class="btn btn-sm btn-danger" onclick="APP.clearBuildHistory()">'+T("settings.clearAll")+'</button></div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,80,.3)">'
-      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">Reset Editor Files</div><div style="font-size:10px;color:var(--text3)">Restore default code templates</div></div>'
-      +'<button class="btn btn-sm btn-danger" onclick="APP.resetEditor()">Reset</button></div>'
+      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">'+T("settings.resetEditorFiles")+'</div><div style="font-size:10px;color:var(--text3)">'+T("settings.resetEditorFilesDesc")+'</div></div>'
+      +'<button class="btn btn-sm btn-danger" onclick="APP.resetEditor()">'+T("settings.reset")+'</button></div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">'
-      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">Reset All Data</div><div style="font-size:10px;color:var(--text3)">Clear all localStorage data and start fresh</div></div>'
-      +'<button class="btn btn-sm btn-danger" onclick="APP.resetAllData()">Reset Everything</button></div>'
+      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">'+T("settings.resetAllData")+'</div><div style="font-size:10px;color:var(--text3)">'+T("settings.resetAllDataDesc")+'</div></div>'
+      +'<button class="btn btn-sm btn-danger" onclick="APP.resetAllData()">'+T("settings.resetEverything")+'</button></div>'
       +'</div></div>'
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">About <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.about")+' <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
       +'<div style="display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:12px">'
-      +'<span style="color:var(--text3)">Version</span><span>CrossForge Studio v2.4.1</span>'
-      +'<span style="color:var(--text3)">Build</span><span>2024.06.15-stable</span>'
-      +'<span style="color:var(--text3)">Engine</span><span>Chromium v126 / Flutter 3.22</span>'
-      +'<span style="color:var(--text3)">License</span><span>MIT License</span>'
-      +'<span style="color:var(--text3)">Repository</span><span style="color:var(--accent)">github.com/crossforge/studio</span>'
+      +'<span style="color:var(--text3)">'+T("settings.version")+'</span><span>CrossForge Studio v2.4.1</span>'
+      +'<span style="color:var(--text3)">'+T("settings.build")+'</span><span>2024.06.15-stable</span>'
+      +'<span style="color:var(--text3)">'+T("settings.engine")+'</span><span>Chromium v126 / Flutter 3.22</span>'
+      +'<span style="color:var(--text3)">'+T("settings.license")+'</span><span>MIT License</span>'
+      +'<span style="color:var(--text3)">'+T("settings.repository")+'</span><span style="color:var(--accent)">github.com/crossforge/studio</span>'
       +'</div></div></div>'
-      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Keyboard Shortcuts <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+T("settings.keyboardShortcuts")+' <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
       +'<div class="shortcuts-grid">'
-      +'<div class="shortcut-item"><span>Navigate pages</span><span><span class="kbd">Ctrl</span>+<span class="kbd">1-8</span></span></div>'
-      +'<div class="shortcut-item"><span>New project</span><span><span class="kbd">Ctrl</span>+<span class="kbd">N</span></span></div>'
-      +'<div class="shortcut-item"><span>Trigger build</span><span><span class="kbd">Ctrl</span>+<span class="kbd">B</span></span></div>'
-      +'<div class="shortcut-item"><span>Save file</span><span><span class="kbd">Ctrl</span>+<span class="kbd">S</span></span></div>'
+      +'<div class="shortcut-item"><span>'+T("settings.navigatePages")+'</span><span><span class="kbd">Ctrl</span>+<span class="kbd">1-8</span></span></div>'
+      +'<div class="shortcut-item"><span>'+T("settings.newProject")+'</span><span><span class="kbd">Ctrl</span>+<span class="kbd">N</span></span></div>'
+      +'<div class="shortcut-item"><span>'+T("settings.triggerBuild")+'</span><span><span class="kbd">Ctrl</span>+<span class="kbd">B</span></span></div>'
+      +'<div class="shortcut-item"><span>'+T("settings.saveFile")+'</span><span><span class="kbd">Ctrl</span>+<span class="kbd">S</span></span></div>'
       +'</div></div></div>';
   }
 
   function showNewProject(){
-    var body = '<div class="form-group"><label>Project Name</label><input type="text" id="np_name" placeholder="My Project"></div>'
-      +'<div class="form-group"><label>Description</label><textarea id="np_desc" placeholder="Describe your project..."></textarea></div>'
-      +'<div class="form-row"><div class="form-group"><label>Platforms</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+    var body = '<div class="form-group"><label>'+T("projects.name")+'</label><input type="text" id="np_name" placeholder="My Project"></div>'
+      +'<div class="form-group"><label>'+T("projects.description")+'</label><textarea id="np_desc" placeholder="'+T("projects.description")+'"></textarea></div>'
+      +'<div class="form-row"><div class="form-group"><label>'+T("projects.platforms")+'</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
       +['iOS','Android','Web','Desktop'].map(function(p){return '<label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" value="'+p+'" class="np-platform"> '+p+'</label>'}).join('')
-      +'</div></div><div class="form-group"><label>Status</label><select id="np_status"><option value="dev">Development</option><option value="active">Active</option><option value="testing">Testing</option><option value="deployed">Deployed</option></select></div></div>'
-      +'<div class="form-row"><div class="form-group"><label>Version</label><input type="text" id="np_version" placeholder="1.0.0"></div><div class="form-group"><label>Team (comma separated)</label><input type="text" id="np_team" placeholder="Alice, Bob"></div></div>';
-    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.saveNewProject()">Create Project</button>';
-    openModal('New Project', body, ft);
+      +'</div></div><div class="form-group"><label>'+T("projects.status")+'</label><select id="np_status"><option value="dev">'+T("projects.dev")+'</option><option value="active">'+T("projects.active")+'</option><option value="testing">'+T("projects.testing")+'</option><option value="deployed">'+T("projects.deployed")+'</option></select></div></div>'
+      +'<div class="form-row"><div class="form-group"><label>'+T("projects.version")+'</label><input type="text" id="np_version" placeholder="1.0.0"></div><div class="form-group"><label>'+T("projects.team")+'</label><input type="text" id="np_team" placeholder="Alice, Bob"></div></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">'+T("modal.cancel")+'</button><button class="btn btn-primary" onclick="APP.saveNewProject()">'+T("modal.createProject")+'</button>';
+    openModal(T('modal.newProject'), body, ft);
   }
 
   function saveNewProject(){
@@ -1111,8 +1137,8 @@ var APP = (function(){
     var teamInput = document.getElementById('np_team').value.trim();
     var platforms = [];
     document.querySelectorAll('.np-platform:checked').forEach(function(cb){ platforms.push(cb.value) });
-    if(!name){ toast('Project name is required','error'); return }
-    if(platforms.length===0){ toast('Select at least one platform','error'); return }
+    if(!name){ toast(T('toast.projectNameRequired'),'error'); return }
+    if(platforms.length===0){ toast(T('toast.selectPlatform'),'error'); return }
     var teamList = teamInput ? teamInput.split(',').map(function(s){return s.trim()}).filter(Boolean) : ['Alice'];
     projects.push({
       id: nextProjId++, name:name, desc:desc, platforms:platforms, status:status,
@@ -1121,20 +1147,20 @@ var APP = (function(){
     save('cf_projects', projects);
     closeModal();
     if(currentPage==='projects') renderProjects();
-    toast('Project "'+name+'" created','success');
+    toast(T('toast.projectCreated')+': '+name,'success');
   }
 
   function editProject(id){
     var p = projects.find(function(x){return x.id===id});
     if(!p) return;
-    var body = '<div class="form-group"><label>Project Name</label><input type="text" id="ep_name" value="'+esc(p.name)+'"></div>'
-      +'<div class="form-group"><label>Description</label><textarea id="ep_desc">'+esc(p.desc)+'</textarea></div>'
-      +'<div class="form-row"><div class="form-group"><label>Platforms</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+    var body = '<div class="form-group"><label>'+T("projects.name")+'</label><input type="text" id="ep_name" value="'+esc(p.name)+'"></div>'
+      +'<div class="form-group"><label>'+T("projects.description")+'</label><textarea id="ep_desc">'+esc(p.desc)+'</textarea></div>'
+      +'<div class="form-row"><div class="form-group"><label>'+T("projects.platforms")+'</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
       +['iOS','Android','Web','Desktop'].map(function(pl){return '<label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" value="'+pl+'" class="ep-platform"'+(p.platforms.indexOf(pl)!==-1?' checked':'')+'> '+pl+'</label>'}).join('')
-      +'</div></div><div class="form-group"><label>Status</label><select id="ep_status"><option value="dev"'+(p.status==='dev'?' selected':'')+'>Development</option><option value="active"'+(p.status==='active'?' selected':'')+'>Active</option><option value="testing"'+(p.status==='testing'?' selected':'')+'>Testing</option><option value="deployed"'+(p.status==='deployed'?' selected':'')+'>Deployed</option></select></div></div>'
-      +'<div class="form-row"><div class="form-group"><label>Version</label><input type="text" id="ep_version" value="'+esc(p.version)+'"></div><div class="form-group"><label>Progress (%)</label><input type="number" id="ep_progress" value="'+p.progress+'" min="0" max="100"></div></div>';
-    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.saveEditProject('+id+')">Save Changes</button>';
-    openModal('Edit Project', body, ft);
+      +'</div></div><div class="form-group"><label>'+T("projects.status")+'</label><select id="ep_status"><option value="dev"'+(p.status==='dev'?' selected':'')+'>'+T("projects.dev")+'</option><option value="active"'+(p.status==='active'?' selected':'')+'>'+T("projects.active")+'</option><option value="testing"'+(p.status==='testing'?' selected':'')+'>'+T("projects.testing")+'</option><option value="deployed"'+(p.status==='deployed'?' selected':'')+'>'+T("projects.deployed")+'</option></select></div></div>'
+      +'<div class="form-row"><div class="form-group"><label>'+T("projects.version")+'</label><input type="text" id="ep_version" value="'+esc(p.version)+'"></div><div class="form-group"><label>'+T("projects.progress")+' (%)</label><input type="number" id="ep_progress" value="'+p.progress+'" min="0" max="100"></div></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">'+T("modal.cancel")+'</button><button class="btn btn-primary" onclick="APP.saveEditProject('+id+')">'+T("modal.saveChanges")+'</button>';
+    openModal(T('modal.editProject'), body, ft);
   }
 
   function saveEditProject(id){
@@ -1150,15 +1176,15 @@ var APP = (function(){
     save('cf_projects', projects);
     closeModal();
     renderProjects();
-    toast('Project updated','success');
+    toast(T('toast.projectUpdated'),'success');
   }
 
   function deleteProject(id){
     var p = projects.find(function(x){return x.id===id});
     if(!p) return;
-    var body = '<p style="font-size:13px;color:var(--text2)">Are you sure you want to delete <strong>'+esc(p.name)+'</strong>? This action cannot be undone.</p>';
-    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-danger" onclick="APP.confirmDeleteProject('+id+')">Delete</button>';
-    openModal('Delete Project', body, ft);
+    var body = '<p style="font-size:13px;color:var(--text2)">'+T("projects.areYouSure")+' <strong>'+esc(p.name)+'</strong>? '+T("projects.cannotUndo")+'</p>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">'+T("modal.cancel")+'</button><button class="btn btn-danger" onclick="APP.confirmDeleteProject('+id+')">'+T("modal.delete")+'</button>';
+    openModal(T('modal.deleteProject'), body, ft);
   }
 
   function confirmDeleteProject(id){
@@ -1166,23 +1192,23 @@ var APP = (function(){
     save('cf_projects', projects);
     closeModal();
     renderProjects();
-    toast('Project deleted','success');
+    toast(T('toast.projectDeleted'),'success');
   }
 
   function triggerBuild(){
-    var body = '<div class="form-row"><div class="form-group"><label>Project</label><select id="tb_project">'
+    var body = '<div class="form-row"><div class="form-group"><label>'+T("common.project")+'</label><select id="tb_project">'
       + projects.map(function(p){return '<option value="'+esc(p.name)+'">'+esc(p.name)+'</option>'}).join('')
-      +'</select></div><div class="form-group"><label>Platform</label><select id="tb_platform"><option value="iOS">iOS</option><option value="Android">Android</option><option value="Web">Web</option><option value="Desktop">Desktop</option></select></div></div>';
-    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.startBuild()">Start Build</button>';
-    openModal('Trigger Build', body, ft);
+      +'</select></div><div class="form-group"><label>'+T("common.platform")+'</label><select id="tb_platform"><option value="iOS">iOS</option><option value="Android">Android</option><option value="Web">Web</option><option value="Desktop">Desktop</option></select></div></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">'+T("build.cancel")+'</button><button class="btn btn-primary" onclick="APP.startBuild()">'+T("build.startBuild")+'</button>';
+    openModal(T('modal.triggerBuild'), body, ft);
   }
 
   function triggerBuildFor(platform){
-    var body = '<div class="form-group"><label>Project</label><select id="tb_project">'
+    var body = '<div class="form-group"><label>'+T("common.project")+'</label><select id="tb_project">'
       + projects.map(function(p){return '<option value="'+esc(p.name)+'">'+esc(p.name)+'</option>'}).join('')
       +'</select></div>';
-    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.startBuild(\''+platform+'\')">Build for '+platform+'</button>';
-    openModal('Build for '+platform, body, ft);
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">'+T("build.cancel")+'</button><button class="btn btn-primary" onclick="APP.startBuild(\''+platform+'\')">'+T("build.buildFor")+' '+platform+'</button>';
+    openModal(T('build.buildFor')+' '+platform, body, ft);
   }
 
   function startBuild(platformOverride){
@@ -1195,11 +1221,11 @@ var APP = (function(){
       if(spinner) spinner.classList.remove('active');
       var build = {id:Date.now(),project:project,platform:platform,progress:0,status:'running',time:Date.now()};
     buildQueue.push(build);
-    toast('Build started for '+project+' ('+platform+')','info');
+    toast(T('toast.buildStarted')+': '+project+' ('+platform+')','info');
     if(currentPage==='build') renderBuild();
 
     var logEl = document.getElementById('buildLog');
-    var logs = '[INFO] CrossForge Build System v2.4.1\n'
+    var logs = '[INFO] CrossForge '+T("nav.builds")+' v2.4.1\n'
       +'[INFO] Node.js v20.11.0 | npm v10.2.4\n'
       +'[INFO] Flutter 3.22.0 | Dart 3.4.0\n'
       +'[INFO] ──────────────────────────────\n'
@@ -1240,7 +1266,7 @@ var APP = (function(){
         save('cf_builds', buildHistory);
         buildQueue = buildQueue.filter(function(b){return b.id!==build.id});
         if(currentPage==='build') renderBuild();
-        toast(success?'Build completed!':'Build failed', success?'success':'error');
+        toast(success?T('toast.buildCompleted'):T('toast.buildFailed'), success?'success':'error');
       }
     }, 600);
     }, 1500);
@@ -1252,14 +1278,14 @@ var APP = (function(){
   }
 
   function simulateDownload(project, platform){
-    toast('Preparing download for '+project+' ('+platform+')...','info');
+    toast(T('toast.downloadPreparing')+': '+project+' ('+platform+')...','info');
     setTimeout(function(){
-      toast(project+'-'+platform.toLowerCase()+'.zip download started','success');
+      toast(project+'-'+platform.toLowerCase()+'.zip '+T('toast.downloadStarted'),'success');
     }, 1200);
   }
 
   function retryBuild(project, platform){
-    toast('Retrying build for '+project+' ('+platform+')...','info');
+    toast(T('toast.retryingBuild')+': '+project+' ('+platform+')...','info');
     var build = {id:Date.now(),project:project,platform:platform,progress:0,status:'running',time:Date.now()};
     buildQueue.push(build);
     if(currentPage==='build') renderBuild();
@@ -1281,7 +1307,7 @@ var APP = (function(){
         save('cf_builds', buildHistory);
         buildQueue = buildQueue.filter(function(b){return b.id!==build.id});
         if(currentPage==='build') renderBuild();
-        toast('Retry build completed successfully!','success');
+        toast(T('toast.retryCompleted'),'success');
       }
     }, 700);
   }
@@ -1291,7 +1317,7 @@ var APP = (function(){
     settings.buildCmd = document.getElementById('s_buildCmd').value;
     settings.outputDir = document.getElementById('s_outputDir').value;
     save('cf_settings', settings);
-    toast('Project settings saved','success');
+    toast(T('toast.projectSettingsSaved'),'success');
   }
 
   function saveCIConfig(){
@@ -1299,7 +1325,7 @@ var APP = (function(){
     settings.branch = document.getElementById('s_branch').value;
     settings.autoDeploy = document.getElementById('s_autoDeploy').classList.contains('on');
     save('cf_settings', settings);
-    toast('CI/CD configuration saved','success');
+    toast(T('toast.ciSaved'),'success');
   }
 
   function addEnv(){
@@ -1312,7 +1338,7 @@ var APP = (function(){
     settings.envVars.splice(idx,1);
     save('cf_settings', settings);
     renderSettings();
-    toast('Variable removed','success');
+    toast(T('toast.variableRemoved'),'success');
   }
 
   function saveEnvVars(){
@@ -1325,7 +1351,7 @@ var APP = (function(){
       }
     });
     save('cf_settings', settings);
-    toast('Environment variables saved','success');
+    toast(T('toast.envSaved'),'success');
   }
 
   function toggleNotif(el, key){
@@ -1338,19 +1364,19 @@ var APP = (function(){
     buildHistory = [];
     save('cf_builds', buildHistory);
     if(currentPage==='build') renderBuild();
-    toast('Build history cleared','success');
+    toast(T('toast.buildHistoryCleared'),'success');
   }
 
   function resetEditor(){
     localStorage.removeItem('cf_editor');
     editorFiles = null;
-    toast('Editor files reset to defaults. Refresh to see changes.','info');
+    toast(T('toast.editorReset'),'info');
   }
 
   function resetAllData(){
-    var body = '<p style="font-size:13px;color:var(--text2)">This will permanently delete all saved data including projects, builds, editor files, and settings. Are you absolutely sure?</p>';
-    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-danger" onclick="APP.confirmResetAll()">Reset Everything</button>';
-    openModal('Reset All Data', body, ft);
+    var body = '<p style="font-size:13px;color:var(--text2)">'+T("settings.resetAllDataDesc")+' '+T("projects.cannotUndo")+'</p>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">'+T("modal.cancel")+'</button><button class="btn btn-danger" onclick="APP.confirmResetAll()">'+T("modal.resetEverything")+'</button>';
+    openModal(T('modal.resetAllData'), body, ft);
   }
 
   function confirmResetAll(){
@@ -1359,7 +1385,7 @@ var APP = (function(){
     localStorage.removeItem('cf_editor');
     localStorage.removeItem('cf_settings');
     closeModal();
-    toast('All data has been reset. Reloading...','success');
+    toast(T('toast.allDataReset'),'success');
     setTimeout(function(){ location.reload() }, 1500);
   }
 
@@ -1380,12 +1406,13 @@ var APP = (function(){
       if(key==='8'){ e.preventDefault(); switchPage('settings') }
       if(key==='b' && !e.shiftKey){ e.preventDefault(); triggerBuild() }
       if(key==='n'){ e.preventDefault(); showNewProject() }
-      if(key==='s'){ e.preventDefault(); if(currentPage==='editor'){ toast('File saved','success') } }
+      if(key==='s'){ e.preventDefault(); if(currentPage==='editor'){ toast(T('settings.saveFile'),'success') } }
     }
   });
 
   var _spinnerText=document.querySelector('#buildSpinner .spinner-text');
   if(_spinnerText)_spinnerText.textContent=T('build.preparingBuild');
+  applyStaticI18n();
   renderDashboard();
 
   return {
@@ -1406,7 +1433,10 @@ var APP = (function(){
     switchPage:switchPage
   };
 })();
+renderLangSwitcher();
 // CrossForge Studio v2.4.1 - Cross-Platform App Development Tool
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

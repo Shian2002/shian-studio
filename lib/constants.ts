@@ -7,11 +7,9 @@ export const BRAND = {
 
 export const NAV_LINKS = [
   { label: "Services", href: "/services" },
-  { label: "Case Studies", href: "/case-studies" },
+  { label: "Portfolio", href: "/case-studies" },
   { label: "Blog", href: "/blog" },
-  { label: "About", href: "#about" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 export const PRICING_TIERS = [
@@ -191,6 +189,18 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
     priority: 2,
   },
   {
+    id: "ai-image-gen",
+    title: "AI Image Generation Studio",
+    description: "Prompt-based image generation, editing workflow, and style presets",
+    tags: ["AI", "Image", "Prompt"],
+    tagColors: ["#bd10e0", "#4a9eff", "#f5a623"],
+    category: "web",
+    mediaType: "image",
+    image: "/portfolio/ai-image-gen.jpg",
+    demoUrl: "/demos/ai-image-gen.html",
+    priority: 3,
+  },
+  {
     id: "education-platform",
     title: "Online Education Platform",
     description: "Course marketplace with video learning, paths, and certifications",
@@ -208,7 +218,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["5-week delivery from concept to launch", "Video streaming with adaptive quality", "Stripe integration with 3 pricing tiers", "Certificate generation on completion", "Instructor analytics dashboard"],
       testimonial: { text: "From our first call to launch in 5 weeks. The platform handles video, payments, and certificates — everything we needed to start selling courses.", name: "David K.", role: "Founder, EduTech Startup" },
     },
-    priority: 3,
+    priority: 4,
   },
   {
     id: "ecommerce-admin",
@@ -228,7 +238,19 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["70% faster product management", "Real-time order tracking dashboard", "Batch operations for 100+ products", "Sales analytics with trend detection", "Role-based access for team members"],
       testimonial: { text: "Our operations team went from spending hours on spreadsheets to managing everything in one dashboard. Batch operations alone save us 10+ hours per week.", name: "Jennifer W.", role: "Operations Lead, Retail Brand" },
     },
-    priority: 4,
+    priority: 5,
+  },
+  {
+    id: "project-management",
+    title: "Project Management Workspace",
+    description: "Kanban tasks, team planning, timelines, and delivery tracking",
+    tags: ["SaaS", "Kanban", "Team"],
+    tagColors: ["#4a9eff", "#50e3c2", "#bd10e0"],
+    category: "web",
+    mediaType: "image",
+    image: "/portfolio/project-management.jpg",
+    demoUrl: "/demos/project-management.html",
+    priority: 6,
   },
   {
     id: "iot-dashboard",
@@ -248,7 +270,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["Real-time data refresh < 500ms", "1000+ sensors monitored simultaneously", "Configurable alert thresholds", "Historical trend analysis with date range filtering", "99.9% uptime since deployment"],
       testimonial: { text: "We can finally see our sensor data in real-time. The alert system alone has prevented 3 potential equipment failures in the first month.", name: "Tom H.", role: "VP Engineering, IoT Company" },
     },
-    priority: 5,
+    priority: 7,
   },
   {
     id: "real-estate",
@@ -268,7 +290,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["Interactive map with clustered property markers", "Advanced search filters with instant results", "Agent profiles with listing management", "Geospatial query support via PostGIS", "Responsive design for mobile and desktop"],
       testimonial: { text: "A comprehensive demo that showcases the full potential of a map-driven property search experience.", name: "Internal Demo", role: "Showcase Project" },
     },
-    priority: 6,
+    priority: 8,
   },
   {
     id: "speed-coding",
@@ -288,7 +310,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["Concept to deployed app in under 2 hours", "AI-generated codebase with full test coverage", "Automated CI/CD pipeline setup", "Live demo with real-time feature iteration", "Documented prompt-to-production workflow"],
       testimonial: { text: "Showcases the power of AI-assisted development — from a blank canvas to a live application at unprecedented speed.", name: "Internal Demo", role: "Showcase Project" },
     },
-    priority: 7,
+    priority: 9,
   },
   {
     id: "wechat-miniprogram",
@@ -308,7 +330,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["Complete product catalog with category browsing", "Shopping cart with real-time price calculation", "WeChat Pay integration for seamless checkout", "Order management with status tracking", "WeChat login and user profile integration"],
       testimonial: { text: "A full-featured e-commerce demo that demonstrates the complete WeChat Mini Program shopping experience from browse to buy.", name: "Internal Demo", role: "Showcase Project" },
     },
-    priority: 8,
+    priority: 10,
   },
   {
     id: "cross-platform",
@@ -328,7 +350,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["Single codebase deployed to 4 platforms", "Platform-specific UI adaptations", "Shared business logic with native-like performance", "Mini Program, H5, iOS, and Android builds", "Consistent user experience across all platforms"],
       testimonial: { text: "Proves that cross-platform development doesn't have to mean compromising on quality — one codebase, four platforms, native feel.", name: "Internal Demo", role: "Showcase Project" },
     },
-    priority: 9,
+    priority: 11,
   },
   {
     id: "landing-page",
@@ -348,7 +370,7 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
       results: ["Lighthouse score 95+ across Performance, Accessibility, SEO", "Server-side rendered with Next.js for instant load", "Mobile-first responsive design", "Structured data and Open Graph meta tags", "Optimized Core Web Vitals (LCP, FID, CLS)"],
       testimonial: { text: "A demonstration of what's possible when performance optimization and conversion-focused design come together.", name: "Internal Demo", role: "Showcase Project" },
     },
-    priority: 10,
+    priority: 12,
   },
 ];
 

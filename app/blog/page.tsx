@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { BLOG_POSTS } from "@/lib/blog-data";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ScrollProgress from "@/components/ScrollProgress";
+import BackToTop from "@/components/BackToTop";
+import BlogListClient from "@/components/BlogListClient";
+import TranslationErrorBoundary from "@/components/TranslationErrorBoundary";
 
 export const metadata: Metadata = {
-  title: "Blog — MVP & SaaS Development Insights",
+  title: "Blog - MVP & SaaS Development Insights",
   description:
     "Practical guides on MVP development costs, timelines, and real case studies from SHIAN Studio. Learn how startups and SMBs build and launch products fast.",
   openGraph: {
-    title: "SHIAN Studio Blog — MVP & SaaS Development Insights",
+    title: "SHIAN Studio Blog - MVP & SaaS Development Insights",
     description:
       "Practical guides on MVP development costs, timelines, and real case studies from SHIAN Studio.",
     type: "website",
@@ -16,79 +20,14 @@ export const metadata: Metadata = {
 
 export default function BlogListPage() {
   return (
-    <div className="min-h-screen bg-th-bg">
-      {/* Breadcrumb */}
-      <nav className="max-w-4xl mx-auto px-6 pt-8" aria-label="Breadcrumb">
-        <ol className="flex items-center gap-2 text-sm text-th-muted">
-          <li>
-            <Link href="/" className="hover:text-accent transition-colors">
-              Home
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li className="text-th-text font-medium">Blog</li>
-        </ol>
-      </nav>
-
-      {/* Hero */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-th-text mb-4">
-            Blog
-          </h1>
-          <p className="text-lg text-th-muted max-w-2xl">
-            Practical insights on building MVPs, SaaS products, and AI dashboards.
-            Real numbers, real timelines, real advice.
-          </p>
-        </div>
-      </section>
-
-      {/* Article List */}
-      <section className="pb-20 px-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {BLOG_POSTS.map((post) => (
-            <article
-              key={post.slug}
-              className="group rounded-2xl border border-th-border bg-th-card p-6 md:p-8 hover:border-accent/30 transition-colors"
-            >
-              <div className="flex flex-wrap items-center gap-3 mb-3">
-                <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-accent/10 text-accent">
-                  {post.category}
-                </span>
-                <span className="text-xs text-th-muted">{post.date}</span>
-                <span className="text-xs text-th-muted">{post.readTime}</span>
-              </div>
-              <h2 className="text-xl md:text-2xl font-bold text-th-text mb-2 group-hover:text-accent transition-colors">
-                <Link href={`/blog/${post.slug}`} className="hover:underline">
-                  {post.title}
-                </Link>
-              </h2>
-              <p className="text-th-muted text-sm leading-relaxed mb-4">
-                {post.excerpt}
-              </p>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[11px] font-medium px-2 py-0.5 rounded border border-th-border text-th-muted"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="text-sm font-medium text-accent hover:underline inline-flex items-center gap-1"
-                >
-                  Read article
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-    </div>
+    <TranslationErrorBoundary>
+      <ScrollProgress />
+      <Navbar />
+      <main id="main-content" className="pt-16">
+        <BlogListClient />
+      </main>
+      <Footer />
+      <BackToTop />
+    </TranslationErrorBoundary>
   );
 }

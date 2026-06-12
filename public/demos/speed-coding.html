@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -589,19 +589,19 @@ var LANGS=[
 ];
 var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
 function T(key){
+  if(I18N[curLang]&&Object.prototype.hasOwnProperty.call(I18N[curLang],key))return I18N[curLang][key];
   var keys=key.split('.');var val=I18N[curLang];
   for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
   return(val===undefined||val===null)?key:val;
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
@@ -1147,7 +1147,7 @@ var defaultFiles=[
 {name:'README.md',path:'README.md',content:'# Analytics Dashboard\n\nA real-time analytics dashboard built with React and TypeScript.\n\n## Features\n\n- Real-time data visualization\n- User metrics tracking\n- Revenue analytics\n- Responsive design\n\n## Getting Started\n\n```bash\nnpm install\nnpm run dev\n```\n\n## API\n\nThe backend API is built with FastAPI (Python).\n\n```bash\ncd server\npip install -r requirements.txt\npython main.py\n```',language:'text',lastModified:Date.now(),originalContent:''},
 {name:'Chart.tsx',path:'src/components/Chart.tsx',content:'import React, { useRef, useEffect } from "react";\n\ninterface ChartProps {\n  data: Array<{ x: number; y: number; label: string }>;\n  type: "line" | "bar" | "area";\n  width?: number;\n  height?: number;\n}\n\nexport const Chart: React.FC<ChartProps> = ({\n  data,\n  type = "line",\n  width = 600,\n  height = 300,\n}) => {\n  const canvasRef = useRef<HTMLCanvasElement>(null);\n\n  useEffect(() => {\n    const canvas = canvasRef.current;\n    if (!canvas) return;\n    const ctx = canvas.getContext("2d");\n    if (!ctx) return;\n\n    const padding = { top: 20, right: 20, bottom: 40, left: 50 };\n    const chartW = width - padding.left - padding.right;\n    const chartH = height - padding.top - padding.bottom;\n\n    ctx.clearRect(0, 0, width, height);\n\n    const maxY = Math.max(...data.map((d) => d.y));\n    const minY = Math.min(...data.map((d) => d.y));\n    const rangeY = maxY - minY || 1;\n\n    const scaleX = (i: number) => padding.left + (i / (data.length - 1)) * chartW;\n    const scaleY = (v: number) => padding.top + chartH - ((v - minY) / rangeY) * chartH;\n\n    // Draw grid lines\n    ctx.strokeStyle = "rgba(255,255,255,0.1)";\n    ctx.lineWidth = 1;\n    for (let i = 0; i <= 5; i++) {\n      const y = padding.top + (i / 5) * chartH;\n      ctx.beginPath();\n      ctx.moveTo(padding.left, y);\n      ctx.lineTo(width - padding.right, y);\n      ctx.stroke();\n    }\n\n    // Draw data\n    ctx.strokeStyle = "#60a5fa";\n    ctx.lineWidth = 2;\n    ctx.beginPath();\n    data.forEach((point, i) => {\n      const x = scaleX(i);\n      const y = scaleY(point.y);\n      if (i === 0) ctx.moveTo(x, y);\n      else ctx.lineTo(x, y);\n    });\n    ctx.stroke();\n\n    // Draw dots\n    data.forEach((point, i) => {\n      ctx.fillStyle = "#60a5fa";\n      ctx.beginPath();\n      ctx.arc(scaleX(i), scaleY(point.y), 3, 0, Math.PI * 2);\n      ctx.fill();\n    });\n  }, [data, type, width, height]);\n\n  return (\n    <div className="chart-container">\n      <canvas\n        ref={canvasRef}\n        width={width}\n        height={height}\n        style={{ width: "100%", height: "auto" }}\n      />\n    </div>\n  );\n};',language:'typescript',lastModified:Date.now(),originalContent:''},
 {name:'StatCard.tsx',path:'src/components/StatCard.tsx',content:'import React from "react";\n\ninterface StatCardProps {\n  label: string;\n  value: string | number;\n  change?: number;\n  prefix?: string;\n  suffix?: string;\n}\n\nexport const StatCard: React.FC<StatCardProps> = ({\n  label,\n  value,\n  change = 0,\n  prefix = "",\n  suffix = "",\n}) => {\n  const isPositive = change >= 0;\n  const changeColor = isPositive ? "#4caf50" : "#f44336";\n  const changeIcon = isPositive ? "▲" : "▼";\n\n  return (\n    <div className="stat-card">\n      <div className="stat-label">{label}</div>\n      <div className="stat-value">\n        {prefix}{value}{suffix}\n      </div>\n      {change !== 0 && (\n        <div className="stat-change" style={{ color: changeColor }}>\n          {changeIcon} {Math.abs(change)}%\n        </div>\n      )}\n    </div>\n  );\n};',language:'typescript',lastModified:Date.now(),originalContent:''},
-{name:'.env',path:'.env',content:'API_URL=https://api.example.com\nAPI_KEY=sk_live_xxxxxxxxxxxxx\nNODE_ENV=development\nPORT=5173\n\n# Database\nDB_HOST=localhost\nDB_PORT=5432\nDB_NAME=analytics\n\n# Redis\nREDIS_URL=redis://localhost:6379\nREDIS_TTL=3600\n\n# Feature Flags\nENABLE_ANALYTICS=true\nENABLE_NOTIFICATIONS=false\nMAX_REQUESTS_PER_MINUTE=100',language:'text',lastModified:Date.now(),originalContent:''},
+{name:'.env.example',path:'.env.example',content:'API_URL=https://api.example.com\nDEMO_CREDENTIAL=replace_with_demo_value\nNODE_ENV=development\nPORT=5173\n\n# Database placeholders\nDATABASE_HOST=example-db.local\nDATABASE_PORT=5432\nDATABASE_NAME=analytics_demo\n\n# Cache placeholders\nCACHE_URL=redis://example-cache.local:6379\nCACHE_TTL=3600\n\n# Feature Flags\nENABLE_ANALYTICS=true\nENABLE_NOTIFICATIONS=false\nMAX_REQUESTS_PER_MINUTE=100',language:'text',lastModified:Date.now(),originalContent:''},
 {name:'tsconfig.json',path:'tsconfig.json',content:'{\n  "compilerOptions": {\n    "target": "ES2020",\n    "useDefineForClassFields": true,\n    "lib": ["ES2020", "DOM", "DOM.Iterable"],\n    "module": "ESNext",\n    "skipLibCheck": true,\n    "moduleResolution": "bundler",\n    "allowImportingTsExtensions": true,\n    "resolveJsonModule": true,\n    "isolatedModules": true,\n    "noEmit": true,\n    "jsx": "react-jsx",\n    "strict": true,\n    "noUnusedLocals": true,\n    "noUnusedParameters": true,\n    "noFallthroughCasesInSwitch": true,\n    "forceConsistentCasingInFileNames": true,\n    "baseUrl": ".",\n    "paths": {\n      "@/*": ["src/*"]\n    }\n  },\n  "include": ["src"],\n  "references": [{ "path": "./tsconfig.node.json" }]\n}',language:'json',lastModified:Date.now(),originalContent:''},
 {name:'vite.config.ts',path:'vite.config.ts',content:'import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport { resolve } from "path";\n\nexport default defineConfig({\n  plugins: [react()],\n  resolve: {\n    alias: {\n      "@": resolve(__dirname, "src"),\n    },\n  },\n  server: {\n    port: 5173,\n    open: true,\n    proxy: {\n      "/api": {\n        target: "http://localhost:8000",\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/api/, ""),\n      },\n    },\n  },\n  build: {\n    outDir: "dist",\n    sourcemap: true,\n    minify: "terser",\n    rollupOptions: {\n      output: {\n        manualChunks: {\n          vendor: ["react", "react-dom"],\n        },\n      },\n    },\n  },\n  test: {\n    globals: true,\n    environment: "jsdom",\n    setupFiles: "./src/test/setup.ts",\n  },\n});',language:'typescript',lastModified:Date.now(),originalContent:''}
 ];
@@ -1165,7 +1165,7 @@ var gitData=loadSetting('gitData',{currentBranch:'main',branches:['main','develo
 {hash:'w0x1y2z',message:'Configure Vite build',branch:'develop',timestamp:Date.now()-5400000,files:['vite.config.ts']},
 {hash:'a3b4c5d',message:'Add TypeScript configuration',branch:'develop',timestamp:Date.now()-3600000,files:['tsconfig.json']},
 {hash:'m0n1o2p',message:'Add FastAPI backend server',branch:'develop',timestamp:Date.now()-1800000,files:['server/main.py']},
-{hash:'f6g7h8i',message:'Setup environment variables',branch:'feature/dashboard',timestamp:Date.now()-900000,files:['.env']},
+{hash:'f6g7h8i',message:'Add environment template',branch:'feature/dashboard',timestamp:Date.now()-900000,files:['.env.example']},
 {hash:'j9k0l1m',message:'Update README documentation',branch:'feature/dashboard',timestamp:Date.now()-300000,files:['README.md']},
 {hash:'n2o3p4q',message:'Add styles and theming',branch:'feature/dashboard',timestamp:Date.now()-60000,files:['src/styles.css']}]});
 var folderStates=loadSetting('folderStates',{src:true,'src/components':false,'src/utils':false,server:false});
@@ -1629,7 +1629,7 @@ function processTermCmd(cmd){
     case 'node':
       if(!args[0]){termPrint(T('terminal.usage')+': node <filename>','error');break;}
       var nf=files.find(function(f){return f.name===args[0]||f.path.endsWith(args[0]);});
-      if(nf){try{var result=new Function(nf.content)();if(result!==undefined)termPrint(String(result),'success');else termPrint(T('terminal.undefined'),'info');}catch(e){termPrint(T('terminal.error')+': '+e.message,'error');}}
+      if(nf){termPrint('Simulated Node run: '+nf.path,'success');termPrint('Execution disabled in the public demo sandbox.','info');}
       else termPrint('node: '+args[0]+': '+T('terminal.noSuchFile'),'error');break;
     case 'python':
     case 'python3':
@@ -2360,23 +2360,36 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 window.addEventListener('beforeunload',function(e){
+  if(typeof files==='undefined'||typeof isFileModified!=='function')return;
   var hasUnsaved=files.some(function(f){return isFileModified(f);});
   if(hasUnsaved){e.preventDefault();e.returnValue=T('beforeUnload');}
 });
 window.addEventListener('resize',function(){
-  minimapDirty=true;
+  if(typeof minimapDirty!=='undefined')minimapDirty=true;
   var sidebar=document.getElementById('sidebar');
   if(window.innerWidth<768)sidebar.style.display='none';
 });
 function afterLangChange(){
-  var tt=document.getElementById('titlebarTitle');if(tt){var file=getFileByPath(currentFilePath);if(file)tt.textContent=file.name+T('titlebar.format');else tt.textContent='Cloud IDE';}
-  renderTabs();renderEditor();renderFileTree();updateStatusBar();renderGitSidebar();renderGitPanel();renderAIChat();renderExtensions();
-  renderBreadcrumb();
+  var tt=document.getElementById('titlebarTitle');if(tt&&typeof getFileByPath==='function'&&typeof currentFilePath!=='undefined'){var file=getFileByPath(currentFilePath);if(file)tt.textContent=file.name+T('titlebar.format');else tt.textContent='Cloud IDE';}
+  document.querySelectorAll('#titlebar .menu-item[data-menu]').forEach(function(item){
+    item.textContent=T('menu.'+item.dataset.menu);
+  });
+  if(typeof renderTabs==='function')renderTabs();
+  if(typeof renderEditor==='function')renderEditor();
+  if(typeof renderFileTree==='function')renderFileTree();
+  if(typeof updateStatusBar==='function')updateStatusBar();
+  if(typeof renderGitSidebar==='function')renderGitSidebar();
+  if(typeof renderGitPanel==='function')renderGitPanel();
+  if(typeof renderAIChat==='function')renderAIChat();
+  if(typeof renderExtensions==='function')renderExtensions();
+  if(typeof renderBreadcrumb==='function')renderBreadcrumb();
   var termBody=document.getElementById('terminalBody');
-  if(termBody&&termBody.children.length<=3){termBody.innerHTML='';termPrint(T('term.welcome'),'success');termPrint(T('term.typeHelp'),'info');termPrint('','info');updateTermPrompt();}
+  if(termBody&&termBody.children.length<=3&&typeof termPrint==='function'){termBody.innerHTML='';termPrint(T('term.welcome'),'success');termPrint(T('term.typeHelp'),'info');termPrint('','info');if(typeof updateTermPrompt==='function')updateTermPrompt();}
 }
 renderLangSwitcher();
 afterLangChange();
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

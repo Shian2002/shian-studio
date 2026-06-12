@@ -19,9 +19,7 @@ declare global {
   }
 }
 
-const GA_ID = typeof window !== "undefined"
-  ? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ""
-  : "";
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
 
 function gtag(...args: unknown[]) {
   if (GA_ID && typeof window !== "undefined" && window.gtag) {

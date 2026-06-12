@@ -38,16 +38,17 @@ function FAQItem({ q, a }: { q: string; a: string; }) {
   );
 }
 
-export default function FAQ() {
+export default function FAQ({ compact = false }: { compact?: boolean }) {
   const { t } = useLanguage();
 
-  const faqItems = Array.from({ length: 6 }, (_, i) => ({
+  const itemCount = compact ? 4 : 6;
+  const faqItems = Array.from({ length: itemCount }, (_, i) => ({
     question: t(`faq.items.${i}.question`) as string,
     answer: t(`faq.items.${i}.answer`) as string,
   }));
 
   return (
-    <section id="faq" aria-label={t("nav.faq") as string} className="py-24 px-6 bg-th-bg2">
+    <section id="faq" aria-label={t("nav.faq") as string} className={`${compact ? "py-16" : "py-24"} px-6 bg-th-bg2`}>
       <div className="max-w-3xl mx-auto">
         <motion.div
           variants={fadeInUp}
@@ -55,7 +56,7 @@ export default function FAQ() {
           whileInView="visible"
           viewport={viewportOnce}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className={`text-center ${compact ? "mb-8" : "mb-12"}`}
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber/10 border border-amber/20 text-amber text-xs mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-amber" aria-hidden="true" />
@@ -83,7 +84,7 @@ export default function FAQ() {
           className="text-center text-xs text-th-subtle mt-8"
         >
           {t("faq.stillQuestions") as string}{" "}
-          <a href="#contact" className="text-accent hover:underline">
+          <a href="/contact?source=faq" className="text-accent hover:underline">
             {t("faq.reachOut") as string}
           </a>{" "}
           {t("faq.footer") as string}

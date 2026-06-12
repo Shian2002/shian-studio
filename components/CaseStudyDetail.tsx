@@ -332,7 +332,7 @@ export default function CaseStudyDetail({ slug }: Props) {
               Let&apos;s talk about your idea and see how we can build something great together.
             </p>
             <a
-              href={`/#contact?case=${slug}`}
+              href={`/contact?case=${slug}`}
               onClick={() => trackCtaClick(`case-study-${slug}`)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
             >

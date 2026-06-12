@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -416,23 +416,34 @@ function T(key){
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#6366f1':'none')+';color:'+(l.code===curLang?'#fff':'#ccc')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#6366f1':'none')+';color:'+(l.code===curLang?'#fff':'#ccc')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');
   if(m)m.style.display=m.style.display==='none'?'block':'none';
 }
 function afterLangChange(){
-  renderDashboard();renderProducts();renderOrders();renderCustomers();renderAnalytics();renderSettings();
-  var navItems=document.querySelectorAll('.sidebar-nav .nav-item');
-  var labels=['Dashboard','Products','Orders','Customers','Analytics','Settings'];
-  navItems.forEach(function(item,i){if(labels[i])item.textContent=T('nav.'+labels[i].toLowerCase())||labels[i]});
+  var sectionKeys=['overview','commerce','analytics','system'];
+  document.querySelectorAll('.nav-section-title').forEach(function(el,i){if(sectionKeys[i])el.textContent=T('nav.'+sectionKeys[i])});
+  document.querySelectorAll('.sidebar-nav .nav-item[data-page]').forEach(function(item){
+    var page=item.dataset.page;
+    var icon=item.querySelector('svg');
+    var badge=item.querySelector('.nav-badge');
+    item.innerHTML=(icon?icon.outerHTML:'')+T('nav.'+page.toLowerCase())+(badge?badge.outerHTML:'');
+  });
+  var bc=document.getElementById('breadcrumb');
+  var active=document.querySelector('.sidebar-nav .nav-item.active');
+  var current=active&&active.dataset.page?active.dataset.page.toLowerCase():'dashboard';
+  if(bc)bc.innerHTML='<a>'+T('nav.home')+'</a><span class="sep">/</span><span class="current">'+T('nav.'+current)+'</span>';
+  var cTitle=document.getElementById('confirmTitle');if(cTitle)cTitle.textContent=T('confirm.title');
+  var cMsg=document.getElementById('confirmMsg');if(cMsg)cMsg.textContent=T('confirm.msg');
+  var cCancel=document.getElementById('confirmCancel');if(cCancel)cCancel.textContent=T('confirm.cancel');
+  var cOk=document.getElementById('confirmOk');if(cOk)cOk.textContent=T('confirm.confirm');
 }
 (function(){
 'use strict';
@@ -589,8 +600,9 @@ function navigate(page){
   $('#orderDetailPage').classList.remove('active');
   $$('.nav-item').forEach(function(n){n.classList.toggle('active',n.dataset.page===page)});
   var bc=$('#breadcrumb');
-  bc.innerHTML='<a onclick="void(0)">Home</a><span class="sep">/</span><span class="current">'+page+'</span>';
+  bc.innerHTML='<a onclick="void(0)">'+T('nav.home')+'</a><span class="sep">/</span><span class="current">'+T('nav.'+page.toLowerCase())+'</span>';
   renderPage(page);
+  afterLangChange();
 }
 function renderPage(page){
   switch(page){
@@ -1273,9 +1285,13 @@ window.addEventListener('resize',function(){
 });
 showLoading();
 initData();
+renderLangSwitcher();
 navigate('Dashboard');
+afterLangChange();
 setTimeout(function(){hideLoading()},800);
 })();
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

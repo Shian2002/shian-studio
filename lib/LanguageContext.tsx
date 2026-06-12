@@ -9,7 +9,7 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { type Locale, translations } from "./i18n";
+import { type Locale, translations, loadLocale } from "./i18n";
 
 interface LanguageContextValue {
   locale: Locale;
@@ -40,7 +40,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored && (stored === "en" || stored === "zh" || stored === "ja" || stored === "ko")) {
-        setLocaleState(stored);
+        loadLocale(stored as Locale).then(() => setLocaleState(stored as Locale));
       }
     } catch {}
   }, []);
@@ -53,10 +53,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    try {
-      localStorage.setItem(STORAGE_KEY, newLocale);
-    } catch {}
+    loadLocale(newLocale).then(() => {
+      setLocaleState(newLocale);
+      try {
+        localStorage.setItem(STORAGE_KEY, newLocale);
+      } catch {}
+    });
   }, []);
 
   const t = useCallback(

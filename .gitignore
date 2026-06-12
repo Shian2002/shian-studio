@@ -58,6 +58,7 @@ dev-server*.log
 qa-screenshots/
 screenshots/
 dogfood-output/
+test-artifacts/
 
 # misc
 test_write.txt
@@ -69,5 +70,11 @@ fix_i18n.ps1
 
 # dev-only files
 demos/
+!public/
+!public/demos/
+!public/demos/a11y-helper.js
 docs/
 HANDBOOK.md
+
+.vercel
+nul

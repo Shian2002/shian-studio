@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
@@ -143,8 +143,8 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 
 .integrations{padding:80px 0;background:var(--card-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);transition:background .4s}
 .integrations .section-header{text-align:center;margin-bottom:48px}
-.partner-bar{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
-.partner-logo{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.9375rem;font-weight:700;color:var(--text-secondary);transition:all .25s;min-width:130px}
+.partner-bar{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:16px;max-width:760px;margin:0 auto}
+.partner-logo{display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:14px 18px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.9375rem;font-weight:700;color:var(--text-secondary);transition:all .25s;white-space:nowrap}
 .partner-logo:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
 .partner-logo svg{width:20px;height:20px}
 
@@ -457,8 +457,8 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
   .footer-bottom{flex-direction:column;gap:12px;text-align:center}
   .logo-bar{gap:32px}
   .stats-grid{grid-template-columns:1fr 1fr}
-  .partner-bar{gap:12px}
-  .partner-logo{min-width:100px;padding:10px 16px;font-size:.8125rem}
+  .partner-bar{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:420px}
+  .partner-logo{padding:10px 12px;font-size:.8125rem}
   .badge-grid{gap:12px}
   .compliance-badge{padding:14px 18px}
   .chat-widget{width:calc(100% - 48px);right:24px;bottom:90px}
@@ -1071,13 +1071,12 @@ function T(key){
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#4F46E5)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#4F46E5)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
@@ -1506,5 +1505,7 @@ if(!localStorage.getItem('fs-cookies'))setTimeout(function(){document.getElement
 window.showToast=function(msg,type){var c=document.getElementById('toastContainer'),t=document.createElement('div');t.className='toast '+(type||'info');t.textContent=msg;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(100%)';t.style.transition='all .3s';setTimeout(function(){t.remove()},300)},3000)};
 })();
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

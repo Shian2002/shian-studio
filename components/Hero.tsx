@@ -66,7 +66,7 @@ export default function Hero() {
   const typed = useTypewriter(WORDS);
 
   return (
-    <section id="hero" aria-label={t("nav.hero") as string} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="hero" aria-label={t("nav.hero") as string} className="relative min-h-[86vh] flex items-center justify-center overflow-hidden pt-20 pb-14">
       <div
         className="absolute inset-0"
         aria-hidden="true"
@@ -92,7 +92,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-8"
+          className="mb-5"
         >
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-th-bg-s border border-th-border-m text-xs text-th-muted mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-mint animate-pulse" />
@@ -118,7 +118,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-base md:text-lg text-th-muted max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-base md:text-lg text-th-muted max-w-2xl mx-auto mb-8 leading-relaxed"
         >
           {t("hero.description") as string}
         </motion.p>
@@ -127,10 +127,10 @@ export default function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+          className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
         >
           <a
-            href="#contact"
+            href="/contact?source=hero"
             className="px-8 py-3.5 rounded-xl bg-accent text-white font-medium hover:bg-accent/85 hover:shadow-[0_12px_48px_rgba(74,158,255,0.45)] shadow-[0_4px_20px_rgba(74,158,255,0.25)] transition-all duration-300 text-sm"
           >
             {t("hero.viewWork") as string}
@@ -146,7 +146,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.9 }}
-          className="flex flex-wrap justify-center gap-4 md:gap-6 mb-10"
+          className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8"
         >
           {((t("hero.trustPoints") as string[]) ?? []).map((point) => (
             <div key={point} className="flex items-center gap-2 text-sm text-th-muted">
@@ -174,7 +174,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.4 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:block"
         aria-hidden="true"
       >
         <div className="flex flex-col items-center gap-2">

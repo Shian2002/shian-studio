@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/_next/"],
       },
     ],
-    sitemap: "https://shian.studio/sitemap.xml",
-    host: "https://shian.studio",
+    sitemap: "https://shian-studio.vercel.app/sitemap.xml",
+    host: "https://shian-studio.vercel.app",
   };
 }

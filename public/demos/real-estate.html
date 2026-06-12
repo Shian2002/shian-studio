@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -140,7 +140,7 @@ img{max-width:100%;display:block}.container{max-width:1240px;margin:0 auto;paddi
 .map-features{list-style:none;display:flex;flex-direction:column;gap:12px}
 .map-features li{display:flex;align-items:center;gap:10px;font-size:.92rem;color:var(--text-mid)}
 .map-features li .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
-#map{height:420px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);z-index:1}
+#map{height:420px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);z-index:1;background:#dbeafe}
 .about-section{padding:80px 0;background:var(--bg)}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
 .about-text h2{font-size:2.25rem;font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
@@ -615,11 +615,14 @@ faq:{overline:'자주 묻는 질문',title:'자주 묻는 질문',desc:'HomeNest
 }};
 function T(key){var keys=key.split('.');var val=I18N[curLang];for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}return(val===undefined||val===null)?key:val}
 function Tfmt(key,n){return T(key).replace('{n}',n)}
-function setLang(code){curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}renderLangSwitcher();afterLangChange()}
+function setLang(code){
+  curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
+  window.location.reload();
+}
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #334155;border-radius:6px;padding:4px 8px;color:#cbd5e1;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e293b;border:1px solid #334155;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#3b82f6':'none')+';color:'+(l.code===curLang?'#fff':'#94a3b8')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #334155;border-radius:6px;padding:4px 8px;color:#cbd5e1;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e293b;border:1px solid #334155;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#3b82f6':'none')+';color:'+(l.code===curLang?'#fff':'#94a3b8')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none'}
 function afterLangChange(){updateUIText();renderProperties();renderFilterTabs()}
@@ -1090,13 +1093,27 @@ function doApplySearch(){
   if(filtered.length===0){grid.innerHTML='<div class="no-results"><div class="icon">🔍</div><h3 id="noResultTitle">No Properties Found</h3><p id="noResultDesc">Try adjusting your search or filter criteria to discover more properties.</p></div>'}
   document.getElementById('loadMoreBtn').style.display='none';
 }
-var mapInitialized=false;var mapRetries=0;
+var mapInitialized=false;var mapRetries=0;var mapInstance=null;
 function initMap(){
   if(mapInitialized)return;
   if(typeof L==='undefined'){mapRetries++;if(mapRetries<10){setTimeout(initMap,500)}else{mapInitialized=true;var mapEl=document.getElementById('map');if(mapEl)mapEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-light);font-size:.9rem">Map unavailable</div>'}return}
   mapInitialized=true;
-  var map=L.map('map').setView([37.8,-96],4);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'&copy; Esri',maxZoom:19}).addTo(map);
+  var map=L.map('map',{maxZoom:19}).setView([37.8,-96],4);
+  mapInstance=map;
+  L.gridLayer({
+    attribution:'Demo map layer',
+    maxZoom:19,
+    createTile:function(coords){
+      var tile=document.createElement('div');
+      tile.style.width='256px';
+      tile.style.height='256px';
+      tile.style.backgroundColor='#e8f1ff';
+      tile.style.backgroundImage='linear-gradient(30deg, rgba(96,165,250,.28) 1px, transparent 1px), linear-gradient(120deg, rgba(15,23,42,.16) 1px, transparent 1px), radial-gradient(circle at '+((coords.x*47+coords.y*19)%100)+'% '+((coords.y*53+coords.z*17)%100)+'%, rgba(37,99,235,.36) 0 4px, transparent 5px), linear-gradient(135deg, rgba(14,165,233,.18), rgba(255,255,255,0) 42%)';
+      tile.style.backgroundSize='56px 56px, 104px 104px, 256px 256px, 256px 256px';
+      tile.style.border='1px solid rgba(96,165,250,.18)';
+      return tile;
+    }
+  }).addTo(map);
   var markers=L.markerClusterGroup();
   var bounds=[];
   properties.forEach(function(p){
@@ -1109,18 +1126,21 @@ function initMap(){
   });
   map.addLayer(markers);
   if(bounds.length>0)map.fitBounds(bounds).setZoom(4);
+  setTimeout(function(){map.invalidateSize()},120);
 }
 renderLangSwitcher();
 afterLangChange();
 try{initMap()}catch(e){console.warn('Map init failed:',e)}
-var revealObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target)}})},{threshold:0.12});
-document.querySelectorAll('.reveal').forEach(function(el){revealObserver.observe(el)});
-setTimeout(function(){document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){el.classList.add('visible')})},3000);
 ['listings','about','agents','testimonials','faq','contact','newsletter'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('reveal')});
+var revealObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');if(mapInstance&&e.target.querySelector&&e.target.querySelector('#map'))setTimeout(function(){mapInstance.invalidateSize()},80);revealObserver.unobserve(e.target)}})},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(function(el){revealObserver.observe(el)});
+setTimeout(function(){document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){el.classList.add('visible')});if(mapInstance)mapInstance.invalidateSize()},700);
 window.addEventListener('scroll',function(){
   var btn=document.getElementById('backTopBtn');if(btn)btn.classList.toggle('show',window.scrollY>500);checkCounter();
   var nav=document.getElementById('navbar');if(nav)nav.classList.toggle('scrolled',window.scrollY>50)
 });
   </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

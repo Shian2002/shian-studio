@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { NAV_LINKS, BRAND } from "@/lib/constants";
 import { useLanguage } from "@/lib/LanguageContext";
 import ThemeToggle from "./ThemeToggle";
@@ -11,13 +12,12 @@ const NAV_I18N_KEYS: Record<string, string> = {
   "/services": "nav.services",
   "/case-studies": "nav.portfolio",
   "/blog": "nav.blog",
-  "#about": "nav.about",
-  "#faq": "nav.faq",
-  "#contact": "nav.contact",
+  "/contact": "nav.contact",
 };
 
 export default function Navbar() {
   const { t } = useLanguage();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("hero");
@@ -30,7 +30,7 @@ export default function Navbar() {
         ticking.current = true;
         requestAnimationFrame(() => {
           setScrolled(window.scrollY > 50);
-          const sections = ["hero", "services", "portfolio", "tech-stack", "testimonials", "about", "faq", "contact"];
+          const sections = ["hero", "portfolio", "faq"];
           const pos = window.scrollY + 140;
           let current = sections[0];
           for (const id of sections) {
@@ -98,6 +98,8 @@ export default function Navbar() {
     }
   }, []);
 
+  const brandHref = pathname === "/" ? "#hero" : "/";
+
   return (
     <header className="fixed top-0 inset-x-0 z-50">
       <nav
@@ -113,10 +115,10 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a
-            href="#hero"
+            href={brandHref}
             onClick={(e) => {
               e.preventDefault();
-              handleNavClick("#hero");
+              handleNavClick(brandHref);
             }}
             className="text-th-text font-light text-lg tracking-brand hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-md"
             aria-label={`${BRAND.name} — go to top`}
@@ -129,7 +131,9 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => {
-              const sectionId = link.href.replace("#", "");
+              const sectionId = link.href.startsWith("/#")
+                ? link.href.slice(2)
+                : link.href.replace("#", "");
               const isActive = activeSection === sectionId;
               return (
                 <a
@@ -158,10 +162,10 @@ export default function Navbar() {
             <LanguageSwitcher />
             <ThemeToggle />
             <a
-              href="#contact?source=nav-quote"
+              href="/contact?source=nav-quote"
               onClick={(e) => {
                 e.preventDefault();
-                handleNavClick("#contact");
+                handleNavClick("/contact?source=nav-quote");
               }}
               className="text-sm px-4 py-2 rounded-md bg-accent text-white hover:bg-accent/85 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
@@ -227,10 +231,10 @@ export default function Navbar() {
                   </a>
                 ))}
                 <a
-                  href="#contact?source=nav-quote"
+                  href="/contact?source=nav-quote"
                   onClick={(e) => {
                     e.preventDefault();
-                    handleNavClick("#contact");
+                    handleNavClick("/contact?source=nav-quote");
                   }}
                   className="block text-center text-sm font-medium py-2.5 rounded-md bg-accent text-white hover:bg-accent/85 transition-all duration-200 mt-2"
                 >

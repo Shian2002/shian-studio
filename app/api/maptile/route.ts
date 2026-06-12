@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
           'Referer': 'https://www.openstreetmap.org/',
         },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(1200),
       });
       if (res.ok) {
         const body = await res.arrayBuffer();
@@ -94,5 +94,20 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return new NextResponse('Tile not available', { status: 502 });
+  const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+    <rect width="256" height="256" fill="#eef2f7"/>
+    <path d="M-20 58 C40 36 82 96 142 72 C194 51 214 80 276 52" fill="none" stroke="#d5dde8" stroke-width="18"/>
+    <path d="M-10 176 C38 150 86 188 132 166 C181 143 220 162 266 136" fill="none" stroke="#d5dde8" stroke-width="14"/>
+    <path d="M62 -20 L116 276 M158 -12 L206 270" stroke="#ffffff" stroke-width="8" opacity=".75"/>
+    <path d="M-20 118 L276 102 M-16 220 L276 208" stroke="#ffffff" stroke-width="10" opacity=".85"/>
+    <circle cx="${(xNum * 47 + yNum * 19) % 256}" cy="${(yNum * 53 + zNum * 17) % 256}" r="3" fill="#94a3b8" opacity=".55"/>
+  </svg>`;
+  return new NextResponse(fallbackSvg, {
+    status: 200,
+    headers: {
+      'Content-Type': 'image/svg+xml',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      'Access-Control-Allow-Origin': 'https://shian-studio.vercel.app',
+    },
+  });
 }

@@ -10,8 +10,7 @@ const NAV_I18N_KEYS: Record<string, string> = {
   "/case-studies": "nav.portfolio",
   "/blog": "nav.blog",
   "#about": "nav.about",
-  "#faq": "nav.faq",
-  "#contact": "nav.contact",
+  "/contact": "nav.contact",
 };
 
 export default function Footer() {
@@ -75,16 +74,16 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm text-th-muted">
               <li>
                 <a
-                  href="mailto:hello@shian.studio"
+                  href="mailto:x2938784260u@gmail.com"
                   className="hover:text-th-text transition-colors"
                 >
-                  hello@shian.studio
+                  x2938784260u@gmail.com
                 </a>
               </li>
               <li>{t("footer.remoteFirst") as string}</li>
               <li>
                 <a
-                  href="#contact?source=footer-quote"
+                  href="/contact?source=footer-quote"
                   className="text-accent hover:text-accent/80 transition-colors"
                 >
                   {t("nav.getQuote") as string} →

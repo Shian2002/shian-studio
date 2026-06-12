@@ -3,24 +3,25 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import BackToTop from "@/components/BackToTop";
-import Services from "@/components/Services";
+import Contact from "@/components/Contact";
+import TranslationErrorBoundary from "@/components/TranslationErrorBoundary";
 
 export const metadata: Metadata = {
-  title: "Services and Pricing - MVP, SaaS & Dashboard Development",
+  title: "Contact - SHIAN Studio",
   description:
-    "MVP Sprint, SaaS Build, AI Dashboard, and Landing Page development services. Transparent pricing, 2-4 week delivery. Send a project inquiry.",
+    "Contact SHIAN Studio for MVP, SaaS, AI dashboard, mini program, and landing page development projects.",
 };
 
-export default function ServicesRoute() {
+export default function ContactPage() {
   return (
-    <>
+    <TranslationErrorBoundary>
       <ScrollProgress />
       <Navbar />
       <main id="main-content" className="pt-16">
-        <Services />
+        <Contact />
       </main>
       <Footer />
       <BackToTop />
-    </>
+    </TranslationErrorBoundary>
   );
 }

@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { PORTFOLIO_ITEMS } from "@/lib/constants";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ScrollProgress from "@/components/ScrollProgress";
+import BackToTop from "@/components/BackToTop";
 import CaseStudyDetail from "@/components/CaseStudyDetail";
+import TranslationErrorBoundary from "@/components/TranslationErrorBoundary";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -37,5 +42,15 @@ export function generateStaticParams() {
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params;
-  return <CaseStudyDetail slug={slug} />;
+  return (
+    <TranslationErrorBoundary>
+      <ScrollProgress />
+      <Navbar />
+      <main id="main-content" className="pt-16">
+        <CaseStudyDetail slug={slug} />
+      </main>
+      <Footer />
+      <BackToTop />
+    </TranslationErrorBoundary>
+  );
 }

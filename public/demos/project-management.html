@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -651,19 +651,19 @@ var LANGS=[
 ];
 var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
 function T(key){
+  if(I18N[curLang]&&Object.prototype.hasOwnProperty.call(I18N[curLang],key))return I18N[curLang][key];
   var keys=key.split('.');var val=I18N[curLang];
   for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
   return(val===undefined||val===null)?key:val;
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
@@ -3234,11 +3234,27 @@ function afterLangChange(){
   var eb=document.getElementById('exportBtn');if(eb)eb.innerHTML='<span>📥</span> '+T('topbar.export');
   var ab=document.getElementById('addTaskBtn');if(ab)ab.innerHTML='<span>+</span> '+T('topbar.addTask');
   var dv=document.getElementById('detailDeleteBtn');if(dv)dv.textContent=T('general.delete');
+  var setText=function(id,key){var el=document.getElementById(id);if(el)el.textContent=T(key)};
+  setText('btnCancel','general.cancel');setText('btnCreate','modal.createTask');
+  setText('sprintModalTitle','sprint.create');setText('sprintBtnCancel','general.cancel');setText('sprintBtnCreate','sprint.create');
+  setText('labelModalTitle','labels.create');setText('labelBtnCancel','general.cancel');setText('labelBtnCreate','labels.create');
+  setText('recurBtnCancel','general.cancel');setText('manualTimeBtnCancel','general.cancel');
+  var statusLabels={'backlog':'task.status.backlog','in-progress':'task.status.inProgress','review':'task.status.review','done':'task.status.done'};
+  var priorityLabels={low:'task.priority.low',medium:'task.priority.medium',high:'task.priority.high'};
+  var freqLabels={daily:'recurring.daily',weekly:'recurring.weekly',monthly:'recurring.monthly'};
+  document.querySelectorAll('#formStatus option').forEach(function(o){o.textContent=T(statusLabels[o.value]||o.textContent)});
+  document.querySelectorAll('#formPriority option,#recurFormPriority option').forEach(function(o){o.textContent=T(priorityLabels[o.value]||o.textContent)});
+  document.querySelectorAll('#recurFormFreq option').forEach(function(o){o.textContent=T(freqLabels[o.value]||o.textContent)});
+  var noSprint=document.querySelector('#formSprint option[value=""]');if(noSprint)noSprint.textContent=T('general.noSprint');
+  var ph={formTitle:'modal.titlePlaceholder',formDesc:'modal.descPlaceholder',formDeps:'modal.depsPlaceholder',recurFormTitle:'recurring.taskTitlePlaceholder',recurFormDesc:'modal.descPlaceholder',recurFormLabels:'modal.labelsPlaceholder',manualTimeDesc:'time.descPlaceholder'};
+  Object.keys(ph).forEach(function(id){var el=document.getElementById(id);if(el)el.placeholder=T(ph[id])});
   renderAll();
 }
 renderLangSwitcher();
 afterLangChange();
 })();
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

@@ -1,12 +1,27 @@
 import type { Metadata } from "next";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ScrollProgress from "@/components/ScrollProgress";
+import BackToTop from "@/components/BackToTop";
 import CaseStudiesPage from "@/components/CaseStudiesPage";
+import TranslationErrorBoundary from "@/components/TranslationErrorBoundary";
 
 export const metadata: Metadata = {
-  title: "Case Studies — MVP & SaaS Projects Delivered",
+  title: "Portfolio - MVP, SaaS & AI Product Demos",
   description:
-    "Real products delivered to real clients. See how SHIAN Studio helps startups and SMBs launch MVPs, SaaS products, and AI dashboards in weeks.",
+    "Explore SHIAN Studio's portfolio of MVP, SaaS, AI, dashboard, mini program, and landing page demos.",
 };
 
 export default function Page() {
-  return <CaseStudiesPage />;
+  return (
+    <TranslationErrorBoundary>
+      <ScrollProgress />
+      <Navbar />
+      <main id="main-content" className="pt-16">
+        <CaseStudiesPage />
+      </main>
+      <Footer />
+      <BackToTop />
+    </TranslationErrorBoundary>
+  );
 }

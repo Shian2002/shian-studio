@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -72,16 +72,18 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .confirm-overlay .modal{width:400px}
 
 /* ─── Sidebar ─── */
-.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;position:relative;z-index:10;transition:transform .3s;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;background:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;position:relative;z-index:10;transition:transform .3s ease;overflow:hidden}
 .sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:100px;background:var(--accent-gradient);opacity:.05;pointer-events:none}
-.sidebar-header{padding:14px 14px 10px;border-bottom:1px solid var(--border-color);position:relative;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px}
-.sidebar-header h2{font-size:14px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap;min-width:0}
+.sidebar-header{padding:14px 14px 10px;border-bottom:1px solid var(--border-color);position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;flex-shrink:0;gap:8px}
+.sidebar-header h2{font-size:14px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap;min-width:0;overflow:hidden}
+.sidebar-header h2 span:last-child{overflow:hidden;text-overflow:ellipsis}
 .sidebar-header h2 .logo-icon{width:24px;height:24px;border-radius:6px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fff}
-.sidebar-header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.sidebar-header-right{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.sidebar-header-right #langSwitcher{flex-shrink:0}
 .sidebar-actions{display:flex;gap:3px}
 .sidebar-actions button{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;font-size:13px;transition:all .15s}
 .sidebar-actions button:hover{color:var(--text-primary);border-color:var(--accent)}
-.sidebar-content{flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column}
+.sidebar-content{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;padding-bottom:8px}
 
 .sidebar-section{padding:8px 10px 2px}
 .sidebar-section-title{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:700;padding:4px 8px;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between}
@@ -97,7 +99,7 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .folder-item:hover .folder-del{display:flex;align-items:center;justify-content:center}
 
 /* Conv List */
-.conv-list{display:flex;flex-direction:column;gap:1px;max-height:220px;overflow-y:auto;padding:0 2px}
+.conv-list{display:flex;flex-direction:column;gap:1px;max-height:210px;overflow-y:auto;overflow-x:hidden;padding:0 2px}
 .conv-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;position:relative}
 .conv-item:hover{background:var(--bg-hover)}.conv-item.active{background:var(--accent-gradient-soft)}.conv-item.active .conv-name{color:var(--accent)}
 .conv-item.pinned .conv-name::before{content:'📌';font-size:9px;margin-right:4px}
@@ -119,7 +121,7 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .search-box input:focus{border-color:var(--accent)}
 .search-box .s-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
 
-.doc-list{flex:1;overflow-y:auto;padding:2px 10px}
+.doc-list{overflow-y:visible;overflow-x:hidden;padding:2px 10px}
 .doc-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;position:relative}
 .doc-item:hover{background:var(--bg-hover)}
 .doc-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;text-transform:uppercase;letter-spacing:.03em}
@@ -133,7 +135,7 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .doc-chunk{padding:6px 8px;border-left:2px solid var(--accent);margin-bottom:6px;font-size:11px;color:var(--text-secondary);line-height:1.5}
 .doc-chunk-score{font-size:10px;color:var(--accent);font-weight:600}
 
-.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border-color);display:flex;gap:6px;flex-shrink:0}
+.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border-color);display:flex;gap:6px;flex-shrink:0;background:var(--bg-secondary)}
 .upload-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:var(--accent-gradient);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font-main);font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s}
 .upload-btn:hover{opacity:.9}
 .footer-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;transition:all .15s;font-size:14px;flex-shrink:0}
@@ -304,16 +306,21 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .export-card .exp-name{font-size:13px;font-weight:600;color:var(--text-primary)}
 .export-card .exp-desc{font-size:10px;color:var(--text-muted);margin-top:2px}
 
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.sidebar-backdrop.active{opacity:1;pointer-events:auto}
+
 /* ─── Responsive ─── */
 @media(max-width:1100px){
   .header-controls .slider-control{display:none}
 }
 @media(max-width:768px){
-  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);width:280px}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);width:min(300px,86vw);min-width:0;box-shadow:14px 0 40px rgba(0,0,0,.24)}
   .sidebar.open{transform:translateX(0)}
-  .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
-  .sidebar-backdrop.active{opacity:1;pointer-events:auto}
+  .sidebar-backdrop{display:block}
   .chat-header{padding:8px 12px;gap:8px}
+  .chat-header-left{min-width:0}
+  .chat-header-left h1{font-size:15px}
+  .model-badge{max-width:128px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .header-controls .slider-control{display:none}
   .token-badge{display:none}
   .message{padding:0 12px}
@@ -518,19 +525,21 @@ var LANGS=[
 ];
 var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
 function T(key){
-  var keys=key.split('.');var val=I18N[curLang];
+  var lang=(curLang||'en').split('-')[0];
+  var dict=I18N[lang]||I18N.en||{};
+  if(Object.prototype.hasOwnProperty.call(dict,key))return dict[key];
+  var keys=key.split('.');var val=dict;
   for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
   return(val===undefined||val===null)?key:val;
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
@@ -568,6 +577,8 @@ var I18N={
     'chat.edit':'✎ Edit',
     'chat.save':'Save',
     'chat.cancel':'Cancel',
+    'chat.run':'▶ Run',
+    'chat.output':'Output',
     'chat.justNow':'Just now',
     'chat.searchDocs':'Search documents...',
     'chat.noDocsYet':'No documents yet',
@@ -821,6 +832,8 @@ var I18N={
     'chat.edit':'✎ 编辑',
     'chat.save':'保存',
     'chat.cancel':'取消',
+    'chat.run':'▶ 运行',
+    'chat.output':'输出',
     'chat.justNow':'刚刚',
     'chat.searchDocs':'搜索文档...',
     'chat.noDocsYet':'暂无文档',
@@ -1024,6 +1037,8 @@ var I18N={
     'chat.edit':'✎ 編集',
     'chat.save':'保存',
     'chat.cancel':'キャンセル',
+    'chat.run':'▶ 実行',
+    'chat.output':'出力',
     'chat.justNow':'たった今',
     'button.newFolder':'📁',
     'button.newChat':'＋',
@@ -1228,6 +1243,8 @@ var I18N={
     'chat.edit':'✎ 수정',
     'chat.save':'저장',
     'chat.cancel':'취소',
+    'chat.run':'▶ 실행',
+    'chat.output':'출력',
     'chat.justNow':'방금 전',
     'chat.searchDocs':'문서 검색...',
     'chat.noDocsYet':'문서가 아직 없습니다',
@@ -1460,7 +1477,7 @@ if(!state.conversations.length){
   state.conversations=[
     {id:genId(),title:'Payment API Integration',folderId:null,pinned:true,model:'gpt4',systemPrompt:'',messages:[
       {role:'user',content:'How do I integrate the payment API?',timestamp:now-3600000,feedback:'none',edited:false,tokens:8},
-      {role:'assistant',content:'Great question! Here\'s a step-by-step guide:\n\n**1. Get your API key**\nNavigate to `Settings → API Keys` and generate a new key.\n\n**2. Install the SDK**\n```bash\nnpm install @acme/payments-sdk\n```\n\n**3. Initialize the client**\n```javascript\nconst client = new PaymentClient({\n  apiKey: process.env.PAYMENT_API_KEY,\n  environment: \'sandbox\',\n});\n```\n\nCheck the Authentication section for full details.',timestamp:now-3590000,feedback:'up',edited:false,tokens:85,model:'gpt4'},
+      {role:'assistant',content:'Great question! Here\'s a step-by-step guide:\n\n**1. Create a test credential**\nNavigate to `Settings → Developer Credentials` and generate a sandbox credential.\n\n**2. Install the SDK**\n```bash\nnpm install @acme/payments-sdk\n```\n\n**3. Initialize the client**\n```javascript\nconst client = new PaymentClient({\n  paymentCredential: "replace-with-sandbox-credential",\n  environment: \'sandbox\',\n});\n```\n\nCheck the Authentication section for full details.',timestamp:now-3590000,feedback:'up',edited:false,tokens:85,model:'gpt4'},
       {role:'user',content:'What are the pricing plans?',timestamp:now-3500000,feedback:'none',edited:false,tokens:6},
       {role:'assistant',content:'We offer three flexible tiers:\n\n| Plan | Price/mo | API Calls | Features |\n|------|----------|-----------|----------|\n| Starter | $29 | 10,000 | Basic analytics, email support |\n| Pro | $99 | 100,000 | Advanced analytics, priority support |\n| Enterprise | Custom | Unlimited | Dedicated support, SLA |\n\nAll plans include **SSL encryption** and **PCI DSS compliance**.',timestamp:now-3490000,feedback:'none',edited:false,tokens:95,model:'gpt4'}
     ],createdAt:now-3600000,updatedAt:now-3490000},
@@ -1565,7 +1582,7 @@ function formatMsg(text){
   text=esc(text);
   text=text.replace(/```(\w*)\n([\s\S]*?)```/g,function(m,lang,code){
     var bid='cb'+genId();
-    return '<div class="code-block" data-bid="'+bid+'"><div class="code-block-header"><span>'+(lang||'code')+'</span><div class="code-block-btns"><button class="code-block-btn copy-cb-btn">📋 Copy</button><button class="code-block-btn run-btn" data-lang="'+(lang||'js')+'">▶ Run</button></div></div><pre>'+hlCode(code.trim())+'</pre><div class="code-output" id="out_'+bid+'"><div class="code-output-label">Output</div><div class="code-output-text"></div></div></div>';
+    return '<div class="code-block" data-bid="'+bid+'"><div class="code-block-header"><span>'+(lang||'code')+'</span><div class="code-block-btns"><button class="code-block-btn copy-cb-btn">'+T('chat.copy')+'</button><button class="code-block-btn run-btn" data-lang="'+(lang||'js')+'">'+T('chat.run')+'</button></div></div><pre>'+hlCode(code.trim())+'</pre><div class="code-output" id="out_'+bid+'"><div class="code-output-label">'+T('chat.output')+'</div><div class="code-output-text"></div></div></div>';
   });
   text=text.replace(/`([^`]+)`/g,'<code>$1</code>');
   text=text.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
@@ -1665,9 +1682,9 @@ function renderFolders(){
   el.querySelectorAll('[data-act="del"]').forEach(function(btn){
     btn.addEventListener('click',function(e){
       e.stopPropagation();var id=btn.closest('.conv-item').dataset.id;
-      showConfirm('Delete','Delete this conversation?',function(){
+      showConfirm(T('confirm.delete'),T('confirm.deleteConv'),function(){
         state.conversations=state.conversations.filter(function(c){return c.id!==id});
-        persist();if(state.currentConvId===id){state.currentConvId=null;renderMessages()}renderConvList();renderFolders();toast('Deleted','success');
+        persist();if(state.currentConvId===id){state.currentConvId=null;renderMessages()}renderConvList();renderFolders();toast(T('conv.deleted'),'success');
       });
     });
   });
@@ -1675,21 +1692,21 @@ function renderFolders(){
 
 function loadConversation(id){
   state.currentConvId=id;renderConvList();renderFolders();renderMessages();renderSuggestions();
-  var conv=getConv();if(conv)toast('Loaded: '+conv.title,'info');
+  var conv=getConv();if(conv)toast(T('chat.loaded')+conv.title,'info');
 }
 function getConv(){return state.conversations.find(function(c){return c.id===state.currentConvId})}
 
 function newChat(){
-  var conv={id:genId(),title:'New Chat',folderId:null,pinned:false,model:state.settings.model,systemPrompt:'',messages:[],createdAt:Date.now(),updatedAt:Date.now()};
+  var conv={id:genId(),title:T('chat.newChat'),folderId:null,pinned:false,model:state.settings.model,systemPrompt:'',messages:[],createdAt:Date.now(),updatedAt:Date.now()};
   state.conversations.push(conv);persist();state.currentConvId=conv.id;
-  renderConvList();renderFolders();renderMessages();renderSuggestions();toast('New chat started','info');
+  renderConvList();renderFolders();renderMessages();renderSuggestions();toast(T('chat.started'),'info');
 }
 
 function renderMessages(){
   var el=document.getElementById('messages');
   var conv=getConv();
   if(!conv||conv.messages.length===0){
-    el.innerHTML='<div class="welcome-msg"><h2>How can I help you today?</h2><p>Start a new conversation or ask me anything.</p></div>';
+    el.innerHTML='<div class="welcome-msg"><h2>'+T('chat.welcome')+'</h2><p>'+T('chat.welcomeSub')+'</p></div>';
     updateTokenCount();return;
   }
   el.innerHTML=conv.messages.map(function(m,i){return buildMsgHtml(m,i)}).join('');
@@ -1701,15 +1718,15 @@ function buildMsgHtml(msg,idx){
   var model=getModel(msg.model||state.settings.model);
   var family=model.family;
   if(msg.role==='user'){
-    var editTag=msg.edited?'<span class="msg-edited">(edited)</span>':'';
+    var editTag=msg.edited?'<span class="msg-edited">'+T('chat.edited')+'</span>':'';
     var toks=msg.tokens||countTokens(msg.content);
-    return '<div class="message"><div class="msg-wrapper user"><div class="msg-avatar user-av">U</div><div class="msg-content"><div class="msg-bubble" data-idx="'+idx+'">'+esc(msg.content)+editTag+'</div><div class="msg-meta"><span>'+fmtTime(msg.timestamp)+'</span><span class="msg-tokens">'+toks+' tok</span></div><div class="msg-actions"><button class="msg-action-btn edit-btn" data-idx="'+idx+'">✎ Edit</button></div></div></div></div>';
+    return '<div class="message"><div class="msg-wrapper user"><div class="msg-avatar user-av">U</div><div class="msg-content"><div class="msg-bubble" data-idx="'+idx+'">'+esc(msg.content)+editTag+'</div><div class="msg-meta"><span>'+fmtTime(msg.timestamp)+'</span><span class="msg-tokens">'+toks+' tok</span></div><div class="msg-actions"><button class="msg-action-btn edit-btn" data-idx="'+idx+'">'+T('chat.edit')+'</button></div></div></div></div>';
   }
   var fbUp=msg.feedback==='up'?' active-up':'';
   var fbDown=msg.feedback==='down'?' active-down':'';
   var toks=msg.tokens||countTokens(msg.content);
   var cost=calcCost(toks,model,true).toFixed(4);
-  return '<div class="message"><div class="msg-wrapper assistant"><div class="msg-avatar ai-av">✦</div><div class="msg-content"><div class="msg-bubble" data-idx="'+idx+'">'+formatMsg(msg.content)+'</div><div class="msg-meta"><span>'+fmtTime(msg.timestamp)+'</span><span class="msg-model-tag '+family+'">'+model.name+'</span><span class="msg-tokens">'+toks+' tok · $'+cost+'</span></div><div class="msg-actions"><button class="msg-action-btn copy-btn" data-idx="'+idx+'">📋 Copy</button><button class="msg-action-btn regen-btn" data-idx="'+idx+'">🔄 Regen</button><div class="feedback-btns"><button class="feedback-btn'+fbUp+'" data-idx="'+idx+'" data-fb="up">👍</button><button class="feedback-btn'+fbDown+'" data-idx="'+idx+'" data-fb="down">👎</button></div></div></div></div></div>';
+  return '<div class="message"><div class="msg-wrapper assistant"><div class="msg-avatar ai-av">✦</div><div class="msg-content"><div class="msg-bubble" data-idx="'+idx+'">'+formatMsg(msg.content)+'</div><div class="msg-meta"><span>'+fmtTime(msg.timestamp)+'</span><span class="msg-model-tag '+family+'">'+model.name+'</span><span class="msg-tokens">'+toks+' tok · $'+cost+'</span></div><div class="msg-actions"><button class="msg-action-btn copy-btn" data-idx="'+idx+'">'+T('chat.copy')+'</button><button class="msg-action-btn regen-btn" data-idx="'+idx+'">'+T('chat.regen')+'</button><div class="feedback-btns"><button class="feedback-btn'+fbUp+'" data-idx="'+idx+'" data-fb="up">👍</button><button class="feedback-btn'+fbDown+'" data-idx="'+idx+'" data-fb="down">👎</button></div></div></div></div></div>';
 }
 
 function updateTokenCount(){
@@ -1860,7 +1877,7 @@ function initMsgActions(){
     var idx=parseInt(btn.dataset.idx);var conv=getConv();if(!conv||!conv.messages[idx])return;
     if(btn.classList.contains('copy-btn')){
       var txt=conv.messages[idx].content;
-      navigator.clipboard.writeText(txt).then(function(){btn.classList.add('copied');btn.textContent='✓ Copied';setTimeout(function(){btn.classList.remove('copied');btn.textContent='📋 Copy'},2000)}).catch(function(){toast('Copy failed','error')});
+      navigator.clipboard.writeText(txt).then(function(){btn.classList.add('copied');btn.textContent=T('chat.copied');setTimeout(function(){btn.classList.remove('copied');btn.textContent=T('chat.copy')},2000)}).catch(function(){toast('Copy failed','error')});
     }
     if(btn.classList.contains('regen-btn')){
       if(state.isTyping)return;
@@ -1877,7 +1894,7 @@ function initMsgActions(){
       var bubble=document.querySelector('.msg-bubble[data-idx="'+idx+'"]');
       if(!bubble||bubble.querySelector('.msg-edit-area'))return;
       var orig=msg.content;
-      bubble.innerHTML='<div class="msg-edit-area"><textarea class="form-input">'+esc(orig)+'</textarea><button class="btn btn-primary btn-sm save-edit-btn">Save</button><button class="btn btn-secondary btn-sm cancel-edit-btn">Cancel</button></div>';
+      bubble.innerHTML='<div class="msg-edit-area"><textarea class="form-input">'+esc(orig)+'</textarea><button class="btn btn-primary btn-sm save-edit-btn">'+T('chat.save')+'</button><button class="btn btn-secondary btn-sm cancel-edit-btn">'+T('chat.cancel')+'</button></div>';
       var ta=bubble.querySelector('textarea');
       ta.style.height=Math.min(Math.max(ta.scrollHeight,50),200)+'px';ta.focus();
       bubble.querySelector('.save-edit-btn').onclick=function(){
@@ -1911,7 +1928,7 @@ function initMsgActions(){
         };
         var lang=runBtn.dataset.lang||'default';
         outText.textContent=fakeOutputs[lang]||fakeOutputs.default;
-        runBtn.textContent='▶ Run';
+        runBtn.textContent=T('chat.run');
       },800+Math.random()*600);
     }
     var copyBtn=e.target.closest('.copy-cb-btn');
@@ -2147,7 +2164,7 @@ function doExport(fmt){
     conv.messages.forEach(function(m){
       content+='<div class="msg '+(m.role==='user'?'user':'ai')+'"><div class="time">'+(m.role==='user'?'You':'AI')+' · '+fmtTime(m.timestamp)+'</div><p>'+esc(m.content).replace(/\n/g,'<br>')+'</p></div>';
     });
-    content+='</body></html>';
+    content+='</body></html>'; 
     name=conv.title.replace(/[^a-z0-9]/gi,'_')+'.html';
   }
   var blob=new Blob([content],{type:'text/plain'});
@@ -2161,7 +2178,7 @@ function renderAnalytics(){
   var totalToks=a.tokenHistory.reduce(function(s,t){return s+t.tokens},0);
   var totalCost=a.costHistory.reduce(function(s,c){return s+c.cost},0);
 
-  body.innerHTML='<div class="analytics-grid"><div class="analytics-card"><h4>Total Messages</h4><div class="stat-value">'+totalMsgs+'</div></div><div class="analytics-card"><h4>Total Tokens</h4><div class="stat-value">'+totalToks.toLocaleString()+'</div></div><div class="analytics-card"><h4>Total Cost</h4><div class="stat-value">$'+totalCost.toFixed(4)+'</div></div><div class="analytics-card"><h4>Documents</h4><div class="stat-value">'+state.knowledge.length+'</div></div></div><div class="analytics-full" style="margin-bottom:16px"><h4>Daily Messages</h4><canvas id="chartDaily" width="750" height="200"></canvas></div><div class="analytics-grid"><div class="analytics-full"><h4>Model Usage</h4><canvas id="chartModels" width="360" height="200"></canvas></div><div class="analytics-full"><h4>Token Distribution</h4><canvas id="chartTokens" width="360" height="200"></canvas></div></div>';
+  body.innerHTML='<div class="analytics-grid"><div class="analytics-card"><h4>'+T('analytics.totalMessages')+'</h4><div class="stat-value">'+totalMsgs+'</div></div><div class="analytics-card"><h4>'+T('analytics.totalTokens')+'</h4><div class="stat-value">'+totalToks.toLocaleString()+'</div></div><div class="analytics-card"><h4>'+T('analytics.totalCost')+'</h4><div class="stat-value">$'+totalCost.toFixed(4)+'</div></div><div class="analytics-card"><h4>'+T('analytics.documents')+'</h4><div class="stat-value">'+state.knowledge.length+'</div></div></div><div class="analytics-full" style="margin-bottom:16px"><h4>'+T('analytics.dailyMessages')+'</h4><canvas id="chartDaily" width="750" height="200"></canvas></div><div class="analytics-grid"><div class="analytics-full"><h4>'+T('analytics.modelUsage')+'</h4><canvas id="chartModels" width="360" height="200"></canvas></div><div class="analytics-full"><h4>'+T('analytics.tokenDist')+'</h4><canvas id="chartTokens" width="360" height="200"></canvas></div></div>';
 
   setTimeout(function(){
     drawDailyChart();drawModelChart();drawTokenChart();
@@ -2172,7 +2189,7 @@ function drawDailyChart(){
   var c=document.getElementById('chartDaily');if(!c)return;
   var ctx=c.getContext('2d');var w=c.width=750;var h=c.height=180;
   var data=state.analytics.dailyMessages.slice(-14);
-  if(!data.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText('No data yet',w/2-30,h/2);return}
+  if(!data.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText(T('analytics.noData'),w/2-30,h/2);return}
   var max=Math.max.apply(null,data.map(function(d){return d.count}))||1;
   var padL=40,padR=20,padT=20,padB=30;
   var cw=w-padL-padR,ch=h-padT-padB;
@@ -2209,7 +2226,7 @@ function drawModelChart(){
   var c=document.getElementById('chartModels');if(!c)return;
   var ctx=c.getContext('2d');var w=c.width=360;var h=c.height=180;
   var usage=state.analytics.modelUsage;var entries=Object.keys(usage);
-  if(!entries.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText('No data yet',w/2-30,h/2);return}
+  if(!entries.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText(T('analytics.noData'),w/2-30,h/2);return}
   var total=entries.reduce(function(s,k){return s+usage[k]},0)||1;
   var colors=['#8b5cf6','#3b82f6','#22c55e','#f59e0b','#ef4444','#ec4899'];
   var cx=w/2,cy=h/2,r=60;
@@ -2236,7 +2253,7 @@ function drawTokenChart(){
     var k=t.model||'unknown';tokByModel[k]=(tokByModel[k]||0)+t.tokens;
   });
   var entries=Object.keys(tokByModel);
-  if(!entries.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText('No data yet',w/2-30,h/2);return}
+  if(!entries.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText(T('analytics.noData'),w/2-30,h/2);return}
   var max=Math.max.apply(null,entries.map(function(k){return tokByModel[k]}))||1;
   var colors=['#8b5cf6','#3b82f6','#22c55e','#f59e0b'];
   var barH=24,gap=8,padL=100,padR=40;
@@ -2256,9 +2273,9 @@ function drawTokenChart(){
 
 function renderTeam(){
   var body=document.getElementById('teamBody');
-  body.innerHTML='<div style="margin-bottom:16px"><h4 style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Team Members</h4>'+
+  body.innerHTML='<div style="margin-bottom:16px"><h4 style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+T('team.members')+'</h4>'+
     TEAM_MEMBERS.map(function(m){return '<div class="team-member"><div class="team-member-avatar" style="background:'+m.color+'">'+m.avatar+'</div><div class="team-member-info"><div class="team-member-name">'+m.name+' <span style="font-size:10px;color:var(--text-muted);font-weight:400">'+m.role+'</span></div></div><div class="team-member-status '+(m.online?'online':'offline')+'"></div></div>'}).join('')+
-    '</div><div><h4 style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Shared Rooms</h4>'+
+    '</div><div><h4 style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+T('team.rooms')+'</h4>'+
     SHARED_ROOMS.map(function(r){
       var members=r.members.map(function(mid){var tm=TEAM_MEMBERS.find(function(t){return t.id===mid});return tm?'<div style="background:'+tm.color+'">'+tm.avatar+'</div>':''}).join('');
       return '<div class="shared-room"><div class="shared-room-header"><span class="shared-room-name">'+r.name+'</span><span style="font-size:10px;color:var(--text-muted)">'+timeAgo(r.lastActivity)+'</span></div><div class="shared-room-members"><div class="avatar-stack">'+members+'</div></div></div>';
@@ -2302,7 +2319,7 @@ function afterLangChange(){
   if(navSections.length>=3){navSections[1].textContent=T('sidebar.folders');}
   if(navSections.length>=4){navSections[2].textContent=T('sidebar.recent');}
   var s=document.getElementById('searchInput');if(s)s.placeholder=T('sidebar.search');
-  var up=document.getElementById('uploadBtn');if(up)up.innerHTML='📤 '+T('sidebar.upload');
+  var up=document.getElementById('uploadBtn');if(up)up.innerHTML=T('sidebar.upload');
   ['newFolderBtn','newChatBtn'].forEach(function(id){
     var b=document.getElementById(id);
     if(b){var m={newFolderBtn:T('sidebar.newFolder'),newChatBtn:T('sidebar.newChat')};b.title=m[id];}
@@ -2310,10 +2327,23 @@ function afterLangChange(){
   var si=document.getElementById('sidebarClose');if(si)si.title=T('sidebar.close');
   var ci=document.getElementById('chatInput');if(ci)ci.placeholder=T('chat.inputPlaceholder');
   var hi=document.querySelector('.input-hint');if(hi)hi.textContent=T('chat.inputHint');
+  var setText=function(id,key){var el=document.getElementById(id);if(el)el.textContent=T(key)};
+  setText('confirmTitle','confirm.title');setText('confirmCancel','confirm.cancel');setText('confirmOk','confirm.delete');
+  var settingsTitle=document.querySelector('#settingsOverlay .modal-header h3');if(settingsTitle)settingsTitle.textContent=T('settings.title');
+  var analyticsTitle=document.querySelector('#analyticsOverlay .modal-header h3');if(analyticsTitle)analyticsTitle.textContent=T('analytics.title');
+  var teamTitle=document.querySelector('#teamOverlay .modal-header h3');if(teamTitle)teamTitle.textContent=T('team.title');
+  var addDocTitle=document.getElementById('addDocTitle');if(addDocTitle)addDocTitle.textContent=T('docs.upload');
+  setText('addDocCancelBtn','docs.cancel');setText('addDocSaveBtn','docs.save');
+  var promptApply=document.getElementById('promptApplyBtn');if(promptApply)promptApply.textContent=T('prompt.apply');
+  document.querySelectorAll('#promptOverlay .btn-secondary').forEach(function(b){b.textContent=T('prompt.cancel')});
+  renderMessages();
+  renderKnowledge();
 }
 renderLangSwitcher();
 afterLangChange();
 })();
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

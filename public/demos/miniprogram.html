@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -345,13 +345,12 @@ function T(key){
 }
 function setLang(code){
   curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
-  renderLangSwitcher();
-  afterLangChange();
+  window.location.reload();
 }
 function renderLangSwitcher(){
   var el=document.getElementById('langSwitcher');if(!el)return;
   var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
-  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:3px 6px;color:#fff;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:3px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#2a2a2a;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:120px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:6px 8px;border:none;background:'+(l.code===curLang?'#07C160':'none')+';color:'+(l.code===curLang?'#fff':'#ccc')+';cursor:pointer;font-size:11px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:3px 6px;color:#fff;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:3px">&#127760; '+cur.code.toUpperCase()+' &#9662;</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#2a2a2a;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:120px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:6px 8px;border:none;background:'+(l.code===curLang?'#07C160':'none')+';color:'+(l.code===curLang?'#fff':'#ccc')+';cursor:pointer;font-size:11px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
 }
 function toggleLangMenu(){
   var m=document.getElementById('langMenu');
@@ -424,6 +423,10 @@ var b4=document.getElementById('banner4Title');if(b4)b4.textContent=T('banner.s4
 var b4d=document.getElementById('banner4Desc');if(b4d)b4d.textContent=T('banner.s4d');
 var lt=document.getElementById('liveTitle');if(lt)lt.textContent=T('home.live');
 var lm=document.getElementById('liveMore');if(lm)lm.textContent=T('home.more');
+var lexitTitle=document.getElementById('liveExitTitle');if(lexitTitle)lexitTitle.textContent=T('live.exitTitle');
+var lexitDesc=document.getElementById('liveExitDesc');if(lexitDesc)lexitDesc.textContent=T('live.exitDesc');
+var lexitCancel=document.getElementById('liveExitCancel');if(lexitCancel)lexitCancel.textContent=T('common.cancel');
+var lexitConfirm=document.getElementById('liveExitConfirmBtn');if(lexitConfirm)lexitConfirm.textContent=T('live.exitConfirm');
 var ft=document.getElementById('flashTitle');if(ft)ft.innerHTML='<span class="fire">⚡</span> '+T('home.flash');
 var rt=document.getElementById('recTitle');if(rt)rt.textContent=T('home.recommend');
 var cpt=document.getElementById('cartPageTitle');if(cpt)cpt.textContent=T('cart.title');
@@ -1118,11 +1121,14 @@ save('mp_coupons',coupons);document.getElementById('couponPopup').classList.remo
 };
 }
 
+renderLangSwitcher();
 renderCategoryRow();renderLive();renderFlash();renderRec();
 renderCart();renderProfile();
 applyStaticI18n();
 
 })();
 </script>
+<script src="/demos/a11y-helper.js" defer></script>
+<script src="/demos/demo-return.js" defer></script>
 </body>
 </html>

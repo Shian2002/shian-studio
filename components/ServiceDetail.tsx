@@ -481,7 +481,7 @@ export default function ServiceDetail({ tier }: { tier: Tier }) {
               Send a project inquiry and let&apos;s discuss your {name} project.
             </p>
             <a
-              href={`/#contact?service=${tier.id}`}
+              href={`/contact?service=${tier.id}`}
               onClick={() => trackCtaClick(`service-${tier.id}`)}
               className="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-white font-medium transition-all duration-200 hover:opacity-90"
               style={{ backgroundColor: color }}

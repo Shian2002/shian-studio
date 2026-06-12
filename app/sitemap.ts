@@ -3,7 +3,7 @@ import { PORTFOLIO_ITEMS, PRICING_TIERS } from "@/lib/constants";
 import { BLOG_POSTS } from "@/lib/blog-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://shian.studio";
+  const baseUrl = "https://shian-studio.vercel.app";
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
