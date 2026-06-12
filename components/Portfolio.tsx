@@ -88,6 +88,7 @@ export default function Portfolio() {
             return (
               <ProjectCard
                 key={item.id}
+                id={item.id}
                 title={translatedTitle}
                 description={translatedDescription}
                 tags={item.tags}
