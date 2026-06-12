@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/LanguageContext";
 
 interface Props {
@@ -37,6 +37,14 @@ export default function ProjectCard({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { t } = useLanguage();
+  const router = useRouter();
+
+  const handleCardClick = useCallback((e: React.MouseEvent) => {
+    // Prevent navigation if user clicked an inner link/button
+    const target = e.target as HTMLElement;
+    if (target.closest("a") || target.closest("button")) return;
+    router.push(`/case-studies/${id}`);
+  }, [router, id]);
 
   useEffect(() => {
     if (!playing) return;
@@ -72,9 +80,9 @@ export default function ProjectCard({
       <motion.article
         whileHover={{ y: -4 }}
         transition={{ duration: 0.2 }}
-        className="group rounded-2xl overflow-hidden bg-th-card border border-th-border hover:border-th-border-m transition-all duration-300"
+        className="group rounded-2xl overflow-hidden bg-th-card border border-th-border hover:border-th-border-m transition-all duration-300 cursor-pointer"
+        onClick={handleCardClick}
       >
-        <Link href={`/case-studies/${id}`} className="block">
           <div className="relative aspect-video overflow-hidden">
             {mediaType === "youtube" && playing ? (
               <iframe
@@ -173,7 +181,6 @@ export default function ProjectCard({
             </div>
           </div>
         </div>
-        </Link>
       </motion.article>
 
       <AnimatePresence>
