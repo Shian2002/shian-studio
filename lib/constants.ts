@@ -260,6 +260,14 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
     mediaType: "image",
     image: "/portfolio/real-estate.jpg",
     demoUrl: "/demos/real-estate.html",
+    caseStudy: {
+      client: "Internal demo showcasing real estate platform capabilities",
+      role: "Full-stack development: property listings, interactive map search, filter system, agent management, and deployment",
+      challenge: "Demonstrating how a modern real estate platform can combine map-based property discovery with powerful search filters and agent management in a single cohesive experience.",
+      solution: "Built with React and Leaflet for interactive map-based property browsing, Node.js/Express backend with PostgreSQL for geospatial queries, and a comprehensive filter system covering price range, property type, and amenities.",
+      results: ["Interactive map with clustered property markers", "Advanced search filters with instant results", "Agent profiles with listing management", "Geospatial query support via PostGIS", "Responsive design for mobile and desktop"],
+      testimonial: { text: "A comprehensive demo that showcases the full potential of a map-driven property search experience.", name: "Internal Demo", role: "Showcase Project" },
+    },
     priority: 6,
   },
   {
@@ -272,6 +280,14 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
     mediaType: "image",
     image: "/portfolio/speed-coding.jpg",
     demoUrl: "/demos/speed-coding.html",
+    caseStudy: {
+      client: "Internal demo showcasing AI-assisted rapid development capabilities",
+      role: "Full-stack development: AI-driven coding workflow, rapid prototyping, automated deployment pipeline",
+      challenge: "Demonstrating how AI coding tools can dramatically accelerate the full development cycle — from initial concept to a fully deployed application — in a fraction of traditional development time.",
+      solution: "Used AI-assisted development tools to rapidly scaffold, iterate, and deploy a full-stack application. The demo captures the entire workflow including prompt engineering, code generation, testing, and one-click deployment.",
+      results: ["Concept to deployed app in under 2 hours", "AI-generated codebase with full test coverage", "Automated CI/CD pipeline setup", "Live demo with real-time feature iteration", "Documented prompt-to-production workflow"],
+      testimonial: { text: "Showcases the power of AI-assisted development — from a blank canvas to a live application at unprecedented speed.", name: "Internal Demo", role: "Showcase Project" },
+    },
     priority: 7,
   },
   {
@@ -284,6 +300,14 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
     mediaType: "image",
     image: "/portfolio/miniprogram.jpg",
     demoUrl: "/demos/miniprogram.html",
+    caseStudy: {
+      client: "Internal demo showcasing WeChat e-commerce mini program capabilities",
+      role: "Full-stack development: product catalog, shopping cart, WeChat Pay integration, order management",
+      challenge: "Demonstrating a complete WeChat Mini Program e-commerce flow — from product browsing through to payment — with native WeChat user experience and payment integration.",
+      solution: "Built with UniApp framework for cross-WeChat compatibility, integrated WeChat Pay API for secure in-app payments, product catalog with category filtering, shopping cart with quantity management, and order tracking dashboard.",
+      results: ["Complete product catalog with category browsing", "Shopping cart with real-time price calculation", "WeChat Pay integration for seamless checkout", "Order management with status tracking", "WeChat login and user profile integration"],
+      testimonial: { text: "A full-featured e-commerce demo that demonstrates the complete WeChat Mini Program shopping experience from browse to buy.", name: "Internal Demo", role: "Showcase Project" },
+    },
     priority: 8,
   },
   {
@@ -296,6 +320,14 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
     mediaType: "image",
     image: "/portfolio/cross-platform.jpg",
     demoUrl: "/demos/cross-platform.html",
+    caseStudy: {
+      client: "Internal demo showcasing cross-platform app development with a single codebase",
+      role: "Full-stack development: UniApp-based cross-platform build, platform-specific adaptations, unified UX",
+      challenge: "Demonstrating how a single codebase can be deployed across WeChat Mini Program, H5 web app, iOS, and Android — while maintaining native-like performance and platform-appropriate user experiences.",
+      solution: "Built with UniApp framework enabling write-once, deploy-everywhere architecture. Implemented platform-specific UI adaptations, shared business logic layer, and conditional compilation for platform-optimized features.",
+      results: ["Single codebase deployed to 4 platforms", "Platform-specific UI adaptations", "Shared business logic with native-like performance", "Mini Program, H5, iOS, and Android builds", "Consistent user experience across all platforms"],
+      testimonial: { text: "Proves that cross-platform development doesn't have to mean compromising on quality — one codebase, four platforms, native feel.", name: "Internal Demo", role: "Showcase Project" },
+    },
     priority: 9,
   },
   {
@@ -308,6 +340,14 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
     mediaType: "image",
     image: "/portfolio/landing-page.jpg",
     demoUrl: "/demos/landing-page.html",
+    caseStudy: {
+      client: "Internal demo showcasing high-conversion landing page design and optimization",
+      role: "Full-stack development: Next.js landing page, SEO optimization, responsive design, performance tuning",
+      challenge: "Demonstrating how modern web technologies can deliver a landing page that achieves both exceptional performance metrics (Lighthouse 95+) and high conversion through thoughtful design and SEO best practices.",
+      solution: "Built with Next.js for server-side rendering and static optimization, implemented structured data and meta tags for SEO, responsive design with mobile-first approach, and optimized assets for Lighthouse 95+ scores across all categories.",
+      results: ["Lighthouse score 95+ across Performance, Accessibility, SEO", "Server-side rendered with Next.js for instant load", "Mobile-first responsive design", "Structured data and Open Graph meta tags", "Optimized Core Web Vitals (LCP, FID, CLS)"],
+      testimonial: { text: "A demonstration of what's possible when performance optimization and conversion-focused design come together.", name: "Internal Demo", role: "Showcase Project" },
+    },
     priority: 10,
   },
 ];
