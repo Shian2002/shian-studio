@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? 'x2938784260u@gmail.com';
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'SHIAN Studio <onboarding@resend.dev>';
+const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT;
+const FORMSUBMIT_ENDPOINT =
+  process.env.FORMSUBMIT_ENDPOINT ?? `https://formsubmit.co/ajax/${CONTACT_EMAIL}`;
+
 // --- Types ---
 
 interface ContactFormData {
@@ -87,12 +93,22 @@ function validateBody(body: Record<string, unknown>): {
 const submissionTimestamps = new Map<string, number[]>();
 const RATE_LIMIT_WINDOW = 60_000; // 1 minute
 const RATE_LIMIT_MAX = 3; // max 3 submissions per window
+const MAP_CLEANUP_THRESHOLD = 500; // cleanup when Map exceeds this size
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
   const timestamps = submissionTimestamps.get(ip)?.filter(
     (t) => now - t < RATE_LIMIT_WINDOW
   ) ?? [];
+
+  // Periodic cleanup to prevent memory leak
+  if (submissionTimestamps.size > MAP_CLEANUP_THRESHOLD) {
+    for (const [key, ts] of submissionTimestamps) {
+      if (ts.every((t) => now - t >= RATE_LIMIT_WINDOW)) {
+        submissionTimestamps.delete(key);
+      }
+    }
+  }
 
   if (timestamps.length >= RATE_LIMIT_MAX) {
     return true;
@@ -102,10 +118,8 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-// --- Email via Resend ---
-
-async function sendEmailNotification(record: ContactRecord): Promise<Response> {
-  const emailBody = [
+function buildEmailBody(record: ContactRecord): string {
+  return [
     `New contact form submission`,
     ``,
     `Name: ${record.name}`,
@@ -131,6 +145,84 @@ async function sendEmailNotification(record: ContactRecord): Promise<Response> {
   ]
     .filter(Boolean)
     .join('\n');
+}
+
+// --- Email via Formspree ---
+
+async function sendFormspreeNotification(record: ContactRecord): Promise<Response> {
+  if (!FORMSPREE_ENDPOINT) {
+    throw new Error('FORMSPREE_ENDPOINT is not configured');
+  }
+
+  return fetch(FORMSPREE_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: record.name,
+      email: record.email,
+      company: record.company,
+      projectType: record.projectType,
+      budget: record.budget,
+      timeline: record.timeline,
+      message: record.message,
+      source: record.source,
+      pagePath: record.pagePath,
+      utm_source: record.utm_source,
+      utm_medium: record.utm_medium,
+      utm_campaign: record.utm_campaign,
+      service: record.service,
+      caseStudy: record.caseStudy,
+      submissionId: record.id,
+      submittedAt: record.createdAt,
+      clientIp: record.ip,
+      _subject: `New Contact: ${record.name} - ${record.projectType}`,
+    }),
+  });
+}
+
+// --- Email via FormSubmit ---
+
+async function sendFormSubmitNotification(record: ContactRecord): Promise<Response> {
+  const payload = new URLSearchParams();
+  payload.set('name', record.name);
+  payload.set('email', record.email);
+  payload.set('_replyto', record.email);
+  payload.set('_subject', `New Contact: ${record.name} - ${record.projectType}`);
+  payload.set('_template', 'table');
+  payload.set('_captcha', 'false');
+  payload.set('company', record.company ?? '');
+  payload.set('projectType', record.projectType);
+  payload.set('budget', record.budget);
+  payload.set('timeline', record.timeline ?? '');
+  payload.set('message', record.message ?? '');
+  payload.set('source', record.source ?? '');
+  payload.set('pagePath', record.pagePath ?? '');
+  payload.set('utm_source', record.utm_source ?? '');
+  payload.set('utm_medium', record.utm_medium ?? '');
+  payload.set('utm_campaign', record.utm_campaign ?? '');
+  payload.set('service', record.service ?? '');
+  payload.set('caseStudy', record.caseStudy ?? '');
+  payload.set('submissionId', record.id);
+  payload.set('submittedAt', record.createdAt);
+  payload.set('clientIp', record.ip);
+
+  return fetch(FORMSUBMIT_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: payload.toString(),
+  });
+}
+
+// --- Email via Resend ---
+
+async function sendEmailNotification(record: ContactRecord): Promise<Response> {
+  const emailBody = buildEmailBody(record);
 
   return fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -139,10 +231,8 @@ async function sendEmailNotification(record: ContactRecord): Promise<Response> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      // Requires: shian.studio domain verified in Resend dashboard.
-      // If not yet verified, fall back to onboarding@resend.dev temporarily.
-      from: 'SHIAN Studio <hello@shian.studio>',
-      to: ['hello@shian.studio'],
+      from: RESEND_FROM_EMAIL,
+      to: [CONTACT_EMAIL],
       reply_to: record.email,
       subject: `New Contact: ${record.name} - ${record.projectType}`,
       text: emailBody,
@@ -151,10 +241,9 @@ async function sendEmailNotification(record: ContactRecord): Promise<Response> {
 }
 
 // --- Route Handler ---
-// Deployment note: Set RESEND_API_KEY env var for email delivery.
-// Without it, the API returns 500 — form submissions will NOT be delivered.
-// IMPORTANT: Verify shian.studio domain in Resend dashboard before deploying.
-// Until verified, the from address must stay on onboarding@resend.dev.
+// Deployment note: FormSubmit is the default no-signup, no-domain Gmail delivery path.
+// Optional: set FORMSPREE_ENDPOINT or FORMSUBMIT_ENDPOINT to override the default.
+// Resend is kept as a final fallback for future domain-verified email delivery.
 
 export async function POST(request: NextRequest) {
   try {
@@ -196,11 +285,32 @@ export async function POST(request: NextRequest) {
       ip,
     };
 
-    // Send email — RESEND_API_KEY is required
+    if (FORMSPREE_ENDPOINT) {
+      const formspreeRes = await sendFormspreeNotification(record);
+      if (!formspreeRes.ok) {
+        const errText = await formspreeRes.text().catch(() => 'Unknown error');
+        console.error('[Contact Form] Formspree API error:', formspreeRes.status, errText);
+        return NextResponse.json(
+          { success: false, error: 'Failed to send notification email. Please try again later.' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ success: true, id });
+    }
+
+    const formSubmitRes = await sendFormSubmitNotification(record);
+    if (formSubmitRes.ok) {
+      return NextResponse.json({ success: true, id });
+    }
+
+    const formSubmitErrText = await formSubmitRes.text().catch(() => 'Unknown error');
+    console.error('[Contact Form] FormSubmit API error:', formSubmitRes.status, formSubmitErrText);
+
     if (!process.env.RESEND_API_KEY) {
-      console.error('[Contact Form] RESEND_API_KEY not configured. Submission NOT delivered:', JSON.stringify(record, null, 2));
+      console.error('[Contact Form] No email provider configured. Submission NOT delivered:', JSON.stringify(record, null, 2));
       return NextResponse.json(
-        { success: false, error: 'Email service not configured. Please contact hello@shian.studio directly.' },
+        { success: false, error: 'Email service not configured. Please try again later.' },
         { status: 500 }
       );
     }
@@ -210,7 +320,7 @@ export async function POST(request: NextRequest) {
       const errText = await emailRes.text().catch(() => 'Unknown error');
       console.error('[Contact Form] Resend API error:', emailRes.status, errText);
       return NextResponse.json(
-        { success: false, error: 'Failed to send notification email. Please try again or email hello@shian.studio directly.' },
+        { success: false, error: 'Failed to send notification email. Please try again later.' },
         { status: 500 }
       );
     }
