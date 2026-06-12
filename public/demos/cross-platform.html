@@ -300,38 +300,38 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <div class="info"><h2>CrossForge</h2><div class="sub">Studio v2.4.1</div></div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-sec"><div class="nav-sec-title">'+T("nav.main")+'</div>
-      <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span>"+T("nav.dashboard")+"</div>
-      <div class="nav-item" data-page="projects"><span class="icon">📁</span>"+T("nav.projects")+"<span class="badge" id="projCount">6</span></div>
-      <div class="nav-item" data-page="editor"><span class="icon">💻</span>"+T("nav.editor")+"</div>
-      <div class="nav-item" data-page="build"><span class="icon">🔨</span>"+T("nav.builds")+"<span class="badge" id="buildCount">3</span></div>
+    <div class="nav-sec"><div class="nav-sec-title">Main</div>
+      <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span>Dashboard</div>
+      <div class="nav-item" data-page="projects"><span class="icon">📁</span>Projects<span class="badge" id="projCount">6</span></div>
+      <div class="nav-item" data-page="editor"><span class="icon">💻</span>Code Editor</div>
+      <div class="nav-item" data-page="build"><span class="icon">🔨</span>Build System<span class="badge" id="buildCount">3</span></div>
     </div>
-    <div class="nav-sec"><div class="nav-sec-title">'+T("nav.tools")+'</div>
-      <div class="nav-item" data-page="devices"><span class="icon">📱</span>"+T("nav.devices")+"</div>
-      <div class="nav-item" data-page="team"><span class="icon">👥</span>"+T("nav.team")+"<span class="badge" id="teamCount">8</span></div>
-      <div class="nav-item" data-page="analytics"><span class="icon">📈</span>"+T("nav.analytics")+"</div>
-      <div class="nav-item" data-page="settings"><span class="icon">⚙️</span>"+T("nav.settings")+"</div>
+    <div class="nav-sec"><div class="nav-sec-title">Tools</div>
+      <div class="nav-item" data-page="devices"><span class="icon">📱</span>Device Preview</div>
+      <div class="nav-item" data-page="team"><span class="icon">👥</span>Team<span class="badge" id="teamCount">8</span></div>
+      <div class="nav-item" data-page="analytics"><span class="icon">📈</span>Analytics</div>
+      <div class="nav-item" data-page="settings"><span class="icon">⚙️</span>Settings</div>
     </div>
   </nav>
   <div class="sidebar-ft" style="padding:12px;border-top:1px solid var(--border);font-size:10px;color:var(--text3)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span>CrossForge v2.4.1</span><span style="color:var(--green)">● '+T("sidebar.online")+'</span>
+      <span>CrossForge v2.4.1</span><span style="color:var(--green)">● Online</span>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
-      <span style="opacity:.7">'+T("sidebar.buildsToday")+': 3</span>
+      <span style="opacity:.7">Builds today: 3</span>
       <span style="opacity:.7">|</span>
-      <span style="opacity:.7">'+T("sidebar.api")+': 45ms</span>
+      <span style="opacity:.7">API: 45ms</span>
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="APP.showNewProject()">'+T("sidebar.newProject")+'</button>
+    <button class="btn btn-primary" style="width:100%" onclick="APP.showNewProject()">+ New Project</button>
     <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;opacity:.5;text-align:center">
-      '+T("sidebar.copyright")+'
+      &copy; 2024 CrossForge Studio &middot; MIT License
     </div>
   </div>
 </aside>
 
 <div class="main">
   <div class="main-hdr">
-    <h1 id="pageTitle">"+T("nav.dashboard")+"</h1>
+    <h1 id="pageTitle">Dashboard</h1>
     <div class="actions" id="pageActions"></div>
     <div id="langSwitcher" style="position:relative"></div>
   </div>

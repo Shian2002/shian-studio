@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? 'x2938784260u@gmail.com';
-const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'SHIAN Studio <onboarding@resend.dev>';
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? '';
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? '';
 const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT;
 const FORMSUBMIT_ENDPOINT =
-  process.env.FORMSUBMIT_ENDPOINT ?? `https://formsubmit.co/ajax/${CONTACT_EMAIL}`;
+  process.env.FORMSUBMIT_ENDPOINT ?? (CONTACT_EMAIL ? `https://formsubmit.co/ajax/${CONTACT_EMAIL}` : '');
 
 // --- Types ---
 
@@ -247,6 +247,15 @@ async function sendEmailNotification(record: ContactRecord): Promise<Response> {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check email service configuration
+    if (!CONTACT_EMAIL) {
+      console.error('[Contact Form] CONTACT_EMAIL env var not set');
+      return NextResponse.json(
+        { success: false, error: 'Email service not configured.' },
+        { status: 503 }
+      );
+    }
+
     // Parse body
     let body: Record<string, unknown>;
     try {

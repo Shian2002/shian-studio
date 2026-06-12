@@ -333,8 +333,8 @@ export const BUDGET_RANGES = [
 export const SOCIAL_LINKS = {
   github: "https://github.com/Shian2002",
   twitter: "https://x.com/shiancoding?s=11",
-  youtube: "https://youtube.com/@shian_dev",
-  email: "mailto:hello@shian.studio",
+  youtube: "",
+  email: "mailto:x2938784260u@gmail.com",
 } as const;
 
 export const TESTIMONIALS = [

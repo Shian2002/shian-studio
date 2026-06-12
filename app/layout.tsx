@@ -18,9 +18,8 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://shian.studio";
-const OG_IMAGE =
-  "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SHIAN%20Studio%20dark%20tech%20brand%20banner%20with%20blue%20gradient%20abstract%20geometry%20minimalist%20professional&image_size=landscape_16_9";
+const SITE_URL = "https://shian-studio.vercel.app";
+const OG_IMAGE = "https://shian-studio.vercel.app/portfolio/shian-studio.jpg";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -103,8 +102,8 @@ export const metadata: Metadata = {
     title: "SHIAN Studio — MVP & SaaS Development for Startups and SMBs",
     description:
       "SHIAN Studio delivers production-ready MVPs, SaaS products, and AI dashboards for startups and SMBs. From idea to launch in 2-4 weeks. AI-powered full-stack delivery.",
-    creator: "@shian_dev",
-    creatorId: "@shian_dev",
+    creator: "@shiancoding",
+    creatorId: "@shiancoding",
     images: [
       {
         url: OG_IMAGE,
@@ -146,7 +145,6 @@ const jsonLd = {
       sameAs: [
         "https://github.com/Shian2002",
         "https://x.com/shiancoding",
-        "https://youtube.com/@shian_dev",
       ],
       knowsLanguage: ["en"],
       serviceType: [
