@@ -4,8 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { LOCALES, type Locale } from "@/lib/i18n";
 import { useLanguage } from "@/lib/LanguageContext";
 
-// Only show English for now — zh/ja/ko translations need review before public launch
-const VISIBLE_LOCALES = LOCALES.filter((l) => l.code === "en");
+const VISIBLE_LOCALES = LOCALES;
 
 export default function LanguageSwitcher() {
   const { locale, setLocale } = useLanguage();

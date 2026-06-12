@@ -155,7 +155,7 @@ export default function Navbar() {
                 </a>
               );
             })}
-            {/* <LanguageSwitcher /> — hidden until zh/ja/ko translations are reviewed */}
+            <LanguageSwitcher />
             <ThemeToggle />
             <a
               href="#contact?source=nav-quote"
@@ -170,7 +170,7 @@ export default function Navbar() {
           </div>
 
           <div className="flex md:hidden items-center gap-2">
-            {/* <LanguageSwitcher /> — hidden until zh/ja/ko translations are reviewed */}
+            <LanguageSwitcher />
             <ThemeToggle />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}

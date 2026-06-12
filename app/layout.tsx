@@ -146,7 +146,7 @@ const jsonLd = {
         "https://github.com/Shian2002",
         "https://x.com/shiancoding",
       ],
-      knowsLanguage: ["en"],
+      knowsLanguage: ["en", "zh", "ja", "ko"],
       serviceType: [
         "MVP Development",
         "SaaS Development",
