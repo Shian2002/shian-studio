@@ -8,14 +8,14 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0a0a0a] text-white">
+    <div role="alert" className="flex min-h-screen flex-col items-center justify-center bg-th-bg text-th-text px-6">
       <h1 className="text-4xl font-bold text-red-400">Something went wrong</h1>
-      <p className="mt-4 text-gray-400">
+      <p className="mt-4 text-th-muted text-center max-w-md">
         {error.message || "An unexpected error occurred."}
       </p>
       <button
-        onClick={reset}
-        className="mt-8 rounded-lg border border-white/10 bg-white/5 px-6 py-3 text-sm text-gray-300 transition-colors hover:border-white/20 hover:bg-white/10"
+        onClick={() => reset()}
+        className="mt-8 rounded-lg border border-th-border bg-th-bg-s px-6 py-3 text-sm text-th-text2 transition-colors hover:border-accent/30 hover:bg-accent/5 hover:text-th-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         Try again
       </button>

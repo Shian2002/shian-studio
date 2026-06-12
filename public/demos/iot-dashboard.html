@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SentinelIoT — 智能设备管理平台</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-0:#060a10;--bg-1:#0c1018;--bg-2:#111620;--bg-3:#171d2a;--bg-hover:#1e2538;
+  --border:#1f2740;--text-1:#e0e6f0;--text-2:#8892a6;--text-3:#4e5870;
+  --accent:#0ea5e9;--accent2:#38bdf8;--accent-glow:rgba(14,165,233,.14);
+  --green:#22c55e;--green-bg:rgba(34,197,94,.12);
+  --red:#ef4444;--red-bg:rgba(239,68,68,.12);
+  --yellow:#eab308;--yellow-bg:rgba(234,179,8,.12);
+  --orange:#f97316;--orange-bg:rgba(249,115,22,.12);
+  --purple:#a855f7;--purple-bg:rgba(168,85,247,.12);
+  --cyan:#06b6d4;--cyan-bg:rgba(6,182,212,.12);
+  --sidebar-w:240px;--topbar-h:52px;--radius:10px;--radius-sm:7px;
+}
+html{font-size:14px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg-0);color:var(--text-1);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg-1);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-brand{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-brand .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.sidebar-brand span{font-weight:700;font-size:1rem;letter-spacing:-.3px}
+.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto}
+.nav-section-title{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);padding:12px 12px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--radius-sm);color:var(--text-2);cursor:pointer;transition:all .2s;font-size:.84rem;font-weight:500;margin-bottom:2px;position:relative}
+.nav-item:hover{background:var(--bg-hover);color:var(--text-1)}
+.nav-item.active{background:var(--accent-glow);color:var(--accent2)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.65}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.56rem;font-weight:700;padding:2px 6px;border-radius:8px;min-width:18px;text-align:center}
+.main{margin-left:var(--sidebar-w);min-height:100vh}
+.topbar{height:var(--topbar-h);background:rgba(12,16,24,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:1rem;font-weight:700}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.top-btn{background:none;border:none;color:var(--text-2);cursor:pointer;padding:6px;border-radius:var(--radius-sm);transition:all .2s;position:relative}
+.top-btn:hover{background:var(--bg-hover);color:var(--text-1)}
+.top-btn svg{width:18px;height:18px}
+.top-btn .dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid var(--bg-1)}
+.content{padding:20px}
+.page{display:none}.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.page-header h1{font-size:1.3rem;font-weight:700;letter-spacing:-.3px}
+.page-header p{color:var(--text-2);font-size:.84rem;margin-top:2px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#0284c7}
+.btn-ghost{background:var(--bg-2);color:var(--text-2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg-hover);color:var(--text-1)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{opacity:.9}
+.btn-sm{padding:4px 9px;font-size:.73rem}
+.btn-icon{width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);background:var(--bg-2);border:1px solid var(--border);color:var(--text-2);cursor:pointer;transition:all .2s}
+.btn-icon:hover{background:var(--bg-hover);color:var(--text-1)}
+.btn-icon svg{width:14px;height:14px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;transition:all .25s}
+.stat-card:hover{border-color:rgba(14,165,233,.3);transform:translateY(-1px)}
+.stat-card .stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.stat-card .stat-label{font-size:.7rem;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.stat-card .stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.stat-card .stat-icon svg{width:14px;height:14px}
+.stat-card .stat-value{font-size:1.5rem;font-weight:800;letter-spacing:-.5px}
+.stat-card .stat-sub{font-size:.7rem;color:var(--text-3);margin-top:3px}
+.table-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.table-toolbar .toolbar-left{display:flex;align-items:center;gap:8px}
+.search-input{padding:6px 10px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-family:inherit;font-size:.8rem;outline:none;width:180px}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.search-input::placeholder{color:var(--text-3)}
+.filter-select{padding:6px 10px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-family:inherit;font-size:.8rem;outline:none}
+.filter-select option{background:var(--bg-2);color:var(--text-1)}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;font-size:.66rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--bg-hover)}
+tbody td{padding:8px 12px;font-size:.8rem;border-bottom:1px solid rgba(31,39,64,.4);vertical-align:middle}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:.68rem;font-weight:600}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%}
+.badge-online,.badge-active,.badge-completed,.badge-success{background:var(--green-bg);color:var(--green)}.badge-online::before,.badge-active::before,.badge-completed::before,.badge-success::before{background:var(--green)}
+.badge-offline,.badge-critical,.badge-failed{background:var(--red-bg);color:var(--red)}.badge-offline::before,.badge-critical::before,.badge-failed::before{background:var(--red)}
+.badge-warning{background:var(--yellow-bg);color:var(--yellow)}.badge-warning::before{background:var(--yellow)}
+.badge-pending,.badge-scheduled,.badge-pushing{background:var(--orange-bg);color:var(--orange)}.badge-pending::before,.badge-scheduled::before,.badge-pushing::before{background:var(--orange)}
+.badge-info,.badge-acknowledged{background:var(--cyan-bg);color:var(--cyan)}.badge-info::before,.badge-acknowledged::before{background:var(--cyan)}
+.badge-rolled-back{background:var(--purple-bg);color:var(--purple)}.badge-rolled-back::before{background:var(--purple)}
+.chart-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.chart-title{font-size:.9rem;font-weight:600}
+.chart-wrap{height:220px;position:relative}
+.chart-wrap canvas{width:100%!important;height:100%!important}
+.alert-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;transition:all .2s}
+.alert-card:hover{border-color:rgba(14,165,233,.3)}
+.alert-card.critical{border-left:3px solid var(--red)}
+.alert-card.warning{border-left:3px solid var(--yellow)}
+.alert-card.info{border-left:3px solid var(--accent)}
+.alert-card .alert-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.alert-card .alert-icon svg{width:13px;height:13px}
+.alert-card .alert-body{flex:1;min-width:0}
+.alert-card .alert-title{font-size:.84rem;font-weight:600;margin-bottom:2px}
+.alert-card .alert-desc{font-size:.74rem;color:var(--text-2);line-height:1.4}
+.alert-card .alert-time{font-size:.65rem;color:var(--text-3);margin-top:3px}
+.alert-card .alert-actions{display:flex;gap:4px;flex-shrink:0}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);width:520px;max-width:92vw;max-height:85vh;overflow-y:auto;animation:fadeIn .25s ease}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:.92rem;font-weight:700}
+.modal-close{width:26px;height:26px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);color:var(--text-2);cursor:pointer;font-size:13px;transition:all .2s}
+.modal-close:hover{background:var(--bg-hover);color:var(--text-1)}
+.modal-body{padding:16px}
+.modal-body label{display:block;font-size:.74rem;font-weight:600;color:var(--text-2);margin-bottom:4px;margin-top:12px}
+.modal-body label:first-child{margin-top:0}
+.modal-body input,.modal-body select,.modal-body textarea{width:100%;padding:7px 10px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-family:inherit;font-size:.82rem;outline:none;transition:border .2s}
+.modal-body input:focus,.modal-body select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.modal-body select option{background:var(--bg-2);color:var(--text-1)}
+.modal-body .form-row{display:flex;gap:10px}
+.modal-body .form-row>div{flex:1}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;border-top:1px solid var(--border)}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:400;display:none;align-items:center;justify-content:center}
+.confirm-overlay.show{display:flex}
+.confirm-box{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);width:360px;max-width:90vw;padding:20px;text-align:center}
+.confirm-box h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+.confirm-box p{color:var(--text-2);font-size:.82rem;margin-bottom:14px}
+.confirm-box .confirm-btns{display:flex;gap:8px;justify-content:center}
+.toast-container{position:fixed;top:60px;right:16px;z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{padding:10px 14px;border-radius:var(--radius-sm);font-size:.8rem;font-weight:500;color:#fff;pointer-events:auto;animation:toastIn .3s ease;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.info{background:var(--accent)}.toast.success{background:var(--green)}.toast.warning{background:var(--yellow);color:#000}.toast.error{background:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.progress-bar{width:100%;height:6px;background:var(--bg-3);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.signal-bars{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+.signal-bars .bar{width:3px;border-radius:1px;background:var(--text-3)}
+.signal-bars .bar.active{background:var(--green)}
+.gauge-container{display:flex;align-items:center;justify-content:center;gap:4px}
+.gauge-label{text-align:center;font-size:.68rem;color:var(--text-3);margin-top:4px}
+.gauge-value{font-size:1.1rem;font-weight:700;text-align:center}
+.floor-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.floor-cell{aspect-ratio:1;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;font-size:.6rem;color:var(--text-3)}
+.floor-cell:hover{border-color:var(--accent);z-index:1}
+.floor-cell.occupied-online{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4)}
+.floor-cell.occupied-warning{background:rgba(234,179,8,.15);border-color:rgba(234,179,8,.4)}
+.floor-cell.occupied-offline{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4)}
+.floor-cell .device-dot{width:10px;height:10px;border-radius:50%}
+.floor-cell .device-dot.online{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.5)}
+.floor-cell .device-dot.warning{background:var(--yellow);box-shadow:0 0 6px rgba(234,179,8,.5)}
+.floor-cell .device-dot.offline{background:var(--red)}
+.rule-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;transition:all .2s}
+.rule-card:hover{border-color:rgba(14,165,233,.3)}
+.rule-card .rule-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.rule-card .rule-name{font-weight:600;font-size:.86rem}
+.rule-card .rule-logic{font-size:.78rem;color:var(--accent2);background:var(--accent-glow);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:6px;font-family:'Consolas','Courier New',monospace}
+.rule-card .rule-desc{font-size:.74rem;color:var(--text-2)}
+.tab-bar{display:flex;gap:2px;margin-bottom:16px;background:var(--bg-2);border-radius:var(--radius-sm);padding:3px;border:1px solid var(--border);width:fit-content}
+.tab-btn{padding:6px 14px;border:none;background:none;color:var(--text-3);font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;border-radius:5px;transition:all .2s}
+.tab-btn.active{background:var(--accent);color:#fff}
+.tab-btn:hover:not(.active){color:var(--text-1)}
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.stats-grid{grid-template-columns:1fr 1fr}.search-input{width:140px}.table-scroll-hint{display:block}}
+@media(max-width:768px){.col-hide-sm{display:none}}
+.fw-spinner{display:none;position:fixed;inset:0;background:rgba(6,10,16,.7);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.fw-spinner.active{display:flex}
+.fw-spinner .spinner-ring{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:fwSpin .8s linear infinite}
+.fw-spinner .spinner-text{font-size:.84rem;color:var(--text-2)}
+@keyframes fwSpin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text-3)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-state .empty-msg{font-size:.9rem;margin-bottom:4px;color:var(--text-2)}
+.empty-state .empty-hint{font-size:.78rem;opacity:.7}
+@media print{
+  .sidebar,.topbar,.modal-overlay,.toast-container,.fw-spinner,.confirm-overlay{display:none!important}
+  .main{margin-left:0;width:100%}
+  .stats-grid,.chart-card,.table-card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="fw-spinner" id="fwSpinner"><div class="spinner-ring"></div><div class="spinner-text">正在推送固件更新...</div></div>
+<div class="toast-container" id="toastContainer"></div>
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">确认</h3>
+    <p id="confirmMsg">确定要执行此操作？</p>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" id="confirmCancel">取消</button>
+      <button class="btn btn-danger" id="confirmOk">确认</button>
+    </div>
+  </div>
+</div>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="logo">S</div><span>SentinelIoT</span></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title" id="navSecMonitor">监控</div>
+    <div class="nav-item active" data-page="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-text">仪表盘</span>
+    </div>
+    <div class="nav-item" data-page="Gauges">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span class="nav-text">实时仪表</span>
+    </div>
+    <div class="nav-section-title" id="navSecManage">管理</div>
+    <div class="nav-item" data-page="Devices">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/></svg>
+      <span class="nav-text">设备管理</span>
+    </div>
+    <div class="nav-item" data-page="Alerts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span class="nav-text">告警中心</span>
+      <span class="nav-badge" id="alertBadge">0</span>
+    </div>
+    <div class="nav-item" data-page="DataExplorer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="nav-text">数据探索</span>
+    </div>
+    <div class="nav-section-title" id="navSecSystem">系统</div>
+    <div class="nav-item" data-page="Firmware">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span class="nav-text">固件管理</span>
+    </div>
+    <div class="nav-item" data-page="Automation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span class="nav-text">自动化规则</span>
+    </div>
+    <div class="nav-item" data-page="FloorPlan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg>
+      <span class="nav-text">平面图</span>
+    </div>
+    <div class="nav-item" data-page="Reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span class="nav-text">报表中心</span>
+    </div>
+  </nav>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="topbar-title" id="topbarTitle">仪表盘</div>
+      <div id="langSwitcher" style="position:relative;display:inline-block;"></div>
+    </div>
+    <div class="topbar-right">
+      <button class="top-btn" onclick="navigateTo('Alerts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="dot" id="alertDot" style="display:none"></span>
+      </button>
+    </div>
+  </header>
+  <div class="content">
+
+    <!-- ===== Dashboard ===== -->
+    <div class="page active" id="pageDashboard">
+      <div class="stats-grid" id="statsGrid"></div>
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="dashboard.throughput">数据吞吐量 (24h)</div></div><div class="chart-wrap"><canvas id="throughputChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="dashboard.deviceDist">设备类型分布</div></div><div class="chart-wrap"><canvas id="typeDistChart"></canvas></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="table-card">
+          <div class="table-toolbar"><div class="toolbar-left"><strong data-i18n="dashboard.latestAlerts" style="font-size:.86rem">最新告警</strong></div></div>
+          <table><thead><tr><th data-i18n="dashboard.alert">告警</th><th data-i18n="dashboard.device">设备</th><th data-i18n="dashboard.severity">级别</th><th data-i18n="dashboard.time">时间</th></tr></thead><tbody id="dashAlertsBody"></tbody></table>
+        </div>
+        <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="dashboard.overview">实时仪表概览</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 8px">
+            <div><canvas id="dashGaugeTemp" width="160" height="100"></canvas><div class="gauge-value" id="dashGaugeTempVal">--</div><div class="gauge-label" data-i18n="gauges.temp">温度 °C</div></div>
+            <div><canvas id="dashGaugeHum" width="160" height="100"></canvas><div class="gauge-value" id="dashGaugeHumVal">--</div><div class="gauge-label" data-i18n="gauges.hum">湿度 %</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Gauges ===== -->
+    <div class="page" id="pageGauges">
+      <div class="page-header"><div><h1 data-i18n="gauges.title">实时仪表</h1><p data-i18n="gauges.desc">每2秒刷新传感器数据</p></div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+        <div class="chart-card" style="text-align:center"><canvas id="gaugeTemp" width="200" height="130"></canvas><div class="gauge-value" id="gaugeTempVal">--</div><div class="gauge-label" data-i18n="gauges.temp">温度 (°C)</div></div>
+        <div class="chart-card" style="text-align:center"><canvas id="gaugeHum" width="200" height="130"></canvas><div class="gauge-value" id="gaugeHumVal">--</div><div class="gauge-label" data-i18n="gauges.hum">湿度 (%)</div></div>
+        <div class="chart-card" style="text-align:center"><canvas id="gaugePressure" width="200" height="130"></canvas><div class="gauge-value" id="gaugePressureVal">--</div><div class="gauge-label" data-i18n="gauges.press">气压 (atm)</div></div>
+        <div class="chart-card" style="text-align:center"><canvas id="gaugeBattery" width="200" height="130"></canvas><div class="gauge-value" id="gaugeBatteryVal">--</div><div class="gauge-label" data-i18n="gauges.batt">电量 (%)</div></div>
+      </div>
+      <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="gauges.stream">实时数据流</div></div><div class="chart-wrap"><canvas id="realtimeChart"></canvas></div></div>
+    </div>
+
+    <!-- ===== Devices ===== -->
+    <div class="page" id="pageDevices">
+      <div class="page-header">
+        <div><h1 data-i18n="devices.title">设备管理</h1><p data-i18n="devices.desc">管理所有 IoT 设备</p></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="exportDevicesCSV"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="btn-i18n" data-i18n="devices.exportCSV">导出 CSV</span></button>
+          <button class="btn btn-primary" id="addDeviceBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="btn-i18n" data-i18n="devices.add">添加设备</span></button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="toolbar-left">
+            <input class="search-input" id="deviceSearch" placeholder="搜索设备...">
+            <select class="filter-select" id="deviceTypeFilter"><option value="" data-i18n="devices.allTypes">全部类型</option><option>Sensor</option><option>Camera</option><option>Controller</option><option>Gateway</option></select>
+            <select class="filter-select" id="deviceStatusFilter"><option value="" data-i18n="devices.allStatus">全部状态</option><option>online</option><option>offline</option><option>warning</option></select>
+            <select class="filter-select" id="deviceGroupFilter"><option value="" data-i18n="devices.allGroups">全部分组</option><option>Building A</option><option>Building B</option><option>Plant C</option><option>Outdoor</option></select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <div class="table-scroll-hint" style="display:none;padding:6px 12px;font-size:.7rem;color:var(--text-3);background:var(--bg-3);border-bottom:1px solid var(--border);text-align:center">&larr; 左右滑动查看更多列 &rarr;</div>
+        <table><thead><tr><th data-i18n="devices.name">设备</th><th data-i18n="devices.type">类型</th><th class="col-hide-sm" data-i18n="devices.location">位置</th><th data-i18n="devices.reading">读数</th><th class="col-hide-sm" data-i18n="devices.signal">信号</th><th class="col-hide-sm" data-i18n="devices.battery">电量</th><th class="col-hide-sm" data-i18n="devices.firmware">固件</th><th class="col-hide-sm" data-i18n="devices.heartbeat">心跳</th><th class="col-hide-sm" data-i18n="devices.group">分组</th><th data-i18n="devices.status">状态</th><th data-i18n="devices.actions">操作</th></tr></thead><tbody id="devicesBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Alerts ===== -->
+    <div class="page" id="pageAlerts">
+      <div class="page-header">
+        <div><h1 data-i18n="alerts.title">告警中心</h1><p data-i18n="alerts.desc">监控与管理告警</p></div>
+        <div class="header-actions">
+          <select class="filter-select" id="alertSevFilter"><option value="" data-i18n="alerts.allSev">全部级别</option><option>critical</option><option>warning</option><option>info</option></select>
+          <button class="btn btn-ghost" id="exportAlertsBtn"><span class="btn-i18n" data-i18n="alerts.exportHistory">导出历史</span></button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="alerts.trend">告警趋势 (7天)</div></div><div class="chart-wrap"><canvas id="alertTrendChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="alerts.dist">告警分布</div></div><div class="chart-wrap"><canvas id="alertPieChart"></canvas></div></div>
+      </div>
+      <div id="alertsList"></div>
+    </div>
+
+    <!-- ===== Data Explorer ===== -->
+    <div class="page" id="pageDataExplorer">
+      <div class="page-header"><div><h1 data-i18n="data.title">数据探索</h1><p data-i18n="data.desc">查看与分析设备数据</p></div>
+        <div class="header-actions">
+          <select class="filter-select" id="explorerDevice"></select>
+          <select class="filter-select" id="explorerMetric"><option value="temperature" data-i18n="data.temp">温度</option><option value="humidity" data-i18n="data.hum">湿度</option><option value="pressure" data-i18n="data.press">气压</option><option value="battery" data-i18n="data.batt">电量</option></select>
+          <button class="btn btn-ghost" id="explorerExportBtn"><span class="btn-i18n" data-i18n="data.export">导出 CSV</span></button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+        <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="data.timeSeries">时间序列</div></div><div class="chart-wrap"><canvas id="explorerChart"></canvas></div></div>
+        <div>
+          <div class="chart-card">
+            <div class="chart-header"><div class="chart-title" data-i18n="data.compare">设备对比</div></div>
+            <div style="margin-bottom:10px"><select class="filter-select" id="compareDeviceA" style="width:100%;margin-bottom:6px"></select><select class="filter-select" id="compareDeviceB" style="width:100%"></select></div>
+            <div class="chart-wrap" style="height:160px"><canvas id="compareChart"></canvas></div>
+          </div>
+          <div class="chart-card"><div class="chart-header"><div class="chart-title" data-i18n="data.stats">统计摘要</div></div><div id="explorerStats" style="font-size:.82rem;color:var(--text-2)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Firmware ===== -->
+    <div class="page" id="pageFirmware">
+      <div class="page-header"><div><h1 data-i18n="firmware.title">固件管理</h1><p data-i18n="firmware.desc">管理设备固件版本与更新</p></div>
+        <div class="header-actions"><button class="btn btn-primary" id="pushFWBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg><span class="btn-i18n" data-i18n="firmware.push">推送更新</span></button></div>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar"><div class="toolbar-left"><strong data-i18n="firmware.versions" style="font-size:.86rem">固件版本</strong></div></div>
+        <table><thead><tr><th data-i18n="firmware.version">版本</th><th data-i18n="firmware.deviceType">设备类型</th><th data-i18n="firmware.releaseDate">发布日期</th><th data-i18n="firmware.size">大小</th><th data-i18n="firmware.deviceCount">设备数</th><th data-i18n="firmware.status">状态</th><th data-i18n="firmware.actions">操作</th></tr></thead><tbody id="firmwareBody"></tbody></table>
+      </div>
+      <div class="table-card" style="margin-top:14px">
+        <div class="table-toolbar"><div class="toolbar-left"><strong data-i18n="firmware.updateTasks" style="font-size:.86rem">更新任务</strong></div></div>
+        <table><thead><tr><th data-i18n="firmware.taskID">任务ID</th><th data-i18n="firmware.firmware">固件</th><th data-i18n="firmware.target">目标设备</th><th data-i18n="firmware.progress">进度</th><th data-i18n="firmware.status">状态</th><th data-i18n="firmware.actions">操作</th></tr></thead><tbody id="fwJobsBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ===== Automation ===== -->
+    <div class="page" id="pageAutomation">
+      <div class="page-header"><div><h1 data-i18n="automation.title">自动化规则</h1><p data-i18n="automation.desc">IF-THEN 规则引擎</p></div>
+        <div class="header-actions"><button class="btn btn-primary" id="addRuleBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="btn-i18n" data-i18n="automation.createRule">创建规则</span></button></div>
+      </div>
+      <div class="tab-bar"><button class="tab-btn active" data-tab="rules" onclick="switchAutoTab('rules',this)"><span class="tab-i18n" data-i18n="automation.rules">规则列表</span></button><button class="tab-btn" data-tab="logs" onclick="switchAutoTab('logs',this)"><span class="tab-i18n" data-i18n="automation.logs">执行日志</span></button></div>
+      <div id="autoRulesTab"></div>
+      <div id="autoLogsTab" style="display:none"><div class="table-card"><table><thead><tr><th data-i18n="automation.time">时间</th><th data-i18n="automation.rule">规则</th><th data-i18n="automation.condition">触发条件</th><th data-i18n="automation.action">执行动作</th><th data-i18n="automation.result">结果</th></tr></thead><tbody id="autoLogsBody"></tbody></table></div></div>
+    </div>
+
+    <!-- ===== Floor Plan ===== -->
+    <div class="page" id="pageFloorPlan">
+      <div class="page-header"><div><h1 data-i18n="floor.title">平面图</h1><p data-i18n="floor.desc">设备布局与状态一览</p></div>
+        <div class="header-actions">
+          <select class="filter-select" id="floorFilter"><option value="all" data-i18n="floor.all">全部楼层</option><option value="1F" data-i18n="floor.1F">1F - 大厅</option><option value="2F" data-i18n="floor.2F">2F - 办公区</option><option value="B1" data-i18n="floor.B1">B1 - 机房</option></select>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div class="chart-title" data-i18n="floor.layout">设备布局 — <span id="floorTitle">全部楼层</span></div>
+          <div style="display:flex;gap:14px;font-size:.72rem;color:var(--text-3)"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:3px"></span><span class="i18n-label" data-i18n="floor.online">在线</span></span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--yellow);margin-right:3px"></span><span class="i18n-label" data-i18n="floor.alert">告警</span></span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:3px"></span><span class="i18n-label" data-i18n="floor.offline">离线</span></span></div>
+        </div>
+        <div class="floor-grid" id="floorGrid"></div>
+      </div>
+      <div id="floorDetail" style="display:none" class="chart-card"><div class="chart-header"><div class="chart-title" id="floorDetailTitle" data-i18n="floor.detail">设备详情</div></div><div id="floorDetailBody"></div></div>
+    </div>
+
+    <!-- ===== Reports ===== -->
+    <div class="page" id="pageReports">
+      <div class="page-header"><div><h1 data-i18n="reports.title">报表中心</h1><p data-i18n="reports.desc">生成数据报表</p></div>
+        <div class="header-actions">
+          <select class="filter-select" id="reportType"><option value="daily" data-i18n="reports.daily">日报</option><option value="weekly" data-i18n="reports.weekly">周报</option><option value="monthly" data-i18n="reports.monthly">月报</option></select>
+          <button class="btn btn-primary" id="genReportBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="btn-i18n" data-i18n="reports.generate">生成报表</span></button>
+        </div>
+      </div>
+      <div id="reportOutput"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Device Modal -->
+<div class="modal-overlay" id="deviceModal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="deviceModalTitle">添加设备</h3><button class="modal-close" onclick="closeModal('deviceModal')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editDeviceId">
+      <div class="form-row"><div><label>设备名称 *</label><input type="text" id="dName" placeholder="如：温控传感器 A1"></div><div><label>设备类型 *</label><select id="dType"><option>Sensor</option><option>Camera</option><option>Controller</option><option>Gateway</option></select></div></div>
+      <div class="form-row"><div><label>位置</label><input type="text" id="dLocation" placeholder="如：A栋 1层"></div><div><label>分组</label><select id="dGroup"><option>Building A</option><option>Building B</option><option>Plant C</option><option>Outdoor</option></select></div></div>
+      <div class="form-row"><div><label>固件版本</label><input type="text" id="dFirmware" placeholder="如：v2.1.3"></div><div><label>信号强度</label><input type="number" id="dSignal" min="0" max="100" placeholder="0-100"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('deviceModal')">取消</button><button class="btn btn-primary" id="saveDeviceBtn">保存</button></div>
+  </div>
+</div>
+
+<!-- Firmware Push Modal -->
+<div class="modal-overlay" id="fwPushModal">
+  <div class="modal">
+    <div class="modal-header"><h3>推送固件更新</h3><button class="modal-close" onclick="closeModal('fwPushModal')">&times;</button></div>
+    <div class="modal-body">
+      <label>目标固件版本</label><select id="fwTarget"></select>
+      <label>目标设备</label><select id="fwDevice"><option value="all">全部设备</option></select>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('fwPushModal')">取消</button><button class="btn btn-primary" id="doPushFWBtn">推送</button></div>
+  </div>
+</div>
+
+<!-- Automation Rule Modal -->
+<div class="modal-overlay" id="ruleModal">
+  <div class="modal">
+    <div class="modal-header"><h3>创建自动化规则</h3><button class="modal-close" onclick="closeModal('ruleModal')">&times;</button></div>
+    <div class="modal-body">
+      <label>规则名称</label><input type="text" id="ruleName" placeholder="如：高温告警">
+      <div class="form-row"><div><label>IF — 条件设备</label><select id="ruleDevice"></select></div><div><label>指标</label><select id="ruleMetric"><option value="temperature">温度</option><option value="humidity">湿度</option><option value="pressure">气压</option><option value="battery">电量</option></select></div></div>
+      <div class="form-row"><div><label>比较</label><select id="ruleOp"><option value=">">大于 (&gt;)</option><option value="<">小于 (&lt;)</option><option value=">=">大于等于</option><option value="<=">小于等于</option></select></div><div><label>阈值</label><input type="number" id="ruleThreshold" placeholder="如：30"></div></div>
+      <label>THEN — 执行动作</label><select id="ruleAction"><option value="alert">发送告警</option><option value="notify">通知管理员</option><option value="shutdown">关闭设备</option></select>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('ruleModal')">取消</button><button class="btn btn-primary" id="saveRuleBtn">创建</button></div>
+  </div>
+</div>
+
+<script>
+/* ===== I18N ===== */
+var LANGS=[
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'zh',name:'中文',flag:'🇨🇳'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'},
+  {code:'ko',name:'한국어',flag:'🇰🇷'}
+];
+var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return document.documentElement.lang||'en'})();
+function T(key){
+  var keys=key.split('.');var val=I18N[curLang];
+  for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
+  return(val===undefined||val===null)?key:val;
+}
+function setLang(code){
+  curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
+  renderLangSwitcher();
+  afterLangChange();
+}
+function renderLangSwitcher(){
+  var el=document.getElementById('langSwitcher');if(!el)return;
+  var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#0ea5e9)':'none')+';color:'+(l.code===curLang?'#fff':'#8892a6')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+}
+function toggleLangMenu(){
+  var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+var I18N={
+  en:{
+    nav:{monitor:'Monitor',manage:'Manage',system:'System',dashboard:'Dashboard',gauges:'Gauges',devices:'Devices',alerts:'Alerts',data:'Data Explorer',firmware:'Firmware',automation:'Automation',floor:'Floor Plan',reports:'Reports'},
+    device:{sensor:'Sensor',camera:'Camera',controller:'Controller',gateway:'Gateway'},
+    alert:{critical:'Critical',warning:'Warning',info:'Info'},
+    gauge:{temp:'Temp',hum:'Humidity',press:'Pressure',batt:'Battery'},
+    btn:{cancel:'Cancel',confirm:'Confirm',save:'Save',create:'Create',delete:'Delete',edit:'Edit',export:'Export',search:'Search',add:'Add',push:'Push',rollback:'Rollback',dismiss:'Dismiss',acknowledge:'Acknowledge',generate:'Generate'},
+    page:{dashboard:'Dashboard',gauges:'Gauges',devices:'Devices',alerts:'Alerts',dataexplorer:'Data Explorer',firmware:'Firmware',automation:'Automation',floorplan:'Floor Plan',reports:'Reports'},
+    status:{online:'Online',offline:'Offline',warning:'Warning',latest:'Latest',deprecated:'Deprecated','rolled-back':'Rolled Back',pushing:'Pushing',completed:'Completed',failed:'Failed',enabled:'Enabled',disabled:'Disabled'},
+    msg:{confirmDelete:'Are you sure you want to delete this device?',confirmDeleteRule:'Are you sure you want to delete this rule?',confirmFW:'Are you sure you want to rollback this firmware?',noDevices:'No devices yet',noAlerts:'No alerts yet',noRules:'No rules yet',noLogs:'No logs yet',deviceAdded:'Device added',deviceUpdated:'Device updated',deviceDeleted:'Device deleted',alertAcked:'Alert acknowledged',alertDismissed:'Alert dismissed',ruleCreated:'Rule created',ruleDeleted:'Rule deleted',ruleToggled:'Rule toggled',fwPushed:'Firmware push task created',fwCompleted:'Firmware update completed',fwRolled:'Firmware rolled back',exported:'CSV exported',reportGenerated:'Report generated',errorName:'Please enter device name',errorRuleName:'Please enter rule name',errorFW:'Please select firmware version',selectDevice:'Select device',cancel:'Cancel',ok:'OK'},
+    dashboard:{totalDevices:'Total Devices',onlineDevices:'Online',activeAlerts:'Active Alerts',warningOffline:'Warning/Offline',latestAlerts:'Latest Alerts',alert:'Alert',device:'Device',severity:'Severity',time:'Time',overview:'Realtime Overview',throughput:'Data Throughput (24h)',deviceDist:'Device Distribution'},
+    gauges:{title:'Realtime Gauges',desc:'Sensor data refreshing every 2s',temp:'Temperature (°C)',hum:'Humidity (%)',press:'Pressure (atm)',batt:'Battery (%)',stream:'Realtime Data Stream'},
+    devices:{title:'Devices',desc:'Manage all IoT devices',name:'Name',type:'Type',location:'Location',reading:'Reading',signal:'Signal',battery:'Battery',firmware:'Firmware',heartbeat:'Heartbeat',group:'Group',status:'Status',actions:'Actions',add:'Add Device',edit:'Edit Device',exportCSV:'Export CSV',allTypes:'All Types',allStatus:'All Status',allGroups:'All Groups',search:'Search device...'},
+    alerts:{title:'Alerts',desc:'Monitor & manage alerts',allSev:'All Severities',exportHistory:'Export History',trend:'Alert Trend (7d)',dist:'Alert Distribution',acknowledged:'[Acknowledged]',confirm:'Acknowledge',dismiss:'Dismiss',noAlerts:'No alerts yet',noAlertsHint:'All clear — no active alerts to display'},
+    data:{title:'Data Explorer',desc:'View & analyze device data',timeSeries:'Time Series',compare:'Device Comparison',stats:'Statistics Summary',min:'Min',max:'Max',avg:'Avg',temp:'Temperature',hum:'Humidity',press:'Pressure',batt:'Battery',export:'Export CSV',selectDev:'Select device',metric:'Metric'},
+    firmware:{title:'Firmware',desc:'Manage firmware versions & updates',versions:'Firmware Versions',updateTasks:'Update Tasks',version:'Version',deviceType:'Device Type',releaseDate:'Release Date',size:'Size',deviceCount:'Devices',status:'Status',actions:'Actions',taskID:'Task ID',firmware:'Firmware',target:'Target Devices',progress:'Progress',push:'Push Update',rollback:'Rollback',noTasks:'No update tasks yet'},
+    automation:{title:'Automation Rules',desc:'IF-THEN rule engine',createRule:'Create Rule',rules:'Rules',logs:'Execution Logs',name:'Rule Name',ifDevice:'IF — Device',metric:'Metric',compare:'Comparison',threshold:'Threshold',action:'Action',time:'Time',rule:'Rule',condition:'Condition',result:'Result',noRules:'No rules yet',noRulesHint:'Click above to create your first rule',noLogs:'No execution logs yet',lastTriggered:'Last triggered',neverTriggered:'Never triggered',save:'Save',cancel:'Cancel'},
+    floor:{title:'Floor Plan',desc:'Device layout & status',all:'All Floors','1F':'1F - Lobby','2F':'2F - Office','B1':'B1 - Server Room',online:'Online',alert:'Alert',offline:'Offline',detail:'Device Details',layout:'Device Layout —'},
+    reports:{title:'Reports',desc:'Generate data reports',daily:'Daily',weekly:'Weekly',monthly:'Monthly',generate:'Generate Report',selectType:'Select report type and click Generate',totalDevices:'Total Devices',onlineRate:'Online Rate',activeAlerts:'Active Alerts',avgBattery:'Avg Battery',throughput:'Data Throughput Trend',alertTrend:'Alert Trend',statusOverview:'Device Status Overview',period:'Period',exportCSV:'Export CSV'},
+    fwModal:{title:'Push Firmware Update',cancel:'Cancel',push:'Push',targetVer:'Target Firmware Version',targetDev:'Target Devices',allDevices:'All Devices'},
+    ruleModal:{title:'Create Automation Rule',name:'Rule Name',namePlaceholder:'e.g. High Temp Alert',ifDevice:'IF — Condition Device',metric:'Metric',compare:'Comparison',threshold:'Threshold',thenAction:'THEN — Execute Action',sendAlert:'Send Alert',notifyAdmin:'Notify Admin',shutdown:'Shutdown Device',cancel:'Cancel',create:'Create'},
+    deviceModal:{title:'Add Device',editTitle:'Edit Device',name:'Device Name',namePlaceholder:'e.g. Temp Sensor A1',type:'Device Type',location:'Location',locationPlaceholder:'e.g. Building A 1F',group:'Group',firmware:'Firmware Version',firmwarePlaceholder:'e.g. v2.1.3',signal:'Signal Strength',cancel:'Cancel',save:'Save'},
+    time:{seconds:'s ago',minutes:'min ago',hours:'h ago',days:'d ago'},
+    fwSpinner:'Pushing firmware update...',
+    confirm:{title:'Confirm',msg:'Are you sure?',cancel:'Cancel',ok:'Confirm'}
+  },
+  zh:{
+    nav:{monitor:'监控',manage:'管理',system:'系统',dashboard:'仪表盘',gauges:'实时仪表',devices:'设备管理',alerts:'告警中心',data:'数据探索',firmware:'固件管理',automation:'自动化规则',floor:'平面图',reports:'报表中心'},
+    device:{sensor:'Sensor',camera:'Camera',controller:'Controller',gateway:'Gateway'},
+    alert:{critical:'严重',warning:'警告',info:'信息'},
+    gauge:{temp:'温度',hum:'湿度',press:'气压',batt:'电量'},
+    btn:{cancel:'取消',confirm:'确认',save:'保存',create:'创建',delete:'删除',edit:'编辑',export:'导出',search:'搜索',add:'添加',push:'推送',rollback:'回滚',dismiss:'消除',acknowledge:'确认',generate:'生成'},
+    page:{dashboard:'仪表盘',gauges:'实时仪表',devices:'设备管理',alerts:'告警中心',dataexplorer:'数据探索',firmware:'固件管理',automation:'自动化规则',floorplan:'平面图',reports:'报表中心'},
+    status:{online:'在线',offline:'离线',warning:'告警',latest:'最新',deprecated:'已弃用','rolled-back':'已回滚',pushing:'推送中',completed:'已完成',failed:'失败',enabled:'启用',disabled:'禁用'},
+    msg:{confirmDelete:'确定要从系统中移除此设备？',confirmDeleteRule:'确定要删除此自动化规则？',confirmFW:'确定要回滚此固件版本？',noDevices:'暂无设备',noAlerts:'暂无告警',noRules:'暂无规则',noLogs:'暂无记录',deviceAdded:'设备已添加',deviceUpdated:'设备已更新',deviceDeleted:'设备已删除',alertAcked:'告警已确认',alertDismissed:'告警已消除',ruleCreated:'规则已创建',ruleDeleted:'规则已删除',ruleToggled:'规则状态已切换',fwPushed:'固件推送任务已创建',fwCompleted:'固件更新完成',fwRolled:'固件已回滚',exported:'CSV 已导出',reportGenerated:'报表已生成',errorName:'请输入设备名称',errorRuleName:'请输入规则名称',errorFW:'请选择固件版本',selectDevice:'选择设备',cancel:'取消',ok:'确认'},
+    dashboard:{totalDevices:'设备总数',onlineDevices:'在线设备',activeAlerts:'活跃告警',warningOffline:'告警/离线',latestAlerts:'最新告警',alert:'告警',device:'设备',severity:'级别',time:'时间',overview:'实时仪表概览',throughput:'数据吞吐量 (24h)',deviceDist:'设备类型分布'},
+    gauges:{title:'实时仪表',desc:'每2秒刷新传感器数据',temp:'温度 (°C)',hum:'湿度 (%)',press:'气压 (atm)',batt:'电量 (%)',stream:'实时数据流'},
+    devices:{title:'设备管理',desc:'管理所有 IoT 设备',name:'设备',type:'类型',location:'位置',reading:'读数',signal:'信号',battery:'电量',firmware:'固件',heartbeat:'心跳',group:'分组',status:'状态',actions:'操作',add:'添加设备',edit:'编辑设备',exportCSV:'导出 CSV',allTypes:'全部类型',allStatus:'全部状态',allGroups:'全部分组',search:'搜索设备...'},
+    alerts:{title:'告警中心',desc:'监控与管理告警',allSev:'全部级别',exportHistory:'导出历史',trend:'告警趋势 (7天)',dist:'告警分布',acknowledged:'[已确认]',confirm:'确认',dismiss:'消除',noAlerts:'暂无告警',noAlertsHint:'一切正常 — 没有活跃告警'},
+    data:{title:'数据探索',desc:'查看与分析设备数据',timeSeries:'时间序列',compare:'设备对比',stats:'统计摘要',min:'最小值',max:'最大值',avg:'平均值',temp:'温度',hum:'湿度',press:'气压',batt:'电量',export:'导出 CSV',selectDev:'选择设备',metric:'指标'},
+    firmware:{title:'固件管理',desc:'管理设备固件版本与更新',versions:'固件版本',updateTasks:'更新任务',version:'版本',deviceType:'设备类型',releaseDate:'发布日期',size:'大小',deviceCount:'设备数',status:'状态',actions:'操作',taskID:'任务ID',firmware:'固件',target:'目标设备',progress:'进度',push:'推送更新',rollback:'回滚',noTasks:'暂无更新任务'},
+    automation:{title:'自动化规则',desc:'IF-THEN 规则引擎',createRule:'创建规则',rules:'规则列表',logs:'执行日志',name:'规则名称',ifDevice:'IF — 条件设备',metric:'指标',compare:'比较',threshold:'阈值',action:'执行动作',time:'时间',rule:'规则',condition:'触发条件',result:'结果',noRules:'暂无规则',noRulesHint:'暂无规则，点击上方按钮创建',noLogs:'暂无执行记录',lastTriggered:'上次触发',neverTriggered:'尚未触发',save:'保存',cancel:'取消'},
+    floor:{title:'平面图',desc:'设备布局与状态一览',all:'全部楼层','1F':'1F - 大厅','2F':'2F - 办公区','B1':'B1 - 机房',online:'在线',alert:'告警',offline:'离线',detail:'设备详情',layout:'设备布局 —'},
+    reports:{title:'报表中心',desc:'生成数据报表',daily:'日报',weekly:'周报',monthly:'月报',generate:'生成报表',selectType:'选择报表类型后点击"生成报表"',totalDevices:'设备总数',onlineRate:'在线率',activeAlerts:'活跃告警',avgBattery:'平均电量',throughput:'数据吞吐量趋势',alertTrend:'告警趋势',statusOverview:'设备状态概览',period:'覆盖最近',exportCSV:'导出 CSV'},
+    fwModal:{title:'推送固件更新',cancel:'取消',push:'推送',targetVer:'目标固件版本',targetDev:'目标设备',allDevices:'全部设备'},
+    ruleModal:{title:'创建自动化规则',name:'规则名称',namePlaceholder:'如：高温告警',ifDevice:'IF — 条件设备',metric:'指标',compare:'比较',threshold:'阈值',thenAction:'THEN — 执行动作',sendAlert:'发送告警',notifyAdmin:'通知管理员',shutdown:'关闭设备',cancel:'取消',create:'创建'},
+    deviceModal:{title:'添加设备',editTitle:'编辑设备',name:'设备名称',namePlaceholder:'如：温控传感器 A1',type:'设备类型',location:'位置',locationPlaceholder:'如：A栋 1层',group:'分组',firmware:'固件版本',firmwarePlaceholder:'如：v2.1.3',signal:'信号强度',cancel:'取消',save:'保存'},
+    time:{seconds:'秒前',minutes:'分钟前',hours:'小时前',days:'天前'},
+    fwSpinner:'正在推送固件更新...',
+    confirm:{title:'确认',msg:'确定要执行此操作？',cancel:'取消',ok:'确认'}
+  },
+  ja:{
+    nav:{monitor:'監視',manage:'管理',system:'システム',dashboard:'ダッシュボード',gauges:'リアルタイム計器',devices:'デバイス管理',alerts:'アラート',data:'データ探索',firmware:'ファームウェア',automation:'自動化ルール',floor:'フロアマップ',reports:'レポート'},
+    device:{sensor:'センサー',camera:'カメラ',controller:'コントローラー',gateway:'ゲートウェイ'},
+    alert:{critical:'重大',warning:'警告',info:'情報'},
+    gauge:{temp:'温度',hum:'湿度',press:'気圧',batt:'バッテリー'},
+    btn:{cancel:'キャンセル',confirm:'確認',save:'保存',create:'作成',delete:'削除',edit:'編集',export:'エクスポート',search:'検索',add:'追加',push:'プッシュ',rollback:'ロールバック',dismiss:'解除',acknowledge:'承認',generate:'生成'},
+    page:{dashboard:'ダッシュボード',gauges:'リアルタイム計器',devices:'デバイス管理',alerts:'アラート',dataexplorer:'データ探索',firmware:'ファームウェア',automation:'自動化ルール',floorplan:'フロアマップ',reports:'レポート'},
+    status:{online:'オンライン',offline:'オフライン',warning:'警告',latest:'最新',deprecated:'非推奨','rolled-back':'ロールバック済',pushing:'プッシュ中',completed:'完了',failed:'失敗',enabled:'有効',disabled:'無効'},
+    msg:{confirmDelete:'このデバイスを削除してもよろしいですか？',confirmDeleteRule:'このルールを削除してもよろしいですか？',confirmFW:'このファームウェアをロールバックしてもよろしいですか？',noDevices:'デバイスがありません',noAlerts:'アラートはありません',noRules:'ルールがありません',noLogs:'ログがありません',deviceAdded:'デバイスを追加しました',deviceUpdated:'デバイスを更新しました',deviceDeleted:'デバイスを削除しました',alertAcked:'アラートを承認しました',alertDismissed:'アラートを解除しました',ruleCreated:'ルールを作成しました',ruleDeleted:'ルールを削除しました',ruleToggled:'ルールの状態を変更しました',fwPushed:'ファームウェアのプッシュタスクを作成しました',fwCompleted:'ファームウェアの更新が完了しました',fwRolled:'ファームウェアをロールバックしました',exported:'CSV をエクスポートしました',reportGenerated:'レポートを生成しました',errorName:'デバイス名を入力してください',errorRuleName:'ルール名を入力してください',errorFW:'ファームウェアのバージョンを選択してください',selectDevice:'デバイスを選択',cancel:'キャンセル',ok:'確認'},
+    dashboard:{totalDevices:'デバイス総数',onlineDevices:'オンライン',activeAlerts:'アクティブアラート',warningOffline:'警告/オフライン',latestAlerts:'最新アラート',alert:'アラート',device:'デバイス',severity:'重要度',time:'時間',overview:'リアルタイム概要',throughput:'データスループット (24h)',deviceDist:'デバイス分布'},
+    gauges:{title:'リアルタイム計器',desc:'センサーデータを2秒ごとに更新',temp:'温度 (°C)',hum:'湿度 (%)',press:'気圧 (atm)',batt:'バッテリー (%)',stream:'リアルタイムデータストリーム'},
+    devices:{title:'デバイス管理',desc:'全IoTデバイスを管理',name:'デバイス',type:'タイプ',location:'場所',reading:'値',signal:'信号',battery:'バッテリー',firmware:'ファームウェア',heartbeat:'ハートビート',group:'グループ',status:'状態',actions:'操作',add:'デバイス追加',edit:'デバイス編集',exportCSV:'CSV エクスポート',allTypes:'全タイプ',allStatus:'全状態',allGroups:'全グループ',search:'デバイスを検索...'},
+    alerts:{title:'アラート',desc:'アラートの監視と管理',allSev:'全重要度',exportHistory:'履歴をエクスポート',trend:'アラート傾向 (7日)',dist:'アラート分布',acknowledged:'[承認済]',confirm:'承認',dismiss:'解除',noAlerts:'アラートはありません',noAlertsHint:'異常なし — 表示するアクティブアラートはありません'},
+    data:{title:'データ探索',desc:'デバイスデータの表示と分析',timeSeries:'時系列',compare:'デバイス比較',stats:'統計サマリー',min:'最小値',max:'最大値',avg:'平均値',temp:'温度',hum:'湿度',press:'気圧',batt:'バッテリー',export:'CSV エクスポート',selectDev:'デバイスを選択',metric:'指標'},
+    firmware:{title:'ファームウェア管理',desc:'ファームウェアバージョンと更新管理',versions:'ファームウェアバージョン',updateTasks:'更新タスク',version:'バージョン',deviceType:'デバイスタイプ',releaseDate:'リリース日',size:'サイズ',deviceCount:'デバイス数',status:'状態',actions:'操作',taskID:'タスクID',firmware:'ファームウェア',target:'対象デバイス',progress:'進捗',push:'プッシュ更新',rollback:'ロールバック',noTasks:'更新タスクはありません'},
+    automation:{title:'自動化ルール',desc:'IF-THEN ルールエンジン',createRule:'ルール作成',rules:'ルール一覧',logs:'実行ログ',name:'ルール名',ifDevice:'IF — 条件デバイス',metric:'指標',compare:'比較',threshold:'しきい値',action:'アクション',time:'時間',rule:'ルール',condition:'条件',result:'結果',noRules:'ルールがありません',noRulesHint:'ルールがありません。上のボタンから作成',noLogs:'実行ログがありません',lastTriggered:'最終トリガー',neverTriggered:'未トリガー',save:'保存',cancel:'キャンセル'},
+    floor:{title:'フロアマップ',desc:'デバイスレイアウトと状態',all:'全フロア','1F':'1F - ロビー','2F':'2F - オフィス','B1':'B1 - サーバールーム',online:'オンライン',alert:'アラート',offline:'オフライン',detail:'デバイス詳細',layout:'デバイスレイアウト —'},
+    reports:{title:'レポート',desc:'データレポートを生成',daily:'日次',weekly:'週次',monthly:'月次',generate:'レポート生成',selectType:'レポートタイプを選択して「生成」をクリック',totalDevices:'デバイス総数',onlineRate:'オンライン率',activeAlerts:'アクティブアラート',avgBattery:'平均バッテリー',throughput:'データスループット傾向',alertTrend:'アラート傾向',statusOverview:'デバイス状態概要',period:'期間',exportCSV:'CSV エクスポート'},
+    fwModal:{title:'ファームウェア更新をプッシュ',cancel:'キャンセル',push:'プッシュ',targetVer:'対象ファームウェアバージョン',targetDev:'対象デバイス',allDevices:'全デバイス'},
+    ruleModal:{title:'自動化ルールを作成',name:'ルール名',namePlaceholder:'例：高温アラート',ifDevice:'IF — 条件デバイス',metric:'指標',compare:'比較',threshold:'しきい値',thenAction:'THEN — アクション実行',sendAlert:'アラート送信',notifyAdmin:'管理者通知',shutdown:'デバイス停止',cancel:'キャンセル',create:'作成'},
+    deviceModal:{title:'デバイス追加',editTitle:'デバイス編集',name:'デバイス名',namePlaceholder:'例：温度センサー A1',type:'デバイスタイプ',location:'場所',locationPlaceholder:'例：A棟 1階',group:'グループ',firmware:'ファームウェアバージョン',firmwarePlaceholder:'例：v2.1.3',signal:'信号強度',cancel:'キャンセル',save:'保存'},
+    time:{seconds:'秒前',minutes:'分前',hours:'時間前',days:'日前'},
+    fwSpinner:'ファームウェアをプッシュ中...',
+    confirm:{title:'確認',msg:'実行してもよろしいですか？',cancel:'キャンセル',ok:'確認'}
+  },
+  ko:{
+    nav:{monitor:'모니터',manage:'관리',system:'시스템',dashboard:'대시보드',gauges:'실시간 계기',devices:'장치 관리',alerts:'알림',data:'데이터 탐색',firmware:'펌웨어',automation:'자동화 규칙',floor:'평면도',reports:'보고서'},
+    device:{sensor:'센서',camera:'카메라',controller:'컨트롤러',gateway:'게이트웨이'},
+    alert:{critical:'심각',warning:'경고',info:'정보'},
+    gauge:{temp:'온도',hum:'습도',press:'기압',batt:'배터리'},
+    btn:{cancel:'취소',confirm:'확인',save:'저장',create:'생성',delete:'삭제',edit:'편집',export:'내보내기',search:'검색',add:'추가',push:'푸시',rollback:'롤백',dismiss:'해제',acknowledge:'승인',generate:'생성'},
+    page:{dashboard:'대시보드',gauges:'실시간 계기',devices:'장치 관리',alerts:'알림',dataexplorer:'데이터 탐색',firmware:'펌웨어',automation:'자동화 규칙',floorplan:'평면도',reports:'보고서'},
+    status:{online:'온라인',offline:'오프라인',warning:'경고',latest:'최신',deprecated:'사용중단','rolled-back':'롤백됨',pushing:'푸시 중',completed:'완료',failed:'실패',enabled:'활성화',disabled:'비활성화'},
+    msg:{confirmDelete:'이 장치를 삭제하시겠습니까?',confirmDeleteRule:'이 규칙을 삭제하시겠습니까?',confirmFW:'이 펌웨어를 롤백하시겠습니까?',noDevices:'장치가 없습니다',noAlerts:'알림이 없습니다',noRules:'규칙이 없습니다',noLogs:'로그가 없습니다',deviceAdded:'장치가 추가되었습니다',deviceUpdated:'장치가 업데이트되었습니다',deviceDeleted:'장치가 삭제되었습니다',alertAcked:'알림이 승인되었습니다',alertDismissed:'알림이 해제되었습니다',ruleCreated:'규칙이 생성되었습니다',ruleDeleted:'규칙이 삭제되었습니다',ruleToggled:'규칙 상태가 변경되었습니다',fwPushed:'펌웨어 푸시 작업이 생성되었습니다',fwCompleted:'펌웨어 업데이트가 완료되었습니다',fwRolled:'펌웨어가 롤백되었습니다',exported:'CSV가 내보내졌습니다',reportGenerated:'보고서가 생성되었습니다',errorName:'장치 이름을 입력하세요',errorRuleName:'규칙 이름을 입력하세요',errorFW:'펌웨어 버전을 선택하세요',selectDevice:'장치 선택',cancel:'취소',ok:'확인'},
+    dashboard:{totalDevices:'총 장치',onlineDevices:'온라인',activeAlerts:'활성 알림',warningOffline:'경고/오프라인',latestAlerts:'최신 알림',alert:'알림',device:'장치',severity:'심각도',time:'시간',overview:'실시간 개요',throughput:'데이터 처리량 (24h)',deviceDist:'장치 분포'},
+    gauges:{title:'실시간 계기',desc:'2초마다 센서 데이터 갱신',temp:'온도 (°C)',hum:'습도 (%)',press:'기압 (atm)',batt:'배터리 (%)',stream:'실시간 데이터 스트림'},
+    devices:{title:'장치 관리',desc:'모든 IoT 장치 관리',name:'장치',type:'유형',location:'위치',reading:'값',signal:'신호',battery:'배터리',firmware:'펌웨어',heartbeat:'하트비트',group:'그룹',status:'상태',actions:'작업',add:'장치 추가',edit:'장치 편집',exportCSV:'CSV 내보내기',allTypes:'모든 유형',allStatus:'모든 상태',allGroups:'모든 그룹',search:'장치 검색...'},
+    alerts:{title:'알림',desc:'알림 모니터링 및 관리',allSev:'모든 심각도',exportHistory:'내보내기',trend:'알림 추세 (7일)',dist:'알림 분포',acknowledged:'[승인됨]',confirm:'승인',dismiss:'해제',noAlerts:'알림 없음',noAlertsHint:'모두 정상 — 표시할 활성 알림이 없습니다'},
+    data:{title:'데이터 탐색',desc:'장치 데이터 보기 및 분석',timeSeries:'시계열',compare:'장치 비교',stats:'통계 요약',min:'최소',max:'최대',avg:'평균',temp:'온도',hum:'습도',press:'기압',batt:'배터리',export:'CSV 내보내기',selectDev:'장치 선택',metric:'지표'},
+    firmware:{title:'펌웨어 관리',desc:'펌웨어 버전 및 업데이트 관리',versions:'펌웨어 버전',updateTasks:'업데이트 작업',version:'버전',deviceType:'장치 유형',releaseDate:'출시일',size:'크기',deviceCount:'장치 수',status:'상태',actions:'작업',taskID:'작업 ID',firmware:'펌웨어',target:'대상 장치',progress:'진행률',push:'푸시 업데이트',rollback:'롤백',noTasks:'업데이트 작업이 없습니다'},
+    automation:{title:'자동화 규칙',desc:'IF-THEN 규칙 엔진',createRule:'규칙 생성',rules:'규칙 목록',logs:'실행 로그',name:'규칙 이름',ifDevice:'IF — 조건 장치',metric:'지표',compare:'비교',threshold:'임계값',action:'액션',time:'시간',rule:'규칙',condition:'조건',result:'결과',noRules:'규칙이 없습니다',noRulesHint:'규칙이 없습니다. 위 버튼을 클릭하여 생성',noLogs:'실행 로그가 없습니다',lastTriggered:'마지막 실행',neverTriggered:'실행되지 않음',save:'저장',cancel:'취소'},
+    floor:{title:'평면도',desc:'장치 레이아웃 및 상태',all:'모든 층','1F':'1F - 로비','2F':'2F - 사무실','B1':'B1 - 서버실',online:'온라인',alert:'알림',offline:'오프라인',detail:'장치 상세',layout:'장치 레이아웃 —'},
+    reports:{title:'보고서',desc:'데이터 보고서 생성',daily:'일간',weekly:'주간',monthly:'월간',generate:'보고서 생성',selectType:'보고서 유형을 선택하고 생성 버튼 클릭',totalDevices:'총 장치',onlineRate:'온라인율',activeAlerts:'활성 알림',avgBattery:'평균 배터리',throughput:'데이터 처리량 추세',alertTrend:'알림 추세',statusOverview:'장치 상태 개요',period:'기간',exportCSV:'CSV 내보내기'},
+    fwModal:{title:'펌웨어 업데이트 푸시',cancel:'취소',push:'푸시',targetVer:'대상 펌웨어 버전',targetDev:'대상 장치',allDevices:'모든 장치'},
+    ruleModal:{title:'자동화 규칙 생성',name:'규칙 이름',namePlaceholder:'예: 고온 알림',ifDevice:'IF — 조건 장치',metric:'지표',compare:'비교',threshold:'임계값',thenAction:'THEN — 액션 실행',sendAlert:'알림 보내기',notifyAdmin:'관리자에게 알림',shutdown:'장치 종료',cancel:'취소',create:'생성'},
+    deviceModal:{title:'장치 추가',editTitle:'장치 편집',name:'장치 이름',namePlaceholder:'예: 온도 센서 A1',type:'장치 유형',location:'위치',locationPlaceholder:'예: A동 1층',group:'그룹',firmware:'펌웨어 버전',firmwarePlaceholder:'예: v2.1.3',signal:'신호 강도',cancel:'취소',save:'저장'},
+    time:{seconds:'초 전',minutes:'분 전',hours:'시간 전',days:'일 전'},
+    fwSpinner:'펌웨어 업데이트를 푸시하는 중...',
+    confirm:{title:'확인',msg:'실행하시겠습니까?',cancel:'취소',ok:'확인'}
+  }
+};
+/* ===== HELPERS ===== */
+function LSk(v,k){if(k===undefined){try{return JSON.parse(localStorage.getItem(v))}catch(e){return null}}localStorage.setItem(v,JSON.stringify(k))}
+function LS(k,v){return LSk(k,v)}
+function uid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)}
+function showToast(m,t){t=t||'info';var c=document.getElementById('toastContainer'),el=document.createElement('div');el.className='toast '+t;el.textContent=m;c.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(function(){el.remove()},300)},3000)}
+function openModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('.modal-overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('show')})});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.modal-overlay.show').forEach(function(m){m.classList.remove('show')})});
+var confirmCb=null;
+function showConfirm(t,m,cb){document.getElementById('confirmTitle').textContent=t;document.getElementById('confirmMsg').textContent=m;confirmCb=cb;document.getElementById('confirmOverlay').classList.add('show')}
+document.getElementById('confirmOk').onclick=function(){document.getElementById('confirmOverlay').classList.remove('show');if(confirmCb)confirmCb();confirmCb=null};
+document.getElementById('confirmCancel').onclick=function(){document.getElementById('confirmOverlay').classList.remove('show');confirmCb=null};
+function downloadCSV(fn,headers,rows){var csv=headers.join(',')+'\n';rows.forEach(function(r){csv+=r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')+'\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;a.click();URL.revokeObjectURL(a.href)}
+
+/* ===== CANVAS HELPERS ===== */
+function drawGauge(canvasId,value,min,max,color,unit){
+  var c=document.getElementById(canvasId);if(!c)return;var ctx=c.getContext('2d');
+  var w=c.width,h=c.height,cx=w/2,cy=h-10,r=Math.max(10,Math.min(w,h)*0.6);
+  ctx.clearRect(0,0,w,h);
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,0,false);ctx.strokeStyle='#1f2740';ctx.lineWidth=8;ctx.lineCap='round';ctx.stroke();
+  var pct=Math.max(0,Math.min(1,(value-min)/(max-min)));
+  var angle=Math.PI+pct*Math.PI;
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,angle,false);ctx.strokeStyle=color;ctx.lineWidth=8;ctx.lineCap='round';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r-2,Math.PI,angle,false);ctx.strokeStyle=color.replace('rgb','rgba').slice(0,-1)+',0.2'+String.fromCharCode(41);ctx.lineWidth=14;ctx.stroke();
+}
+
+function drawLineChart(canvasId,labels,datasets,opts){
+  opts=opts||{};
+  var c=document.getElementById(canvasId);if(!c)return;var ctx=c.getContext('2d');
+  var rect=c.parentElement.getBoundingClientRect();
+  c.width=rect.width||c.width;c.height=rect.height||c.height;
+  var w=c.width,h=c.height,pad={t:20,r:20,b:30,l:45};
+  var gw=w-pad.l-pad.r,gh=h-pad.t-pad.b;
+  ctx.clearRect(0,0,w,h);
+  var allVals=[];datasets.forEach(function(ds){allVals=allVals.concat(ds.data)});
+  var vMin=opts.min!==undefined?opts.min:Math.min.apply(null,allVals);
+  var vMax=opts.max!==undefined?opts.max:Math.max.apply(null,allVals);
+  if(vMin===vMax){vMin-=1;vMax+=1}
+  var ySteps=5;
+  ctx.strokeStyle='#1f2740';ctx.lineWidth=1;ctx.font='10px system-ui';ctx.fillStyle='#4e5870';
+  for(var i=0;i<=ySteps;i++){
+    var y=pad.t+gh*(1-i/ySteps);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+    var lbl=(vMin+(vMax-vMin)*i/ySteps).toFixed(1);ctx.textAlign='right';ctx.fillText(lbl,pad.l-6,y+3);
+  }
+  var maxLabels=12;var step=Math.max(1,Math.floor(labels.length/maxLabels));
+  ctx.textAlign='center';
+  labels.forEach(function(l,i){if(i%step===0){var x=pad.l+gw*i/(labels.length-1||1);ctx.fillText(l,x,h-6)}});
+  datasets.forEach(function(ds){
+    ctx.beginPath();ctx.strokeStyle=ds.color||'#0ea5e9';ctx.lineWidth=2;
+    ds.data.forEach(function(v,i){
+      var x=pad.l+gw*i/(ds.data.length-1||1);
+      var y=pad.t+gh*(1-(v-vMin)/(vMax-vMin));
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });ctx.stroke();
+    if(ds.fill){ctx.lineTo(pad.l+gw,pad.t+gh);ctx.lineTo(pad.l,pad.t+gh);ctx.closePath();
+      ctx.fillStyle=ds.fill;ctx.fill()}
+  });
+}
+
+function drawDonut(canvasId,slices){
+  var c=document.getElementById(canvasId);if(!c)return;var ctx=c.getContext('2d');
+  var w=c.width,h=c.height,cx=w/2,cy=h/2,r=Math.max(10,Math.min(w,h)/2-20);
+  ctx.clearRect(0,0,w,h);
+  var total=0;slices.forEach(function(s){total+=s.value});
+  var startAngle=-Math.PI/2;
+  slices.forEach(function(s){
+    var sweep=total>0?(s.value/total)*Math.PI*2:0;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,startAngle,startAngle+sweep);ctx.closePath();
+    ctx.fillStyle=s.color;ctx.fill();
+    startAngle+=sweep;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,r*0.55,0,Math.PI*2);ctx.fillStyle='#111620';ctx.fill();
+  ctx.fillStyle='#e0e6f0';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(total,cx,cy-6);
+  ctx.fillStyle='#4e5870';ctx.font='9px system-ui';ctx.fillText('设备',cx,cy+8);
+  var ly=h-12,lx=10;ctx.font='10px system-ui';ctx.textAlign='left';
+  slices.forEach(function(s){ctx.fillStyle=s.color;ctx.fillRect(lx,ly-6,8,8);ctx.fillStyle='#8892a6';ctx.fillText(s.label+' ('+s.value+')',lx+12,ly+1);lx+=ctx.measureText(s.label+' ('+s.value+')').width+22});
+}
+
+function drawBarChart(canvasId,labels,values,color){
+  var c=document.getElementById(canvasId);if(!c)return;var ctx=c.getContext('2d');
+  var rect=c.parentElement.getBoundingClientRect();c.width=rect.width||c.width;c.height=rect.height||c.height;
+  var w=c.width,h=c.height,pad={t:15,r:15,b:30,l:40};
+  var gw=w-pad.l-pad.r,gh=h-pad.t-pad.b;
+  ctx.clearRect(0,0,w,h);
+  var vMax=Math.max.apply(null,values)*1.1||1;
+  ctx.strokeStyle='#1f2740';ctx.lineWidth=1;ctx.font='9px system-ui';ctx.fillStyle='#4e5870';
+  for(var i=0;i<=4;i++){var y=pad.t+gh*(1-i/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.textAlign='right';ctx.fillText((vMax*i/4).toFixed(0),pad.l-5,y+3)}
+  var bw=gw/labels.length*0.6;var gap=gw/labels.length*0.4;
+  labels.forEach(function(l,i){
+    var x=pad.l+i*(bw+gap)+gap/2;var bh=gh*(values[i]/vMax);
+    ctx.fillStyle=color||'#0ea5e9';ctx.fillRect(x,pad.t+gh-bh,bw,bh);
+    ctx.fillStyle='#4e5870';ctx.textAlign='center';ctx.fillText(l,x+bw/2,h-6);
+  });
+}
+
+/* ===== DEFAULT DATA ===== */
+var LOCATIONS=['Building A, 1F','Building A, 2F','Building B, 1F','Building B, B1','Plant C, Zone 1','Plant C, Zone 2','Outdoor - Roof','Outdoor - Gate'];
+var GROUPS=['Building A','Building B','Plant C','Outdoor'];
+var DEFAULT_DEVICES=[
+  {id:uid(),name:'温控传感器 A1',type:'Sensor',location:'Building A, 1F',firmware:'v2.1.3',status:'online',reading:23.5,unit:'°C',lastUpdate:Date.now(),signal:92,battery:87,group:'Building A',heartbeat:5},
+  {id:uid(),name:'湿度传感器 B2',type:'Sensor',location:'Building B, 1F',firmware:'v1.8.7',status:'online',reading:62.1,unit:'%',lastUpdate:Date.now(),signal:78,battery:65,group:'Building B',heartbeat:3},
+  {id:uid(),name:'气压传感器 C1',type:'Sensor',location:'Plant C, Zone 1',firmware:'v3.0.1',status:'warning',reading:1.45,unit:'atm',lastUpdate:Date.now()-300000,signal:55,battery:42,group:'Plant C',heartbeat:15},
+  {id:uid(),name:'安防摄像头 D1',type:'Camera',location:'Building A, Entrance',firmware:'v4.2.0',status:'online',reading:0,unit:'fps',lastUpdate:Date.now(),signal:88,battery:100,group:'Building A',heartbeat:2},
+  {id:uid(),name:'光照传感器 E3',type:'Sensor',location:'Outdoor - Roof',firmware:'v2.0.5',status:'offline',reading:0,unit:'lux',lastUpdate:Date.now()-7200000,signal:0,battery:12,group:'Outdoor',heartbeat:999},
+  {id:uid(),name:'温控传感器 A2',type:'Sensor',location:'Building A, 2F',firmware:'v2.1.3',status:'online',reading:24.8,unit:'°C',lastUpdate:Date.now(),signal:85,battery:91,group:'Building A',heartbeat:4},
+  {id:uid(),name:'控制器 F1',type:'Controller',location:'Plant C, Zone 2',firmware:'v5.1.0',status:'online',reading:1,unit:'state',lastUpdate:Date.now(),signal:70,battery:100,group:'Plant C',heartbeat:1},
+  {id:uid(),name:'网关 G1',type:'Gateway',location:'Building B, B1',firmware:'v6.0.2',status:'online',reading:156,unit:'pkt/s',lastUpdate:Date.now(),signal:95,battery:100,group:'Building B',heartbeat:1},
+  {id:uid(),name:'安防摄像头 D2',type:'Camera',location:'Building B, Entrance',firmware:'v4.2.0',status:'online',reading:0,unit:'fps',lastUpdate:Date.now(),signal:82,battery:100,group:'Building B',heartbeat:3},
+  {id:uid(),name:'烟雾传感器 H1',type:'Sensor',location:'Building A, 1F',firmware:'v1.5.2',status:'online',reading:0.02,unit:'ppm',lastUpdate:Date.now(),signal:90,battery:78,group:'Building A',heartbeat:6},
+  {id:uid(),name:'控制器 F2',type:'Controller',location:'Building A, 2F',firmware:'v5.0.8',status:'warning',reading:0,unit:'state',lastUpdate:Date.now()-600000,signal:40,battery:55,group:'Building A',heartbeat:30},
+  {id:uid(),name:'门禁传感器 I1',type:'Sensor',location:'Outdoor - Gate',firmware:'v2.3.1',status:'online',reading:1,unit:'events',lastUpdate:Date.now(),signal:65,battery:33,group:'Outdoor',heartbeat:8},
+  {id:uid(),name:'网关 G2',type:'Gateway',location:'Plant C, Zone 1',firmware:'v6.0.2',status:'online',reading:89,unit:'pkt/s',lastUpdate:Date.now(),signal:88,battery:100,group:'Plant C',heartbeat:2},
+  {id:uid(),name:'温控传感器 B1',type:'Sensor',location:'Building B, 1F',firmware:'v2.1.3',status:'online',reading:22.1,unit:'°C',lastUpdate:Date.now(),signal:76,battery:81,group:'Building B',heartbeat:5},
+  {id:uid(),name:'安防摄像头 D3',type:'Camera',location:'Plant C, Zone 2',firmware:'v4.1.5',status:'offline',reading:0,unit:'fps',lastUpdate:Date.now()-3600000,signal:0,battery:100,group:'Plant C',heartbeat:999},
+  {id:uid(),name:'水位传感器 J1',type:'Sensor',location:'Building B, B1',firmware:'v1.9.0',status:'online',reading:45.2,unit:'cm',lastUpdate:Date.now(),signal:72,battery:60,group:'Building B',heartbeat:7}
+];
+
+var DEFAULT_ALERTS=[
+  {id:uid(),device:'气压传感器 C1',type:'气压偏高告警',severity:'warning',message:'气压读数 1.45 atm 接近阈值 2.0 atm',time:Date.now(),acknowledged:false,dismissed:false},
+  {id:uid(),device:'光照传感器 E3',type:'设备离线',severity:'critical',message:'设备已离线超过2小时，最后读数：0 lux',time:Date.now()-7200000,acknowledged:false,dismissed:false},
+  {id:uid(),device:'控制器 F2',type:'信号弱',severity:'warning',message:'信号强度降至 40%，建议检查天线连接',time:Date.now()-1800000,acknowledged:false,dismissed:false},
+  {id:uid(),device:'温控传感器 A1',type:'温度正常',severity:'info',message:'温度读数正常：23.5°C',time:Date.now()-3600000,acknowledged:true,dismissed:false},
+  {id:uid(),device:'安防摄像头 D3',type:'设备离线',severity:'critical',message:'设备已离线超过1小时',time:Date.now()-3600000,acknowledged:false,dismissed:false}
+];
+
+var DEFAULT_FIRMWARE=[
+  {id:'fw1',version:'v6.0.2',deviceType:'Gateway',releaseDate:'2026-05-20',size:'2.4 MB',status:'latest'},
+  {id:'fw2',version:'v5.1.0',deviceType:'Controller',releaseDate:'2026-05-15',size:'1.8 MB',status:'latest'},
+  {id:'fw3',version:'v4.2.0',deviceType:'Camera',releaseDate:'2026-04-28',size:'3.1 MB',status:'latest'},
+  {id:'fw4',version:'v3.0.1',deviceType:'Sensor',releaseDate:'2026-03-10',size:'0.9 MB',status:'latest'},
+  {id:'fw5',version:'v2.1.3',deviceType:'Sensor',releaseDate:'2026-01-22',size:'0.8 MB',status:'deprecated'},
+  {id:'fw6',version:'v5.0.8',deviceType:'Controller',releaseDate:'2026-02-14',size:'1.7 MB',status:'deprecated'}
+];
+
+var DEFAULT_RULES=[
+  {id:uid(),name:'高温告警',device:'温控传感器 A1',metric:'temperature',op:'>',threshold:30,action:'alert',enabled:true,lastTriggered:Date.now()-3600000},
+  {id:uid(),name:'低电量通知',device:'门禁传感器 I1',metric:'battery',op:'<',threshold:20,action:'notify',enabled:true,lastTriggered:null},
+  {id:uid(),name:'气压异常关断',device:'气压传感器 C1',metric:'pressure',op:'>=',threshold:2.0,action:'shutdown',enabled:false,lastTriggered:null}
+];
+
+var DEFAULT_FW_JOBS=[];
+
+var DEFAULT_LOGS=[
+  {id:uid(),time:Date.now()-3600000,rule:'高温告警',condition:'温度(32.5°C) > 30',action:'发送告警',result:'success'},
+  {id:uid(),time:Date.now()-86400000,rule:'低电量通知',condition:'电量(18%) < 20',action:'通知管理员',result:'success'},
+  {id:uid(),time:Date.now()-172800000,rule:'气压异常关断',condition:'气压(2.1atm) >= 2.0',action:'关闭设备',result:'success'}
+];
+
+function initData(){
+  if(!LS('iot_devices'))LS('iot_devices',DEFAULT_DEVICES);
+  if(!LS('iot_alerts'))LS('iot_alerts',DEFAULT_ALERTS);
+  if(!LS('iot_firmware'))LS('iot_firmware',DEFAULT_FIRMWARE);
+  if(!LS('iot_rules'))LS('iot_rules',DEFAULT_RULES);
+  if(!LS('iot_fw_jobs'))LS('iot_fw_jobs',DEFAULT_FW_JOBS);
+  if(!LS('iot_logs'))LS('iot_logs',DEFAULT_LOGS);
+}
+initData();
+
+/* ===== NAVIGATION ===== */
+document.querySelectorAll('.nav-item').forEach(function(item){item.addEventListener('click',function(){var p=this.getAttribute('data-page');if(p)navigateTo(p)})});
+function navigateTo(page){
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  var nav=document.querySelector('.nav-item[data-page="'+page+'"]');if(nav)nav.classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  var el=document.getElementById('page'+page);if(el)el.classList.add('active');
+  document.getElementById('topbarTitle').textContent=T('page.'+page.toLowerCase());
+  if(page==='Dashboard')renderDashboard();
+  if(page==='Gauges')renderGauges();
+  if(page==='Devices')renderDevices();
+  if(page==='Alerts')renderAlerts();
+  if(page==='DataExplorer')renderDataExplorer();
+  if(page==='Firmware')renderFirmware();
+  if(page==='Automation')renderAutomation();
+  if(page==='FloorPlan')renderFloorPlan();
+  if(page==='Reports')renderReports();
+}
+
+/* ===== DASHBOARD ===== */
+function renderDashboard(){
+  var devices=LS('iot_devices')||[];
+  var alerts=LS('iot_alerts')||[];
+  var online=devices.filter(function(d){return d.status==='online'}).length;
+  var warning=devices.filter(function(d){return d.status==='warning'}).length;
+  var offline=devices.filter(function(d){return d.status==='offline'}).length;
+  var activeAlerts=alerts.filter(function(a){return!a.dismissed&&!a.acknowledged}).length;
+  document.getElementById('alertBadge').textContent=activeAlerts;
+  document.getElementById('alertDot').style.display=activeAlerts>0?'block':'none';
+  var stats=[
+    {label:T('dashboard.totalDevices'),value:devices.length,sub:online+' '+T('status.online'),bg:'var(--accent-glow)',color:'var(--accent)'},
+    {label:T('dashboard.onlineDevices'),value:online,sub:Math.round(online/devices.length*100)+'% '+T('reports.onlineRate'),bg:'var(--green-bg)',color:'var(--green)'},
+    {label:T('dashboard.activeAlerts'),value:activeAlerts,sub:alerts.filter(function(a){return a.severity==='critical'&&!a.dismissed}).length+' '+T('alert.critical'),bg:'var(--red-bg)',color:'var(--red)'},
+    {label:T('dashboard.warningOffline'),value:warning+offline,sub:warning+' '+T('status.warning')+' / '+offline+' '+T('status.offline'),bg:'var(--yellow-bg)',color:'var(--yellow)'}
+  ];
+  var html='';
+  stats.forEach(function(s){
+    html+='<div class="stat-card"><div class="stat-top"><span class="stat-label">'+s.label+'</span><div class="stat-icon" style="background:'+s.bg+';color:'+s.color+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/></svg></div></div><div class="stat-value">'+s.value+'</div><div class="stat-sub">'+s.sub+'</div></div>';
+  });
+  document.getElementById('statsGrid').innerHTML=html;
+
+  var hours=[];for(var i=23;i>=0;i--)hours.push(((new Date().getHours()-i+24)%24)+':00');
+  var tpData=hours.map(function(){return Math.floor(Math.random()*500+200)});
+  drawLineChart('throughputChart',hours,[{data:tpData,color:'#0ea5e9',fill:'rgba(14,165,233,0.08)'}]);
+
+  var typeCount={};devices.forEach(function(d){typeCount[d.type]=(typeCount[d.type]||0)+1});
+  var typeColors={Sensor:'#0ea5e9',Camera:'#a855f7',Controller:'#f97316',Gateway:'#22c55e'};
+  var slices=[];Object.keys(typeCount).forEach(function(k){slices.push({label:k,value:typeCount[k],color:typeColors[k]||'#06b6d4'})});
+  drawDonut('typeDistChart',slices);
+
+  var dashAlerts=document.getElementById('dashAlertsBody');dashAlerts.innerHTML='';
+  alerts.filter(function(a){return!a.dismissed}).slice(0,4).forEach(function(a){
+    dashAlerts.innerHTML+='<tr><td>'+a.type+'</td><td>'+a.device+'</td><td><span class="badge badge-'+(a.severity==='critical'?'critical':a.severity)+'">'+a.severity+'</span></td><td style="color:var(--text-3);font-size:.73rem">'+timeAgo(a.time)+'</td></tr>';
+  });
+
+  var tempDevs=devices.filter(function(d){return d.unit==='°C'&&d.status!=='offline'});
+  var avgTemp=tempDevs.length>0?(tempDevs.reduce(function(s,d){return s+d.reading},0)/tempDevs.length).toFixed(1):0;
+  var humDevs=devices.filter(function(d){return d.unit==='%'&&d.status!=='offline'});
+  var avgHum=humDevs.length>0?(humDevs.reduce(function(s,d){return s+d.reading},0)/humDevs.length).toFixed(1):0;
+  drawGauge('dashGaugeTemp',parseFloat(avgTemp),0,50,'rgb(14,165,233)','°C');
+  drawGauge('dashGaugeHum',parseFloat(avgHum),0,100,'rgb(34,197,94)','%');
+  document.getElementById('dashGaugeTempVal').textContent=avgTemp+'°C';
+  document.getElementById('dashGaugeHumVal').textContent=avgHum+'%';
+}
+
+function timeAgo(ts){
+  var diff=Date.now()-ts;var s=Math.floor(diff/1000);
+  if(s<60)return s+T('time.seconds');var m=Math.floor(s/60);if(m<60)return m+T('time.minutes');
+  var h=Math.floor(m/60);if(h<24)return h+T('time.hours');var d=Math.floor(h/24);return d+T('time.days');
+}
+
+var gaugeAnimVals={temp:0,hum:0,pressure:0,battery:0};
+var realtimeData=[];for(var ri=0;ri<30;ri++)realtimeData.push(20+Math.random()*10);
+function renderGauges(){
+  var devices=LS('iot_devices')||[];
+  var tempDevs=devices.filter(function(d){return d.unit==='°C'&&d.status!=='offline'});
+  var humDevs=devices.filter(function(d){return d.unit==='%'&&d.status!=='offline'});
+  var presDevs=devices.filter(function(d){return d.unit==='atm'&&d.status!=='offline'});
+  gaugeAnimVals.temp=tempDevs.length>0?tempDevs.reduce(function(s,d){return s+d.reading},0)/tempDevs.length:0;
+  gaugeAnimVals.hum=humDevs.length>0?humDevs.reduce(function(s,d){return s+d.reading},0)/humDevs.length:0;
+  gaugeAnimVals.pressure=presDevs.length>0?presDevs.reduce(function(s,d){return s+d.reading},0)/presDevs.length:0;
+  gaugeAnimVals.battery=devices.length>0?devices.reduce(function(s,d){return s+d.battery},0)/devices.length:0;
+  updateGauges();
+  var labels=[];for(var i=29;i>=0;i--)labels.push('-'+(i*2)+'s');
+  drawLineChart('realtimeChart',labels,[{data:realtimeData.slice(),color:'#0ea5e9',fill:'rgba(14,165,233,0.08)'}]);
+}
+function updateGauges(){
+  drawGauge('gaugeTemp',gaugeAnimVals.temp,0,50,'rgb(14,165,233)','°C');
+  drawGauge('gaugeHum',gaugeAnimVals.hum,0,100,'rgb(34,197,94)','%');
+  drawGauge('gaugePressure',gaugeAnimVals.pressure,0,3,'rgb(168,85,247)','atm');
+  drawGauge('gaugeBattery',gaugeAnimVals.battery,0,100,'rgb(234,179,8)','%');
+  document.getElementById('gaugeTempVal').textContent=gaugeAnimVals.temp.toFixed(1)+'°C';
+  document.getElementById('gaugeHumVal').textContent=gaugeAnimVals.hum.toFixed(1)+'%';
+  document.getElementById('gaugePressureVal').textContent=gaugeAnimVals.pressure.toFixed(2)+' atm';
+  document.getElementById('gaugeBatteryVal').textContent=Math.round(gaugeAnimVals.battery)+'%';
+}
+
+function signalBars(sig){
+  var bars='';var active=sig>75?4:sig>50?3:sig>25?2:sig>0?1:0;
+  for(var i=0;i<4;i++){var h=4+i*3;bars+='<span class="bar'+(i<active?' active':'')+'" style="height:'+h+'px"></span>'}
+  return '<span class="signal-bars">'+bars+'</span>';
+}
+function batteryBar(pct){
+  var c=pct>60?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
+  return '<div style="display:flex;align-items:center;gap:4px"><div style="width:40px;height:8px;background:var(--bg-3);border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+c+';border-radius:4px"></div></div><span style="font-size:.68rem;color:var(--text-3)">'+pct+'%</span></div>';
+}
+
+function renderDevices(){
+  var devices=LS('iot_devices')||[];
+  var search=document.getElementById('deviceSearch').value.trim().toLowerCase();
+  var typeF=document.getElementById('deviceTypeFilter').value;
+  var statusF=document.getElementById('deviceStatusFilter').value;
+  var groupF=document.getElementById('deviceGroupFilter').value;
+  if(search)devices=devices.filter(function(d){return d.name.toLowerCase().indexOf(search)!==-1||d.location.toLowerCase().indexOf(search)!==-1});
+  if(typeF)devices=devices.filter(function(d){return d.type===typeF});
+  if(statusF)devices=devices.filter(function(d){return d.status===statusF});
+  if(groupF)devices=devices.filter(function(d){return d.group===groupF});
+  var tbody=document.getElementById('devicesBody');tbody.innerHTML='';
+  if(devices.length===0){tbody.innerHTML='<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">📡</div><div class="empty-msg">'+T('msg.noDevices')+'</div><div class="empty-hint">'+T('devices.add')+T('btn.add')+'</div></div></td></tr>';return}
+  var typeIcons={Sensor:'📡',Camera:'📹',Controller:'🎛️',Gateway:'🌐'};
+  devices.forEach(function(d){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td><div style="display:flex;align-items:center;gap:6px"><span>'+typeIcons[d.type]+'</span><strong>'+d.name+'</strong></div></td><td>'+d.type+'</td><td class="col-hide-sm" style="font-size:.75rem">'+d.location+'</td><td><strong>'+d.reading+'</strong> '+d.unit+'</td><td class="col-hide-sm">'+signalBars(d.signal)+'</td><td class="col-hide-sm">'+batteryBar(d.battery)+'</td><td class="col-hide-sm" style="color:var(--text-3);font-size:.75rem">'+d.firmware+'</td><td class="col-hide-sm" style="font-size:.73rem;color:var(--text-3)">'+d.heartbeat+'s</td><td class="col-hide-sm" style="font-size:.73rem">'+d.group+'</td><td><span class="badge badge-'+d.status+'">'+d.status+'</span></td><td><div style="display:flex;gap:3px"><button class="btn-icon" title="编辑" onclick="editDevice(\''+d.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-icon" title="删除" style="color:var(--red)" onclick="deleteDevice(\''+d.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div></td>';
+    tbody.appendChild(tr);
+  });
+}
+document.getElementById('deviceSearch').addEventListener('input',renderDevices);
+document.getElementById('deviceTypeFilter').addEventListener('change',renderDevices);
+document.getElementById('deviceStatusFilter').addEventListener('change',renderDevices);
+document.getElementById('deviceGroupFilter').addEventListener('change',renderDevices);
+
+document.getElementById('addDeviceBtn').addEventListener('click',function(){openDeviceModal()});
+function openDeviceModal(id){
+  document.getElementById('editDeviceId').value='';document.getElementById('dName').value='';document.getElementById('dLocation').value='';document.getElementById('dFirmware').value='';document.getElementById('dType').value='Sensor';document.getElementById('dGroup').value='Building A';document.getElementById('dSignal').value='80';
+  document.getElementById('deviceModalTitle').textContent=T('deviceModal.title');
+  if(id){
+    var devices=LS('iot_devices')||[];var d=devices.find(function(x){return x.id===id});
+    if(d){document.getElementById('editDeviceId').value=d.id;document.getElementById('dName').value=d.name;document.getElementById('dType').value=d.type;document.getElementById('dLocation').value=d.location;document.getElementById('dFirmware').value=d.firmware;document.getElementById('dGroup').value=d.group;document.getElementById('dSignal').value=d.signal;document.getElementById('deviceModalTitle').textContent=T('deviceModal.editTitle')}
+  }
+  openModal('deviceModal');
+}
+document.getElementById('saveDeviceBtn').addEventListener('click',function(){
+  var name=document.getElementById('dName').value.trim();if(!name){showToast(T('msg.errorName'),'error');return}
+  var devices=LS('iot_devices')||[];var editId=document.getElementById('editDeviceId').value;
+  var type=document.getElementById('dType').value;
+  var data={name:name,type:type,location:document.getElementById('dLocation').value.trim()||'N/A',firmware:document.getElementById('dFirmware').value.trim()||'v1.0.0',group:document.getElementById('dGroup').value,signal:parseInt(document.getElementById('dSignal').value)||80};
+  if(editId){var idx=devices.findIndex(function(d){return d.id===editId});if(idx!==-1)Object.assign(devices[idx],data)}
+  else{data.id=uid();data.status='online';data.reading=+(Math.random()*30+10).toFixed(1);data.unit={Sensor:'°C',Camera:'fps',Controller:'state',Gateway:'pkt/s'}[type]||'';data.lastUpdate=Date.now();data.battery=Math.floor(Math.random()*80+20);data.heartbeat=Math.floor(Math.random()*10+1);devices.push(data)}
+  LS('iot_devices',devices);closeModal('deviceModal');renderDevices();showToast(editId?T('msg.deviceUpdated'):T('msg.deviceAdded'),'success');
+});
+function editDevice(id){openDeviceModal(id)}
+function deleteDevice(id){showConfirm(T('btn.delete'),T('msg.confirmDelete'),function(){var devices=LS('iot_devices')||[];devices=devices.filter(function(d){return d.id!==id});LS('iot_devices',devices);renderDevices();showToast(T('msg.deviceDeleted'),'success')})}
+document.getElementById('exportDevicesCSV').addEventListener('click',function(){
+  var devices=LS('iot_devices')||[];
+  downloadCSV('devices_export.csv',[T('devices.name'),T('devices.type'),T('devices.location'),T('devices.reading'),T('devices.signal'),T('devices.battery'),T('devices.firmware'),T('devices.group'),T('devices.status')],devices.map(function(d){return[d.name,d.type,d.location,d.reading+d.unit,d.signal,d.battery,d.firmware,d.group,d.status]}));
+  showToast(T('msg.exported'),'success');
+});
+
+function renderAlerts(){
+  var alerts=LS('iot_alerts')||[];
+  var sevF=document.getElementById('alertSevFilter').value;
+  var active=alerts.filter(function(a){return!a.dismissed});
+  if(sevF)active=active.filter(function(a){return a.severity===sevF});
+  document.getElementById('alertBadge').textContent=alerts.filter(function(a){return!a.dismissed&&!a.acknowledged}).length;
+  var sevBgs={critical:'var(--red-bg)',warning:'var(--yellow-bg)',info:'var(--cyan-bg)'};
+  var sevColors={critical:'var(--red)',warning:'var(--yellow)',info:'var(--cyan)'};
+  var sevIcons={critical:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',warning:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'};
+  var list=document.getElementById('alertsList');
+  if(active.length===0){list.innerHTML='<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-msg">'+T('msg.noAlerts')+'</div><div class="empty-hint">'+T('alerts.noAlertsHint')+'</div></div>'}else{
+    list.innerHTML=active.map(function(a){
+      return '<div class="alert-card '+a.severity+'"><div class="alert-icon" style="background:'+sevBgs[a.severity]+';color:'+sevColors[a.severity]+'">'+sevIcons[a.severity]+'</div><div class="alert-body"><div class="alert-title">'+a.type+(a.acknowledged?' <span style="color:var(--cyan);font-size:.68rem">'+T('alerts.acknowledged')+'</span>':'')+'</div><div class="alert-desc">'+a.message+'</div><div class="alert-time">'+a.device+' · '+timeAgo(a.time)+'</div></div><div class="alert-actions">'+(!a.acknowledged?'<button class="btn btn-ghost btn-sm" onclick="ackAlert(\''+a.id+'\')">'+T('alerts.confirm')+'</button>':'')+'<button class="btn btn-ghost btn-sm" onclick="dismissAlert(\''+a.id+'\')">'+T('alerts.dismiss')+'</button></div></div>';
+    }).join('');
+  }
+  var days=[T('time.mon'),T('time.tue'),T('time.wed'),T('time.thu'),T('time.fri'),T('time.sat'),T('time.sun')];
+  var critData=days.map(function(){return Math.floor(Math.random()*3)});
+  var warnData=days.map(function(){return Math.floor(Math.random()*5)+1});
+  drawBarChart('alertTrendChart',days,critData.map(function(c,i){return c+warnData[i]}),'#ef4444');
+  var crit=alerts.filter(function(a){return a.severity==='critical'}).length;
+  var warn=alerts.filter(function(a){return a.severity==='warning'}).length;
+  var info=alerts.filter(function(a){return a.severity==='info'}).length;
+  drawDonut('alertPieChart',[{label:'严重',value:crit,color:'#ef4444'},{label:'警告',value:warn,color:'#eab308'},{label:'信息',value:info,color:'#06b6d4'}]);
+}
+document.getElementById('alertSevFilter').addEventListener('change',renderAlerts);
+function ackAlert(id){var alerts=LS('iot_alerts')||[];var idx=alerts.findIndex(function(a){return a.id===id});if(idx!==-1){alerts[idx].acknowledged=true;LS('iot_alerts',alerts)}renderAlerts();showToast('告警已确认','info')}
+function dismissAlert(id){var alerts=LS('iot_alerts')||[];var idx=alerts.findIndex(function(a){return a.id===id});if(idx!==-1){alerts[idx].dismissed=true;LS('iot_alerts',alerts)}renderAlerts();showToast('告警已消除','success')}
+document.getElementById('exportAlertsBtn').addEventListener('click',function(){
+  var alerts=LS('iot_alerts')||[];
+  downloadCSV('alert_history.csv',['类型','设备','级别','消息','时间','已确认'],alerts.map(function(a){return[a.type,a.device,a.severity,a.message,timeAgo(a.time),a.acknowledged?'是':'否']}));
+  showToast('告警历史已导出','success');
+});
+
+function renderDataExplorer(){
+  var devices=LS('iot_devices')||[];
+  var sel=document.getElementById('explorerDevice');
+  var devOptions='<option value="">选择设备</option>'+devices.map(function(d){return'<option value="'+d.id+'">'+d.name+' ('+d.type+')</option>'}).join('');
+  sel.innerHTML=devOptions;
+  var selA=document.getElementById('compareDeviceA');var selB=document.getElementById('compareDeviceB');
+  selA.innerHTML=devOptions;selB.innerHTML=devOptions;
+  if(devices.length>1){selA.value=devices[0].id;selB.value=devices[1].id}
+  updateExplorerChart();
+}
+document.getElementById('explorerDevice').addEventListener('change',updateExplorerChart);
+document.getElementById('explorerMetric').addEventListener('change',updateExplorerChart);
+document.getElementById('compareDeviceA').addEventListener('change',updateCompareChart);
+document.getElementById('compareDeviceB').addEventListener('change',updateCompareChart);
+function getMetricData(device,metric,count){
+  var base=0;
+  if(metric==='temperature')base=device.unit==='°C'?device.reading:22;
+  else if(metric==='humidity')base=device.unit==='%'?device.reading:55;
+  else if(metric==='pressure')base=device.unit==='atm'?device.reading:1.0;
+  else base=device.battery;
+  var data=[];for(var i=0;i<count;i++)data.push(+(base+(Math.random()-.5)*base*0.15).toFixed(2));
+  return data;
+}
+function updateExplorerChart(){
+  var deviceId=document.getElementById('explorerDevice').value;
+  var metric=document.getElementById('explorerMetric').value;
+  var labels=[];for(var i=23;i>=0;i--)labels.push('-'+i+'h');
+  if(!deviceId){drawLineChart('explorerChart',labels,[{data:labels.map(function(){return 0}),color:'#0ea5e9'}]);document.getElementById('explorerStats').innerHTML='<p>请选择设备</p>';return}
+  var devices=LS('iot_devices')||[];var dev=devices.find(function(d){return d.id===deviceId});
+  if(!dev)return;
+  var data=getMetricData(dev,metric,24);
+  var metricNames={temperature:'温度 (°C)',humidity:'湿度 (%)',pressure:'气压 (atm)',battery:'电量 (%)'};
+  drawLineChart('explorerChart',labels,[{data:data,color:'#0ea5e9',fill:'rgba(14,165,233,0.08)'}]);
+  var mn=Math.min.apply(null,data),mx=Math.max.apply(null,data),avg=data.reduce(function(a,b){return a+b})/data.length;
+  document.getElementById('explorerStats').innerHTML='<div style="margin-bottom:6px"><strong style="color:var(--text-1)">'+dev.name+'</strong> — '+metricNames[metric]+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div style="font-size:.68rem;color:var(--text-3)">最小值</div><div style="font-weight:700;color:var(--cyan)">'+mn.toFixed(2)+'</div></div><div><div style="font-size:.68rem;color:var(--text-3)">最大值</div><div style="font-weight:700;color:var(--red)">'+mx.toFixed(2)+'</div></div><div><div style="font-size:.68rem;color:var(--text-3)">平均值</div><div style="font-weight:700;color:var(--accent)">'+avg.toFixed(2)+'</div></div></div>';
+  updateCompareChart();
+}
+function updateCompareChart(){
+  var devices=LS('iot_devices')||[];
+  var idA=document.getElementById('compareDeviceA').value;
+  var idB=document.getElementById('compareDeviceB').value;
+  var metric=document.getElementById('explorerMetric').value;
+  var devA=devices.find(function(d){return d.id===idA});var devB=devices.find(function(d){return d.id===idB});
+  var labels=[];for(var i=11;i>=0;i--)labels.push('-'+i+'h');
+  var datasets=[];
+  if(devA)datasets.push({data:getMetricData(devA,metric,12),color:'#0ea5e9'});
+  if(devB)datasets.push({data:getMetricData(devB,metric,12),color:'#a855f7'});
+  if(datasets.length)drawLineChart('compareChart',labels,datasets);
+}
+document.getElementById('explorerExportBtn').addEventListener('click',function(){
+  var deviceId=document.getElementById('explorerDevice').value;if(!deviceId){showToast('请先选择设备','error');return}
+  var devices=LS('iot_devices')||[];var dev=devices.find(function(d){return d.id===deviceId});if(!dev)return;
+  var metric=document.getElementById('explorerMetric').value;
+  var rows=[];for(var i=23;i>=0;i--){var ts=new Date(Date.now()-i*3600000);rows.push([ts.toISOString(),dev.name,metric,getMetricData(dev,metric,1)[0]])}
+  downloadCSV('explorer_export.csv',['时间','设备','指标','值'],rows);showToast('数据已导出','success');
+});
+
+function renderFirmware(){
+  var fw=LS('iot_firmware')||[];var devices=LS('iot_devices')||[];
+  var tbody=document.getElementById('firmwareBody');tbody.innerHTML='';
+  fw.forEach(function(f){
+    var count=devices.filter(function(d){return d.firmware===f.version}).length;
+    tbody.innerHTML+='<tr><td><strong>'+f.version+'</strong></td><td>'+f.deviceType+'</td><td style="font-size:.75rem;color:var(--text-3)">'+f.releaseDate+'</td><td>'+f.size+'</td><td>'+count+'</td><td><span class="badge badge-'+(f.status==='latest'?'active':'info')+'">'+f.status+'</span></td><td>'+(f.status==='latest'?'<button class="btn btn-ghost btn-sm" onclick="showToast(\'已安排推送到全部'+f.deviceType+'设备\',\'info\')">推送</button>':'<button class="btn btn-ghost btn-sm" onclick="rollbackFW(\''+f.id+'\')">回滚</button>')+'</td></tr>';
+  });
+  var jobs=LS('iot_fw_jobs')||[];var jbody=document.getElementById('fwJobsBody');jbody.innerHTML='';
+  if(jobs.length===0){jbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:20px">'+T('firmware.noTasks')+'</td></tr>'}else{
+    jobs.forEach(function(j){
+      var pct=Math.round(j.progress||0);var sc=j.status==='completed'?'success':j.status==='failed'?'failed':'pushing';
+      jbody.innerHTML+='<tr><td style="font-size:.73rem">'+j.id.substr(0,12)+'</td><td>'+j.version+'</td><td>'+j.target+'</td><td><div class="progress-bar"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+(j.status==='failed'?'var(--red)':'var(--accent)')+'"></div></div><span style="font-size:.68rem;color:var(--text-3)">'+pct+'%</span></td><td><span class="badge badge-'+sc+'">'+j.status+'</span></td><td>'+(j.status==='pushing'?'<button class="btn btn-ghost btn-sm" onclick="showToast(\'任务已取消\',\'warning\')">取消</button>':'')+'</td></tr>';
+    });
+  }
+  var fwSel=document.getElementById('fwTarget');fwSel.innerHTML=fw.filter(function(f){return f.status==='latest'}).map(function(f){return'<option value="'+f.version+'">'+f.version+' ('+f.deviceType+')</option>'}).join('');
+}
+function rollbackFW(fwid){
+  showConfirm('回滚固件','确定要回滚此固件版本？关联设备将恢复到上一版本。',function(){
+    var fw=LS('iot_firmware')||[];var f=fw.find(function(x){return x.id===fwid});
+    if(f){f.status='rolled-back';LS('iot_firmware',fw);showToast('固件已回滚','success');renderFirmware()}
+  });
+}
+document.getElementById('pushFWBtn').addEventListener('click',function(){openModal('fwPushModal')});
+document.getElementById('doPushFWBtn').addEventListener('click',function(){
+  var ver=document.getElementById('fwTarget').value;if(!ver){showToast('请选择固件版本','error');return}
+  var target=document.getElementById('fwDevice').value;
+  var spinner=document.getElementById('fwSpinner');
+  closeModal('fwPushModal');
+  if(spinner)spinner.classList.add('active');
+  setTimeout(function(){
+    if(spinner)spinner.classList.remove('active');
+    var jobs=LS('iot_fw_jobs')||[];
+    jobs.push({id:uid(),version:ver,target:target==='all'?'全部设备':target,status:'pushing',progress:0,startTime:Date.now()});
+    LS('iot_fw_jobs',jobs);showToast('固件推送任务已创建','success');renderFirmware();
+    simulateFWJob(jobs[jobs.length-1].id);
+  },2000);
+});
+function simulateFWJob(jobId){
+  var progress=0;var iv=setInterval(function(){
+    var jobs=LS('iot_fw_jobs')||[];var job=jobs.find(function(j){return j.id===jobId});if(!job){clearInterval(iv);return}
+    progress+=Math.random()*18;if(progress>=100){progress=100;job.status='completed';job.progress=100;LS('iot_fw_jobs',jobs);clearInterval(iv);renderFirmware();showToast('固件更新完成','success')}
+    else{job.progress=progress;LS('iot_fw_jobs',jobs)}
+    renderFirmware();
+  },800);
+}
+
+function renderAutomation(){
+  var rules=LS('iot_rules')||[];
+  var container=document.getElementById('autoRulesTab');
+  if(rules.length===0){container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3)">'+T('automation.noRulesHint')+'</div>'}else{
+    container.innerHTML=rules.map(function(r){
+      var metricNames={temperature:'温度',humidity:'湿度',pressure:'气压',battery:'电量'};
+      var actionNames={alert:'发送告警',notify:'通知管理员',shutdown:'关闭设备'};
+      return '<div class="rule-card"><div class="rule-header"><div style="display:flex;align-items:center;gap:8px"><span class="rule-name">'+r.name+'</span><span class="badge badge-'+(r.enabled?'active':'info')+'">'+(r.enabled?'启用':'禁用')+'</span></div><div style="display:flex;gap:4px"><button class="btn-icon" title="'+(r.enabled?'禁用':'启用')+'" onclick="toggleRule(\''+r.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 11-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button><button class="btn-icon" title="删除" style="color:var(--red)" onclick="deleteRule(\''+r.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div></div><div class="rule-logic">IF '+r.device+'.'+metricNames[r.metric]+' '+r.op+' '+r.threshold+' THEN '+actionNames[r.action]+'</div><div class="rule-desc">'+(r.lastTriggered?'上次触发：'+timeAgo(r.lastTriggered):'尚未触发')+'</div></div>';
+    }).join('');
+  }
+  var logs=LS('iot_logs')||[];
+  var lbody=document.getElementById('autoLogsBody');lbody.innerHTML='';
+  if(logs.length===0){lbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:20px">'+T('automation.noLogs')+'</td></tr>'}else{
+    logs.forEach(function(l){
+      lbody.innerHTML+='<tr><td style="font-size:.75rem;color:var(--text-3)">'+timeAgo(l.time)+'</td><td>'+l.rule+'</td><td style="font-size:.78rem">'+l.condition+'</td><td>'+l.action+'</td><td><span class="badge badge-'+(l.result==='success'?'success':'failed')+'">'+l.result+'</span></td></tr>';
+    });
+  }
+  var devices=LS('iot_devices')||[];
+  document.getElementById('ruleDevice').innerHTML=devices.map(function(d){return'<option value="'+d.name+'">'+d.name+'</option>'}).join('');
+}
+function switchAutoTab(tab,btn){
+  document.getElementById('autoRulesTab').style.display=tab==='rules'?'block':'none';
+  document.getElementById('autoLogsTab').style.display=tab==='logs'?'block':'none';
+  document.querySelectorAll('#pageAutomation .tab-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');
+}
+function toggleRule(id){
+  var rules=LS('iot_rules')||[];var r=rules.find(function(x){return x.id===id});
+  if(r){r.enabled=!r.enabled;LS('iot_rules',rules);renderAutomation();showToast(r.enabled?'规则已启用':'规则已禁用','info')}
+}
+function deleteRule(id){
+  showConfirm('删除规则','确定要删除此自动化规则？',function(){
+    var rules=LS('iot_rules')||[];rules=rules.filter(function(r){return r.id!==id});LS('iot_rules',rules);renderAutomation();showToast('规则已删除','success');
+  });
+}
+document.getElementById('addRuleBtn').addEventListener('click',function(){openModal('ruleModal')});
+document.getElementById('saveRuleBtn').addEventListener('click',function(){
+  var name=document.getElementById('ruleName').value.trim();if(!name){showToast('请输入规则名称','error');return}
+  var rules=LS('iot_rules')||[];
+  rules.push({id:uid(),name:name,device:document.getElementById('ruleDevice').value,metric:document.getElementById('ruleMetric').value,op:document.getElementById('ruleOp').value,threshold:parseFloat(document.getElementById('ruleThreshold').value)||0,action:document.getElementById('ruleAction').value,enabled:true,lastTriggered:null});
+  LS('iot_rules',rules);closeModal('ruleModal');renderAutomation();showToast('规则已创建','success');
+  document.getElementById('ruleName').value='';document.getElementById('ruleThreshold').value='';
+});
+
+function renderFloorPlan(){
+  var devices=LS('iot_devices')||[];
+  var filter=document.getElementById('floorFilter').value;
+  var filtered=filter==='all'?devices:devices.filter(function(d){
+    if(filter==='1F')return d.location.indexOf('1F')!==-1||d.location.indexOf('Entrance')!==-1||d.location.indexOf('Gate')!==-1;
+    if(filter==='2F')return d.location.indexOf('2F')!==-1;
+    if(filter==='B1')return d.location.indexOf('B1')!==-1||d.location.indexOf('Zone')!==-1;
+    return true;
+  });
+  var floorNames={all:'全部楼层','1F':'1F — 大厅','2F':'2F — 办公区','B1':'B1 — 机房'};
+  document.getElementById('floorTitle').textContent=floorNames[filter]||'全部楼层';
+  var grid=document.getElementById('floorGrid');grid.innerHTML='';
+  for(var i=0;i<32;i++){
+    var cell=document.createElement('div');cell.className='floor-cell';
+    if(i<filtered.length){
+      var d=filtered[i];var cls=d.status==='online'?'occupied-online':d.status==='warning'?'occupied-warning':'occupied-offline';
+      cell.className='floor-cell '+cls;
+      cell.innerHTML='<div class="device-dot '+d.status+'" title="'+d.name+'"></div>';
+      cell.title=d.name+' | '+d.status+' | '+d.reading+d.unit;
+      cell.setAttribute('data-device',d.id);
+      cell.addEventListener('click',function(){showFloorDevice(this.getAttribute('data-device'))});
+    }
+    grid.appendChild(cell);
+  }
+  document.getElementById('floorDetail').style.display='none';
+}
+document.getElementById('floorFilter').addEventListener('change',renderFloorPlan);
+function showFloorDevice(id){
+  var devices=LS('iot_devices')||[];var d=devices.find(function(x){return x.id===id});if(!d)return;
+  document.getElementById('floorDetail').style.display='block';
+  document.getElementById('floorDetailTitle').textContent=d.name;
+  document.getElementById('floorDetailBody').innerHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:.82rem"><div><span style="color:var(--text-3)">类型</span><div style="font-weight:600">'+d.type+'</div></div><div><span style="color:var(--text-3)">位置</span><div style="font-weight:600">'+d.location+'</div></div><div><span style="color:var(--text-3)">读数</span><div style="font-weight:600">'+d.reading+' '+d.unit+'</div></div><div><span style="color:var(--text-3)">状态</span><div><span class="badge badge-'+d.status+'">'+d.status+'</span></div></div><div><span style="color:var(--text-3)">信号</span><div>'+signalBars(d.signal)+'</div></div><div><span style="color:var(--text-3)">电量</span><div>'+batteryBar(d.battery)+'</div></div><div><span style="color:var(--text-3)">固件</span><div style="font-weight:600">'+d.firmware+'</div></div><div><span style="color:var(--text-3)">分组</span><div style="font-weight:600">'+d.group+'</div></div></div>';
+}
+
+function renderReports(){
+  document.getElementById('reportOutput').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3)">选择报表类型后点击"生成报表"</div>';
+}
+document.getElementById('genReportBtn').addEventListener('click',function(){
+  var type=document.getElementById('reportType').value;
+  var devices=LS('iot_devices')||[];
+  var alerts=LS('iot_alerts')||[];
+  var online=devices.filter(function(d){return d.status==='online'}).length;
+  var offline=devices.filter(function(d){return d.status==='offline'}).length;
+  var warning=devices.filter(function(d){return d.status==='warning'}).length;
+  var critAlerts=alerts.filter(function(a){return a.severity==='critical'}).length;
+  var typeNames={daily:'日报',weekly:'周报',monthly:'月报'};
+  var now=new Date();
+  var dateStr=now.getFullYear()+'-'+(now.getMonth()+1).toString().padStart(2,'0')+'-'+now.getDate().toString().padStart(2,'0');
+  var period=type==='daily'?'24小时':type==='weekly'?'7天':'30天';
+  var points=type==='daily'?24:type==='weekly'?7:30;
+  var labels=[];for(var i=points-1;i>=0;i--)labels.push(type==='daily'?(i+'h'):(i+'d'));
+  var dataTraffic=labels.map(function(){return Math.floor(Math.random()*500+200)});
+  var alertTrend=labels.map(function(){return Math.floor(Math.random()*8)});
+  var html='<div class="chart-card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><h2 style="font-size:1.1rem;font-weight:700">SentinelIoT '+typeNames[type]+'</h2><p style="color:var(--text-3);font-size:.78rem">'+dateStr+' · 覆盖最近 '+period+'</p></div><button class="btn btn-ghost btn-sm" onclick="downloadCSV(\'report.csv\',[\'指标\',\'值\'],[[\'设备总数\','+devices.length+'],[\'在线\','+online+'],[\'离线\','+offline+'],[\'告警\','+offline+']])">导出 CSV</button></div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">';
+  html+='<div style="background:var(--bg-3);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:.68rem;color:var(--text-3)">设备总数</div><div style="font-size:1.3rem;font-weight:800">'+devices.length+'</div></div>';
+  html+='<div style="background:var(--bg-3);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:.68rem;color:var(--text-3)">在线率</div><div style="font-size:1.3rem;font-weight:800;color:var(--green)">'+Math.round(online/devices.length*100)+'%</div></div>';
+  html+='<div style="background:var(--bg-3);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:.68rem;color:var(--text-3)">活跃告警</div><div style="font-size:1.3rem;font-weight:800;color:var(--red)">'+critAlerts+'</div></div>';
+  html+='<div style="background:var(--bg-3);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:.68rem;color:var(--text-3)">平均电量</div><div style="font-size:1.3rem;font-weight:800">'+Math.round(devices.reduce(function(s,d){return s+d.battery},0)/devices.length)+'%</div></div></div>';
+  html+='<div style="margin-bottom:14px"><div style="font-weight:600;margin-bottom:8px">数据吞吐量趋势</div><canvas id="reportTrafficChart" height="180"></canvas></div>';
+  html+='<div style="margin-bottom:14px"><div style="font-weight:600;margin-bottom:8px">告警趋势</div><canvas id="reportAlertChart" height="180"></canvas></div>';
+  html+='<div><div style="font-weight:600;margin-bottom:8px">设备状态概览</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  html+='<div style="background:var(--green-bg);padding:10px;border-radius:var(--radius-sm);text-align:center"><div style="font-size:1.1rem;font-weight:800;color:var(--green)">'+online+'</div><div style="font-size:.72rem;color:var(--text-2)">在线</div></div>';
+  html+='<div style="background:var(--yellow-bg);padding:10px;border-radius:var(--radius-sm);text-align:center"><div style="font-size:1.1rem;font-weight:800;color:var(--yellow)">'+warning+'</div><div style="font-size:.72rem;color:var(--text-2)">告警</div></div>';
+  html+='<div style="background:var(--red-bg);padding:10px;border-radius:var(--radius-sm);text-align:center"><div style="font-size:1.1rem;font-weight:800;color:var(--red)">'+offline+'</div><div style="font-size:.72rem;color:var(--text-2)">离线</div></div></div></div></div>';
+  document.getElementById('reportOutput').innerHTML=html;
+  setTimeout(function(){
+    drawLineChart('reportTrafficChart',labels,[{data:dataTraffic,color:'#0ea5e9',fill:'rgba(14,165,233,0.08)'}]);
+    drawBarChart('reportAlertChart',labels,alertTrend,'#ef4444');
+  },50);
+  showToast(typeNames[type]+'已生成','success');
+});
+
+/* ===== LIVE DATA UPDATE ===== */
+var liveInterval=null;
+function stopLiveData(){
+  if(liveInterval){clearInterval(liveInterval);liveInterval=null}
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){stopLiveData()}
+  else{startLiveData()}
+});
+function startLiveData(){
+  if(liveInterval)return;
+  liveInterval=setInterval(function(){
+    var devices=LS('iot_devices')||[];
+    devices.forEach(function(d){
+      if(d.status==='offline')return;
+      if(d.unit==='°C')d.reading=+(d.reading+(Math.random()-.5)*1.2).toFixed(1);
+      else if(d.unit==='%')d.reading=+(Math.max(0,Math.min(100,d.reading+(Math.random()-.5)*2))).toFixed(1);
+      else if(d.unit==='atm')d.reading=+(Math.max(0.5,d.reading+(Math.random()-.5)*0.05)).toFixed(2);
+      else if(d.unit==='pkt/s')d.reading=Math.max(0,Math.round(d.reading+(Math.random()-.5)*20));
+      d.lastUpdate=Date.now();
+      if(Math.random()<0.01)d.battery=Math.max(0,d.battery-1);
+    });
+    LS('iot_devices',devices);
+    realtimeData.push(20+Math.random()*10);if(realtimeData.length>30)realtimeData.shift();
+    var activePage=document.querySelector('.page.active');
+    if(activePage){
+      var id=activePage.id;
+      if(id==='pageGauges'){gaugeAnimVals.temp+=((Math.random()-.5)*.8);gaugeAnimVals.hum+=((Math.random()-.5)*1.5);gaugeAnimVals.pressure+=((Math.random()-.5)*.02);gaugeAnimVals.battery+=((Math.random()-.5)*.5);updateGauges();var labels=[];for(var i=29;i>=0;i--)labels.push('-'+(i*2)+'s');drawLineChart('realtimeChart',labels,[{data:realtimeData.slice(),color:'#0ea5e9',fill:'rgba(14,165,233,0.08)'}])}
+      if(id==='pageDashboard')renderDashboard();
+    }
+    checkAutomationRules();
+  },2000);
+}
+function checkAutomationRules(){
+  var rules=LS('iot_rules')||[];var devices=LS('iot_devices')||[];var logs=LS('iot_logs')||[];
+  var alerts=LS('iot_alerts')||[];
+  rules.forEach(function(r){
+    if(!r.enabled)return;
+    var dev=devices.find(function(d){return d.name===r.device});if(!dev)return;
+    var val=0;
+    if(r.metric==='temperature'&&dev.unit==='°C')val=dev.reading;
+    else if(r.metric==='humidity'&&dev.unit==='%')val=dev.reading;
+    else if(r.metric==='pressure'&&dev.unit==='atm')val=dev.reading;
+    else if(r.metric==='battery')val=dev.battery;
+    else return;
+    var triggered=false;
+    if(r.op==='>'&&val>r.threshold)triggered=true;
+    else if(r.op==='<'&&val<r.threshold)triggered=true;
+    else if(r.op==='>='&&val>=r.threshold)triggered=true;
+    else if(r.op==='<='&&val<=r.threshold)triggered=true;
+    if(triggered&&Math.random()<0.05){
+      r.lastTriggered=Date.now();
+      var metricNames={temperature:'温度',humidity:'湿度',pressure:'气压',battery:'电量'};
+      var actionNames={alert:'发送告警',notify:'通知管理员',shutdown:'关闭设备'};
+      logs.unshift({id:uid(),time:Date.now(),rule:r.name,condition:metricNames[r.metric]+'('+val+') '+r.op+' '+r.threshold,action:actionNames[r.action],result:'success'});
+      if(logs.length>50)logs=logs.slice(0,50);
+      if(r.action==='alert'){
+        alerts.unshift({id:uid(),device:r.device,type:'规则触发: '+r.name,severity:'warning',message:metricNames[r.metric]+'('+val+') '+r.op+' '+r.threshold,time:Date.now(),acknowledged:false,dismissed:false});
+        LS('iot_alerts',alerts);
+        document.getElementById('alertBadge').textContent=alerts.filter(function(a){return!a.dismissed&&!a.acknowledged}).length;
+      }
+      LS('iot_rules',rules);LS('iot_logs',logs);
+    }
+  });
+}
+
+function translateDOM(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key=el.getAttribute('data-i18n');
+    el.textContent=T(key);
+  });
+  document.getElementById('deviceSearch').placeholder=T('devices.search');
+}
+function afterLangChange(){
+  translateDOM();
+  document.querySelectorAll('.nav-item').forEach(function(n){
+    var p=n.getAttribute('data-page');
+    if(p){var t=n.querySelector('.nav-text');if(t)t.textContent=T('nav.'+p.charAt(0).toLowerCase()+p.slice(1))}
+  });
+  document.getElementById('navSecMonitor').textContent=T('nav.monitor');
+  document.getElementById('navSecManage').textContent=T('nav.manage');
+  document.getElementById('navSecSystem').textContent=T('nav.system');
+  var activePage=document.querySelector('.page.active');
+  if(activePage){
+    var id=activePage.id.replace('page','');
+    document.getElementById('topbarTitle').textContent=T('page.'+id.toLowerCase());
+    renderDashboard();renderGauges();renderDevices();renderAlerts();renderDataExplorer();renderFirmware();renderAutomation();renderFloorPlan();renderReports();
+  }
+  initConfirmI18n();
+}
+function initConfirmI18n(){
+  document.getElementById('confirmTitle').textContent=T('confirm.title');
+  document.getElementById('confirmMsg').textContent=T('confirm.msg');
+  document.getElementById('confirmCancel').textContent=T('confirm.cancel');
+  document.getElementById('confirmOk').textContent=T('confirm.ok');
+  var sp=document.querySelector('.fw-spinner .spinner-text');
+  if(sp)sp.textContent=T('fwSpinner');
+}
+
+/* ===== INIT ===== */
+renderLangSwitcher();
+renderDashboard();
+startLiveData();
+populateFWDeviceSelect();
+function populateFWDeviceSelect(){
+  var devices=LS('iot_devices')||[];
+  var sel=document.getElementById('fwDevice');
+  sel.innerHTML='<option value="all">全部设备</option>'+devices.map(function(d){return'<option value="'+d.id+'">'+d.name+'</option>'}).join('');
+}
+</script>
+</body>
+</html>

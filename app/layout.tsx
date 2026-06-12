@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
+import { ThemeProvider } from "next-themes";
+import { LanguageProvider } from "@/lib/LanguageContext";
+import { GA_ID } from "@/lib/analytics";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,21 +25,24 @@ const OG_IMAGE =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "SHIAN Studio — AI-Powered Full-Stack Development Studio",
+    default: "SHIAN Studio — MVP & SaaS Development for Startups and SMBs",
     template: "%s | SHIAN Studio",
   },
   description:
-    "SHIAN Studio 是一家以 AI 驱动的全栈开发工作室，为全球企业交付生产级网站、小程序与 SaaS 产品。从 MVP 到规模化，以更短的时间和更低的成本，打造优秀的数字产品。",
+    "SHIAN Studio delivers production-ready MVPs, SaaS products, and AI dashboards for startups and SMBs. From idea to launch in 2-4 weeks. AI-powered full-stack delivery.",
   keywords: [
+    "MVP development",
+    "SaaS development",
+    "startup MVP",
+    "AI dashboard",
+    "product development",
+    "rapid prototyping",
     "full-stack developer",
     "custom development",
     "AI-powered development",
     "website development",
-    "mini program",
-    "SaaS development",
     "Next.js developer",
     "React developer",
-    "WeChat mini program",
     "SHIAN Studio",
     "AI coding",
     "vibe coding",
@@ -45,10 +52,6 @@ export const metadata: Metadata = {
   publisher: "SHIAN Studio",
   alternates: {
     canonical: SITE_URL,
-    languages: {
-      "en-US": "/",
-      "zh-CN": "/",
-    },
   },
   robots: {
     index: true,
@@ -80,12 +83,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    alternateLocale: ["zh_CN"],
     siteName: "SHIAN Studio",
     url: SITE_URL,
-    title: "SHIAN Studio — AI-Powered Full-Stack Development Studio",
+    title: "SHIAN Studio — MVP & SaaS Development for Startups and SMBs",
     description:
-      "AI-driven full-stack development studio. Websites, mini programs, SaaS products — delivered fast.",
+      "SHIAN Studio delivers production-ready MVPs, SaaS products, and AI dashboards for startups and SMBs. From idea to launch in 2-4 weeks. AI-powered full-stack delivery.",
     images: [
       {
         url: OG_IMAGE,
@@ -98,9 +100,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SHIAN Studio — AI-Powered Full-Stack Studio",
+    title: "SHIAN Studio — MVP & SaaS Development for Startups and SMBs",
     description:
-      "Websites, mini programs, and SaaS products. Full-stack delivery powered by AI.",
+      "SHIAN Studio delivers production-ready MVPs, SaaS products, and AI dashboards for startups and SMBs. From idea to launch in 2-4 weeks. AI-powered full-stack delivery.",
     creator: "@shian_dev",
     creatorId: "@shian_dev",
     images: [
@@ -120,9 +122,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#0a0a1a" },
-    { media: "(prefers-color-scheme: light)", color: "#0a0a1a" },
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
   ],
-  colorScheme: "dark",
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -136,33 +138,34 @@ const jsonLd = {
       "@id": `${SITE_URL}#professional-service`,
       name: "SHIAN Studio",
       description:
-        "AI-powered full-stack custom development studio building websites, mini programs, and SaaS products.",
+        "AI-powered full-stack development studio specializing in MVP and SaaS delivery for startups and SMBs worldwide.",
       url: SITE_URL,
       image: OG_IMAGE,
       priceRange: "$$$",
       areaServed: "Worldwide",
       sameAs: [
-        "https://github.com/shian",
-        "https://x.com/shian_dev",
+        "https://github.com/Shian2002",
+        "https://x.com/shiancoding",
         "https://youtube.com/@shian_dev",
       ],
-      knowsLanguage: ["en", "zh-CN"],
+      knowsLanguage: ["en"],
       serviceType: [
-        "Web Development",
-        "Mini Program Development",
+        "MVP Development",
         "SaaS Development",
+        "AI Dashboard Development",
         "Full-Stack Development",
+        "Web Application Development",
       ],
     },
     {
       "@type": "Person",
       "@id": `${SITE_URL}#person`,
       name: "Shian",
-      jobTitle: "Full-Stack Developer",
+      jobTitle: "MVP & SaaS Developer",
       worksFor: { "@id": `${SITE_URL}#professional-service` },
       sameAs: [
-        "https://github.com/shian",
-        "https://x.com/shian_dev",
+        "https://github.com/Shian2002",
+        "https://x.com/shiancoding",
       ],
       knowsAbout: [
         "React",
@@ -179,11 +182,68 @@ const jsonLd = {
       "@id": `${SITE_URL}#website`,
       url: SITE_URL,
       name: "SHIAN Studio",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: `${SITE_URL}?s={search_term_string}`,
-        "query-input": "required name=search_term_string",
-      },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}#faq`,
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What types of projects does SHIAN Studio specialize in?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "We specialize in MVP development, SaaS product builds, AI dashboards, and internal tools for startups and SMBs. From rapid prototyping to production deployment.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How fast can you deliver an MVP?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "MVP Sprint: 2-4 weeks. SaaS Build: 4-8 weeks. AI Dashboard: 2-4 weeks. Landing Pages: 3 days. AI-powered workflows enable 3-5x faster delivery.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What is AI-powered development?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "We use cutting-edge AI coding tools like Claude Code, Codex, and Cursor to accelerate development without sacrificing quality. This means faster delivery, fewer bugs, and more competitive pricing.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Do you offer post-launch support?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes. Enterprise plans include 30-day post-launch support. We also offer ongoing maintenance packages for all plan tiers.",
+          },
+        },
+      ],
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${SITE_URL}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: SITE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Services",
+          item: `${SITE_URL}/services`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: "Case Studies",
+          item: `${SITE_URL}/case-studies`,
+        },
+      ],
     },
   ],
 };
@@ -194,7 +254,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
         <link
           rel="preconnect"
@@ -205,15 +265,31 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* GA4 — only loads when NEXT_PUBLIC_GA_MEASUREMENT_ID is set */}
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`}
+            </Script>
+          </>
+        )}
       </head>
-      <body className="font-sans bg-[#0a0a0a] text-gray-200 antialiased selection:bg-accent/30 selection:text-white">
+      <body className="font-sans bg-th-bg text-th-text2 antialiased selection:bg-accent/30 selection:text-th-text">
+        <LanguageProvider>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md focus:shadow-lg"
+          className="skip-link"
         >
           Skip to content
         </a>
         {children}
+        </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

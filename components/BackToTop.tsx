@@ -1,33 +1,27 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function BackToTop() {
   const [visible, setVisible] = useState(false);
-  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
-    const update = () => {
-      setVisible(window.scrollY > 600);
-      rafId.current = null;
-    };
-
+    let ticking = false;
     const onScroll = () => {
-      if (rafId.current === null) {
-        rafId.current = requestAnimationFrame(update);
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          setVisible(window.scrollY > 400);
+          ticking = false;
+        });
       }
     };
-
-    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
-    };
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleClick = () => {
+  const scrollUp = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -35,23 +29,26 @@ export default function BackToTop() {
     <AnimatePresence>
       {visible && (
         <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          onClick={handleClick}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2 }}
+          onClick={scrollUp}
+          className="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-th-card border border-th-border hover:border-th-border-m hover:bg-th-card-h text-th-text shadow-lg flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           aria-label="Back to top"
-          className="fixed bottom-8 right-8 z-40 w-10 h-10 rounded-full bg-surface/80 backdrop-blur border border-white/10 text-white flex items-center justify-center hover:bg-accent/20 hover:border-accent/40 transition-all"
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            <path d="M8 12V4M4 8l4-4 4 4" />
           </svg>
         </motion.button>
       )}

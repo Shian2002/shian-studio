@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">HomeNest — Find Your Dream Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.loli.net/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/leaflet.css" />
+<link rel="stylesheet" href="lib/MarkerCluster.css" />
+<link rel="stylesheet" href="lib/MarkerCluster.Default.css" />
+<script src="lib/leaflet.js"></script>
+<script src="lib/leaflet.markercluster.js"></script>
+<script>
+(function(){
+function loadFallback(){
+  var cdnBase='https://unpkg.com/leaflet@1.9.4/dist/';
+  var cdnCluster='https://unpkg.com/leaflet.markercluster@1.5.3/dist/';
+  var links=[
+    {href:cdnBase+'leaflet.css'},
+    {href:cdnCluster+'MarkerCluster.css'},
+    {href:cdnCluster+'MarkerCluster.Default.css'}
+  ];
+  links.forEach(function(l){var el=document.createElement('link');el.rel='stylesheet';el.href=l.href;document.head.appendChild(el)});
+  var s1=document.createElement('script');s1.src=cdnBase+'leaflet.js';
+  s1.onload=function(){
+    var s2=document.createElement('script');s2.src=cdnCluster+'leaflet.markercluster.js';
+    s2.onload=function(){if(typeof initMap==='function')initMap()};
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+if(typeof L==='undefined'){loadFallback()}
+})();
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#E07A5F;--accent-dark:#c4623f;--accent-light:#f4b8a8;--bg:#FFFFFF;--bg-alt:#FAF8F6;--bg-card:#FFFFFF;--text:#1A1A2E;--text-mid:#555770;--text-light:#8E8EA0;--border:#E8E6E1;--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.08);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius:12px;--radius-sm:8px;--radius-lg:16px;--transition:all .3s cubic-bezier(.4,0,.2,1);--danger:#E74C3C;--success:#10B981}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--text);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;animation:bodyFadeIn .4s ease}
+@keyframes bodyFadeIn{from{opacity:0}to{opacity:1}}
+noscript style{display:none}
+a{text-decoration:none;color:inherit}button{cursor:pointer;border:none;font-family:inherit}
+img{max-width:100%;display:block}.container{max-width:1240px;margin:0 auto;padding:0 24px}
+.error-msg{color:var(--danger);font-size:.75rem;margin-top:4px;display:none}.error-msg.show{display:block}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:var(--transition)}
+.navbar .container{display:flex;align-items:center;justify-content:space-between;height:68px}
+.nav-logo{font-size:1.5rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;cursor:pointer}
+.nav-logo span{color:var(--accent)}.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{font-size:.9rem;font-weight:500;color:var(--text-mid);transition:var(--transition);position:relative;cursor:pointer}
+.nav-links a:hover{color:var(--accent)}.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--accent);border-radius:2px;transition:var(--transition)}
+.nav-links a:hover::after{width:100%}.nav-actions{display:flex;align-items:center;gap:12px}
+.lang-wrap{position:relative}
+.hero{padding:140px 0 80px;background:linear-gradient(165deg,#FFF5F0 0%,#FAF8F6 40%,#F0EDE8 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-120px;right:-80px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(224,122,95,.1) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-40px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(224,122,95,.06) 0%,transparent 70%);pointer-events:none}
+.hero-content{text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:50px;background:rgba(224,122,95,.1);color:var(--accent);font-size:.8rem;font-weight:600;margin-bottom:20px;letter-spacing:.02em}
+.hero h1{font-size:3.5rem;font-weight:800;line-height:1.1;margin-bottom:16px;color:var(--text);letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--accent);position:relative}
+.hero h1 em::after{content:'';position:absolute;bottom:4px;left:0;right:0;height:8px;background:rgba(224,122,95,.2);border-radius:4px;z-index:-1}
+.hero p{font-size:1.15rem;color:var(--text-mid);max-width:560px;margin:0 auto 40px;font-weight:400}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:36px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:1.6rem;font-weight:800;color:var(--text)}
+.hero-stat .lbl{font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.search-bar{background:#fff;border-radius:100px;box-shadow:0 6px 24px rgba(0,0,0,.1),0 1px 4px rgba(0,0,0,.06);max-width:780px;margin:0 auto;padding:0;border:none;display:flex;align-items:stretch;overflow:hidden}
+.search-field{flex:1;display:flex;flex-direction:column;padding:16px 20px;border-right:1px solid #eee;position:relative;transition:background .2s;min-width:0}
+.search-field:last-of-type{border-right:none}
+.search-field:focus-within{background:rgba(224,122,95,.04)}
+.search-field label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#aaa;margin-bottom:4px}
+.search-field input,.search-field select{border:none;outline:none;font-size:.9rem;font-family:inherit;color:var(--text);background:transparent;padding:0;width:100%}
+.search-field select{cursor:pointer;-webkit-appearance:none;appearance:none}
+.search-field .select-wrap{position:relative}
+.search-field .select-wrap::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #bbb;pointer-events:none}
+.search-field.location{flex:1.6}
+.search-field input::placeholder{color:#bbb}
+.search-btn{background:var(--accent);color:#fff;border:none;padding:0 28px;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .3s;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.search-btn:hover{background:var(--accent-dark);box-shadow:inset 0 0 0 100px rgba(0,0,0,.1)}.search-btn svg{width:18px;height:18px;fill:#fff}
+.filter-tags{display:flex;align-items:center;gap:8px;max-width:780px;margin:16px auto 0;flex-wrap:wrap}
+.filter-tag{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;font-size:.82rem;font-weight:500;color:var(--text-mid);background:#fff;border:1px solid var(--border);transition:all .2s;cursor:pointer;user-select:none}
+.filter-tag:hover{border-color:var(--accent-light);color:var(--accent)}
+.filter-tag.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.filter-tag .tag-label{font-weight:600;color:var(--text-light);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
+.filter-tag.active .tag-label{color:rgba(255,255,255,.8)}
+.filter-tag select{border:none;outline:none;background:transparent;font-family:inherit;font-size:.82rem;font-weight:500;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;padding:0;margin:0}
+.filter-tag.active select{color:#fff}
+.keyword-tag{position:relative}
+.keyword-tag input{border:none;outline:none;background:transparent;font-family:inherit;font-size:.82rem;font-weight:500;color:var(--text-mid);width:120px;padding:0;margin:0}
+.keyword-tag input::placeholder{color:var(--text-light)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px}
+.section-header .left{text-align:left}
+.section-header .overline{display:inline-block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px}
+.section-header h2{font-size:2.25rem;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.section-header p{color:var(--text-mid);margin-top:4px;font-size:1.05rem}
+.result-count{font-size:.88rem;color:var(--text-mid);font-weight:500;background:var(--bg-alt);padding:6px 16px;border-radius:20px;border:1px solid var(--border)}
+.filter-tabs{display:flex;align-items:center;gap:8px;margin-bottom:32px;flex-wrap:wrap}
+.filter-tab{padding:8px 20px;border-radius:50px;font-size:.85rem;font-weight:600;color:var(--text-mid);background:var(--bg-alt);border:1px solid var(--border);transition:var(--transition);cursor:pointer}
+.filter-tab:hover{border-color:var(--accent-light);color:var(--accent)}
+.filter-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(224,122,95,.3)}
+.listings{padding:80px 0;background:var(--bg)}
+.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.property-card{background:var(--bg-card);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);transition:var(--transition);position:relative;cursor:pointer}
+.property-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);border-color:transparent}
+.property-card:active{transform:translateY(-2px)}
+.property-card:hover .card-img-inner{transform:scale(1.06)}
+.property-card .card-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.3) 0%,transparent 50%);opacity:0;transition:var(--transition);pointer-events:none;z-index:1}
+.property-card:hover .card-overlay{opacity:1}
+.card-img{position:relative;height:220px;overflow:hidden}
+.card-img-inner{width:100%;height:100%;transition:transform .5s;display:flex;align-items:center;justify-content:center;font-size:4rem}
+.card-img-1 .card-img-inner{background:linear-gradient(135deg,#E07A5F 0%,#F2CC8F 100%)}
+.card-img-2 .card-img-inner{background:linear-gradient(135deg,#3D405B 0%,#81B29A 100%)}
+.card-img-3 .card-img-inner{background:linear-gradient(135deg,#81B29A 0%,#F2CC8F 100%)}
+.card-img-4 .card-img-inner{background:linear-gradient(135deg,#F2CC8F 0%,#E07A5F 100%)}
+.card-img-5 .card-img-inner{background:linear-gradient(135deg,#5B7C99 0%,#81B29A 100%)}
+.card-img-6 .card-img-inner{background:linear-gradient(135deg,#E07A5F 0%,#3D405B 100%)}
+.card-img-7 .card-img-inner{background:linear-gradient(135deg,#6C63FF 0%,#A78BFA 100%)}
+.card-img-8 .card-img-inner{background:linear-gradient(135deg,#F2CC8F 0%,#81B29A 100%)}
+.card-img-9 .card-img-inner{background:linear-gradient(135deg,#3D405B 0%,#E07A5F 100%)}
+.card-badge{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge-sale{background:#fff;color:var(--accent);box-shadow:var(--shadow-sm)}
+.badge-sold{background:#94a3b8;color:#fff}.badge-pending{background:#f59e0b;color:#fff}
+.card-fav{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;transition:var(--transition);border:none;cursor:pointer;z-index:2}
+.card-fav svg{width:18px;height:18px}
+.card-fav .heart-outline{fill:none;stroke:var(--text-mid);stroke-width:2}
+.card-fav .heart-filled{fill:#E74C3C;stroke:#E74C3C;stroke-width:2;display:none}
+.card-fav.active .heart-outline{display:none}.card-fav.active .heart-filled{display:block}
+.card-fav:hover{transform:scale(1.1)}.card-fav.active{background:rgba(231,76,60,.08)}
+.card-body{padding:20px}.card-price{font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:6px}
+.card-address{font-size:.85rem;color:var(--text-mid);margin-bottom:14px;display:flex;align-items:center;gap:4px}
+.card-stats{display:flex;gap:16px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.card-stat{display:flex;align-items:center;gap:5px;font-size:.82rem;color:var(--text-mid);font-weight:500}
+.card-stat span{font-size:.95rem}.card-owner{font-size:.72rem;color:var(--text-light);margin-top:8px;font-style:italic}
+.map-section{padding:80px 0;background:var(--bg-alt)}
+.map-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:stretch}
+.map-info{display:flex;flex-direction:column;justify-content:center}
+.map-info h3{font-size:1.75rem;font-weight:800;margin-bottom:12px}
+.map-info p{color:var(--text-mid);margin-bottom:24px;line-height:1.7}
+.map-features{list-style:none;display:flex;flex-direction:column;gap:12px}
+.map-features li{display:flex;align-items:center;gap:10px;font-size:.92rem;color:var(--text-mid)}
+.map-features li .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+#map{height:420px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);z-index:1}
+.about-section{padding:80px 0;background:var(--bg)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.about-text h2{font-size:2.25rem;font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
+.about-text p{color:var(--text-mid);margin-bottom:16px;line-height:1.7}
+.mission-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.mission-card{padding:20px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border);transition:var(--transition)}
+.mission-card:hover{border-color:var(--accent-light);box-shadow:var(--shadow-sm)}
+.mission-card .icon{font-size:1.6rem;margin-bottom:8px}
+.mission-card h5{font-size:.92rem;font-weight:700;margin-bottom:4px}
+.mission-card p{font-size:.82rem;color:var(--text-mid);margin-bottom:0}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px}
+.stat-item{text-align:center;padding:24px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border)}
+.stat-item h4{font-size:2rem;font-weight:800;color:var(--accent)}
+.stat-item p{font-size:.88rem;color:var(--text-mid);margin-top:4px}
+.about-img{width:100%;aspect-ratio:4/3;border-radius:var(--radius-lg);background:linear-gradient(135deg,#E07A5F 0%,#F2CC8F 50%,#81B29A 100%);display:flex;align-items:center;justify-content:center;font-size:6rem;box-shadow:var(--shadow-lg)}
+.agents-section{padding:80px 0;background:var(--bg-alt)}
+.agents-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.agent-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:32px 24px;text-align:center;border:1px solid var(--border);transition:var(--transition)}
+.agent-card:hover{box-shadow:var(--shadow-md);transform:translateY(-4px)}
+.agent-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.agent-card h4{font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.agent-card p{font-size:.85rem;color:var(--text-mid);margin-bottom:12px}
+.agent-card .agent-phone{font-size:.82rem;color:var(--accent);font-weight:600}
+.contact-section{padding:80px 0;background:var(--bg)}
+.testimonials{padding:80px 0;background:var(--bg-alt)}
+.testimonial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.testimonial-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:28px 24px;border:1px solid var(--border);transition:var(--transition)}
+.testimonial-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.testimonial-card .stars{color:#f59e0b;font-size:1rem;margin-bottom:10px;letter-spacing:2px}
+.testimonial-card .quote{font-size:.9rem;color:var(--text-mid);line-height:1.7;margin-bottom:16px;font-style:italic}
+.testimonial-card .author{display:flex;align-items:center;gap:10px}
+.testimonial-card .author .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.testimonial-card .author .info .name{font-weight:700;font-size:.85rem}
+.testimonial-card .author .info .role{font-size:.73rem;color:var(--text-light)}
+.sort-bar{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.sort-bar label{font-size:.82rem;font-weight:600;color:var(--text-mid)}
+.sort-bar select{padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;font-family:inherit;color:var(--text);background:var(--bg-alt);outline:none;cursor:pointer}
+.sort-bar select:focus{border-color:var(--accent)}
+.back-top{position:fixed;bottom:30px;left:30px;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:var(--shadow-md);cursor:pointer;z-index:999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none}
+.back-top.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.back-top:hover{background:var(--accent-dark);transform:translateY(-3px)}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+noscript .reveal{opacity:1!important;transform:none!important}
+.skeleton{background:linear-gradient(90deg,var(--bg-alt) 25%,var(--border) 50%,var(--bg-alt) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius-sm)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-card{height:380px;border-radius:var(--radius-lg);border:1px solid var(--border)}
+.agent-social{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.agent-social a{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;background:var(--bg-alt);border:1px solid var(--border);transition:var(--transition);text-decoration:none}
+.agent-social a:hover{background:var(--accent);border-color:var(--accent)}
+.agent-card .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:rgba(224,122,95,.1);color:var(--accent);margin-top:4px}
+.agent-card:hover .badge{background:var(--accent);color:#fff}
+.card-date{font-size:.7rem;color:var(--text-light);margin-top:6px;display:flex;align-items:center;gap:3px}
+.newsletter{padding:80px 0;background:linear-gradient(165deg,#1A1A2E 0%,#2a2a4e 100%);color:#fff;text-align:center}
+.newsletter h2{font-size:2rem;font-weight:800;margin-bottom:10px;letter-spacing:-.015em}
+.newsletter p{color:#94a3b8;margin-bottom:28px;font-size:1.05rem;max-width:520px;margin-left:auto;margin-right:auto}
+.newsletter-form{display:flex;max-width:480px;margin:0 auto;gap:10px}
+.newsletter-form input{flex:1;padding:14px 18px;border-radius:var(--radius-sm);border:1px solid #334155;background:rgba(255,255,255,.06);color:#fff;font-size:.9rem;font-family:inherit;outline:none;transition:var(--transition)}
+.newsletter-form input:focus{border-color:var(--accent);background:rgba(255,255,255,.1)}
+.newsletter-form input::placeholder{color:#64748b}
+.newsletter-form button{padding:14px 32px;border-radius:var(--radius-sm);background:var(--accent);color:#fff;font-weight:700;font-size:.9rem;border:none;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.newsletter-form button:hover{background:var(--accent-dark)}
+.no-results{text-align:center;padding:60px 20px;color:var(--text-mid);grid-column:1/-1}
+.no-results .icon{font-size:3rem;margin-bottom:12px}
+.no-results h3{font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.no-results p{font-size:.88rem;color:var(--text-light)}
+.property-card .map-link{position:absolute;bottom:10px;right:10px;z-index:3;background:rgba(255,255,255,.9);backdrop-filter:blur(4px);border:none;border-radius:6px;padding:4px 8px;font-size:.7rem;font-weight:600;color:var(--accent);cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:3px}
+.property-card .map-link:hover{background:var(--accent);color:#fff}
+.sort-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.faq-section{padding:80px 0;background:var(--bg)}
+.faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:var(--transition)}
+.faq-item:hover{border-color:var(--accent-light)}
+.faq-q{width:100%;padding:16px 20px;background:var(--bg-alt);border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.95rem;font-weight:600;color:var(--text);font-family:inherit;text-align:left;transition:var(--transition)}
+.faq-q:hover{color:var(--accent)}.faq-q .arrow{font-size:.7rem;transition:transform .3s;color:var(--text-light)}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg)}
+.faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:all .3s;color:var(--text-mid);font-size:.88rem;line-height:1.7}
+.faq-item.open .faq-a{padding:0 20px 16px;max-height:300px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--bg-alt)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--text-light)}
+::selection{background:rgba(224,122,95,.2);color:var(--text)}
+.navbar.scrolled{background:rgba(255,255,255,.98);box-shadow:0 2px 20px rgba(0,0,0,.08)}
+.form-group input.success,.form-group textarea.success{border-color:var(--success)}
+.form-group input.error,.form-group textarea.error{border-color:var(--danger)}
+.agent-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.contact-details li svg{transition:var(--transition)}.contact-details li:hover svg{transform:scale(1.15)}
+.testimonial-card .stars{transition:var(--transition)}.testimonial-card:hover .stars{transform:scale(1.02)}
+.map-info h3 em{font-style:normal;color:var(--accent)}.map-info ul li .dot.green{background:var(--success)}
+.faq-q:focus{outline:2px solid var(--accent-light);outline-offset:-2px}
+.btn-outline:active{transform:scale(.97)}.btn-primary:active{transform:scale(.97)}.search-btn:active{transform:scale(.97)}
+.newsletter-form input:focus{box-shadow:0 0 0 3px rgba(224,122,95,.15)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:40px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.property-grid.loading .property-card{opacity:.6;pointer-events:none}
+.property-grid .property-card{transition:opacity .3s,transform .3s,border-color .3s,box-shadow .3s}
+.card-stats .card-stat svg{width:14px;height:14px;fill:var(--text-light)}.card-address svg{width:14px;height:14px;fill:var(--text-light);flex-shrink:0}
+.nav-logo svg{width:24px;height:24px;fill:var(--accent)}.nav-logo span{color:var(--accent)}
+.hero-badge{animation:fadeInUp .5s ease}@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.section-header .overline{animation:fadeInUp .5s .1s both}
+.card-price{transition:color .3s}.property-card:hover .card-price{color:var(--accent)}
+.modal-actions .btn-outline{border-color:var(--danger);color:var(--danger)}
+.modal-actions .btn-outline:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+.agent-card .agent-phone{transition:var(--transition)}.agent-card:hover .agent-phone{color:var(--accent-dark)}
+.section-header h2{color:var(--text)}.filter-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(224,122,95,.3)}
+.section-header .left .overline{color:var(--accent)}
+.modal-badge .card-badge{position:static;display:inline-block}
+.modal-hero .card-badge{font-size:.7rem;padding:4px 10px}
+.card-stat span{font-weight:700;color:var(--text)}
+.card-price sup{font-size:.6em;font-weight:500;color:var(--text-light);top:-.3em}
+.search-field input::placeholder{color:var(--text-light)}
+.form-group input.error,.form-group textarea.error{border-color:var(--danger)}
+.contact-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.contact-info h2{font-size:2.25rem;font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
+.contact-info p{color:var(--text-mid);margin-bottom:24px;line-height:1.7}
+.contact-details{list-style:none;display:flex;flex-direction:column;gap:16px}
+.contact-details li{display:flex;align-items:center;gap:12px;font-size:.95rem;color:var(--text-mid)}
+.contact-details svg{width:20px;height:20px;fill:var(--accent);flex-shrink:0}
+.contact-form{display:flex;flex-direction:column;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:.82rem;font-weight:600;color:var(--text)}
+.form-group input,.form-group textarea{padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:inherit;color:var(--text);background:var(--bg-alt);outline:none;transition:var(--transition)}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(224,122,95,.1)}
+.form-group textarea{min-height:120px;resize:vertical}
+.form-privacy{font-size:.78rem;color:var(--text-light);margin-top:-8px}
+.form-privacy a{color:var(--accent);text-decoration:underline}
+.footer{padding:48px 0 24px;background:#1A1A2E;color:#94a3b8}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px}
+.footer-brand h3{font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:12px}
+.footer-brand h3 span{color:var(--accent)}.footer-brand p{font-size:.85rem;line-height:1.7}
+.footer-col h4{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:16px;text-transform:uppercase;letter-spacing:.05em}
+.footer-col a{display:block;font-size:.85rem;margin-bottom:10px;transition:var(--transition)}
+.footer-col a:hover{color:var(--accent)}
+.footer-col a{cursor:pointer}.footer-col a:hover{padding-left:3px}
+.footer-bottom{text-align:center;padding-top:24px;border-top:1px solid #334155;font-size:.82rem}
+.contact-form button[type="submit"]{padding:14px 36px;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;letter-spacing:.02em}
+.property-card:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.load-more-wrap{text-align:center;margin-top:40px}
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A2E;color:#fff;padding:14px 24px;border-radius:var(--radius-sm);font-size:.88rem;box-shadow:var(--shadow-lg);z-index:9999;opacity:0;transform:translateY(20px);transition:all .4s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.toast.success{border-left:4px solid var(--success)}.toast.error{border-left:4px solid var(--danger)}
+.leaflet-popup-content-wrapper{border-radius:var(--radius-sm)!important;box-shadow:var(--shadow-md)!important}
+.leaflet-popup-content{margin:12px 16px!important;font-family:'Inter',sans-serif!important}
+.popup-title{font-weight:700;font-size:1rem;margin-bottom:4px}.popup-price{color:var(--accent);font-weight:700;font-size:.95rem}.popup-addr{color:var(--text-light);font-size:.78rem;margin-top:2px}
+@media(max-width:968px){.property-grid{grid-template-columns:repeat(2,1fr)}.map-wrapper{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.agents-grid{grid-template-columns:repeat(2,1fr)}.testimonial-grid{grid-template-columns:repeat(2,1fr)}.mission-cards{grid-template-columns:1fr}.contact-wrapper{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:2.5rem}.hero-stats{gap:20px}.hero-stat .num{font-size:1.3rem}}
+@media(max-width:768px){.search-bar{flex-wrap:wrap;border-radius:var(--radius-lg)}.search-field{min-width:calc(50% - 1px);flex:1 1 calc(50% - 1px)}.search-field.location{min-width:100%;flex:1 1 100%}.search-btn{flex:1 1 100%;justify-content:center;padding:14px;border-radius:0}.filter-tags{justify-content:center}.map-section,.about-section,.agents-section,.testimonials,.contact-section,.faq-section,.newsletter{padding:48px 0}.section-header h2{font-size:1.6rem}.hero h1{font-size:2rem}.hero{padding:110px 0 48px}.container{padding:0 16px}.map-wrapper{grid-template-columns:1fr}#map{height:300px}.about-grid{grid-template-columns:1fr;gap:32px}.about-text h2{font-size:1.6rem}.agents-grid{grid-template-columns:repeat(2,1fr);gap:16px}.agent-card{padding:20px 16px}.testimonial-grid{grid-template-columns:1fr}.contact-wrapper{grid-template-columns:1fr;gap:32px}.contact-info h2{font-size:1.6rem}.faq-list{padding:0}.faq-q{font-size:.88rem;padding:14px 16px}.newsletter-form{flex-direction:column}.newsletter-form button{width:100%}.newsletter h2{font-size:1.5rem}.footer-grid{grid-template-columns:1fr 1fr;gap:24px}.sort-bar{flex-wrap:wrap}.filter-tabs{gap:6px}.filter-tab{padding:6px 14px;font-size:.8rem}}
+@media(max-width:640px){.property-grid{grid-template-columns:1fr}.nav-links{display:none}.search-bar{border-radius:var(--radius-lg)}.search-field{min-width:100%;flex:1 1 100%;border-right:none;border-bottom:1px solid #eee}.search-field:last-of-type{border-bottom:none}.search-btn{border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:14px}.filter-tags{gap:6px}.filter-tag{padding:5px 10px;font-size:.78rem}.agents-grid{grid-template-columns:1fr}.testimonial-grid{grid-template-columns:1fr}.mission-cards{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}.hero h1{font-size:1.8rem}.hero p{font-size:1rem}.hero-stats{gap:12px}.hero-stat .num{font-size:1.1rem}.hero-stat .lbl{font-size:.7rem}.modal-stats{grid-template-columns:1fr}.modal-details{grid-template-columns:1fr}}
+@media(max-width:480px){.hero h1{font-size:1.5rem}.hero p{font-size:.9rem}.hero{padding:100px 0 36px}.hero-badge{font-size:.72rem;padding:5px 12px}.section-header h2{font-size:1.35rem}.section-header p{font-size:.9rem}.map-section,.about-section,.agents-section,.testimonials,.contact-section,.faq-section,.newsletter{padding:36px 0}.agents-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr}.mission-cards{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}.modal{width:calc(100% - 24px);max-height:90vh}.modal-body{padding:16px}.modal-hero{height:160px;font-size:4rem}.modal-price{font-size:1.5rem}.card-img{height:180px}.card-price{font-size:1.15rem}.card-stats{gap:10px}.back-top{width:38px;height:38px;bottom:20px;left:20px;font-size:1rem}.toast{left:16px;right:16px;bottom:16px}.newsletter-form input{padding:12px 14px}.newsletter-form button{padding:12px 24px}.faq-q{font-size:.82rem;padding:12px 14px}.faq-a{font-size:.82rem;line-height:1.6}}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:var(--bg-card);border-radius:var(--radius-lg);max-width:620px;width:calc(100% - 48px);max-height:85vh;overflow-y:auto;z-index:9999;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:all .3s}
+.modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.9);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--text-mid);transition:var(--transition);z-index:10;backdrop-filter:blur(4px)}
+.modal-close:hover{background:#fff;color:var(--text);transform:scale(1.08)}
+.modal-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:none;display:flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;transition:var(--transition);z-index:10;backdrop-filter:blur(4px);color:var(--text-mid)}
+.modal-nav:hover{background:#fff;color:var(--text);transform:translateY(-50%) scale(1.08)}
+.modal-prev{left:10px}.modal-next{right:10px}
+.modal-hero{height:220px;display:flex;align-items:center;justify-content:center;font-size:6rem;position:relative}
+.modal-hero .modal-badge{position:absolute;top:14px;left:14px}
+.modal-body{padding:24px 28px 28px}
+.modal-body h2{font-size:1.5rem;font-weight:800;margin-bottom:2px;letter-spacing:-.015em}
+.modal-address{color:var(--text-mid);font-size:.85rem;margin-bottom:12px;display:flex;align-items:center;gap:4px}
+.modal-price{font-size:1.9rem;font-weight:800;color:var(--accent);margin-bottom:18px}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.modal-stat{background:var(--bg-alt);border-radius:var(--radius-sm);padding:14px;text-align:center;border:1px solid var(--border)}
+.modal-stat .val{font-size:1.25rem;font-weight:800;color:var(--text)}
+.modal-stat .lbl{font-size:.72rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.modal-details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.modal-detail{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.modal-detail .k{color:var(--text-light)}.modal-detail .v{font-weight:600;color:var(--text)}
+.modal-agent{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-alt);border-radius:var(--radius-sm);margin-bottom:18px}
+.modal-agent .av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.modal-agent .info{flex:1}.modal-agent .info .name{font-weight:700;font-size:.92rem}
+.modal-agent .info .role{font-size:.75rem;color:var(--text-mid)}
+.modal-actions{display:flex;gap:10px}
+.modal-actions button{flex:1;padding:11px;border-radius:var(--radius-sm);font-weight:600;font-size:.88rem}
+.btn-primary{background:var(--accent);color:#fff;border:none;transition:var(--transition)}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-outline{background:transparent;color:var(--text-mid);border:1px solid var(--border);padding:10px 28px;border-radius:var(--radius-sm);font-weight:600;font-size:.88rem;transition:var(--transition);cursor:pointer}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.fav-item{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);align-items:center;transition:var(--transition)}
+.fav-item:hover{background:var(--bg-alt);border-radius:var(--radius-sm);padding-left:8px;padding-right:8px}
+.fav-item-img{width:80px;height:60px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
+.fav-item-info{flex:1;min-width:0}
+.fav-item-price{font-size:1.1rem;font-weight:800;color:var(--accent)}
+.fav-item-addr{font-size:.85rem;color:var(--text-mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-item-stats{font-size:.78rem;color:var(--text-light);margin-top:4px}
+.fav-remove{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 14px;font-size:.8rem;color:var(--text-mid);cursor:pointer;transition:var(--transition);flex-shrink:0}
+.fav-remove:hover{border-color:var(--danger);color:var(--danger)}
+.fav-empty{text-align:center;padding:40px 0;color:var(--text-light)}
+.fav-empty .icon{font-size:3rem;margin-bottom:8px}
+.search-loading{position:absolute;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:10;border-radius:var(--radius-lg);opacity:0;pointer-events:none;transition:opacity .3s}
+.search-loading.show{opacity:1;pointer-events:auto}
+.search-loading .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+</style>
+<noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+<nav class="navbar" id="navbar"><div class="container">
+<div class="nav-logo" onclick="scrollToTop()"><svg viewBox="0 0 24 24"><path d="M12 3L4 9v12h5v-7h6v7h5V9z"/></svg><span>Home</span>Nest</div>
+<ul class="nav-links">
+<li><a onclick="scrollToSection('listings')" id="navHome">Home</a></li>
+<li><a onclick="scrollToSection('listings')" id="navProperties">Properties</a></li>
+<li><a onclick="scrollToSection('about')" id="navAbout">About</a></li>
+<li><a onclick="scrollToSection('contact')" id="navContact">Contact</a></li>
+<li><a onclick="openFavorites()" id="navFav" style="color:var(--accent)">Favorites</a></li>
+</ul>
+<div class="nav-actions"><div class="lang-wrap" id="langSwitcher"></div></div>
+</div></nav>
+<section class="hero" id="hero"><div class="container"><div class="hero-content">
+<div class="hero-badge" id="heroBadge">🏡 Trusted by 10,000+ Families</div>
+<h1 id="heroTitle">Find Your <em>Dream Home</em></h1>
+<p id="heroDesc">Discover the perfect property from our curated collection of premium homes, apartments, and villas in the most desirable neighborhoods.</p>
+<div class="search-bar">
+<div class="search-field location"><label id="searchLocation">Location</label><div class="select-wrap"><select id="locationSelect"><option value="all">All Cities</option><option value="San Francisco">San Francisco</option><option value="Los Angeles">Los Angeles</option><option value="New York">New York</option><option value="Miami">Miami</option><option value="Seattle">Seattle</option></select></div></div>
+<div class="search-field"><label id="searchType">Type</label><div class="select-wrap"><select id="typeSelect"><option value="all">All Types</option><option value="House">House</option><option value="Apartment">Apartment</option><option value="Villa">Villa</option><option value="Condo">Condo</option></select></div></div>
+<div class="search-field"><label id="searchPrice">Price</label><div class="select-wrap"><select id="priceSelect"><option value="all">Any Price</option><option value="0-500000">Under $500K</option><option value="500000-1000000">$500K - $1M</option><option value="1000000-2000000">$1M - $2M</option><option value="2000000-99999999">$2M+</option></select></div></div>
+<button class="search-btn" onclick="applySearch()"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><span id="searchBtnText">Search</span></button>
+</div>
+<div class="filter-tags">
+<div class="filter-tag active" id="bedsTag"><span class="tag-label" id="searchBeds">Beds</span><select id="bedsSelect" onchange="applySearch();updateTagState(this)"><option value="all">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
+<div class="filter-tag active" id="bathsTag"><span class="tag-label" id="searchBaths">Baths</span><select id="bathsSelect" onchange="applySearch();updateTagState(this)"><option value="all">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
+<div class="filter-tag keyword-tag" id="keywordTag"><span class="tag-label" id="searchKeyword">Keyword</span><input type="text" id="keywordInput" placeholder="Address, zip..." onkeydown="if(event.key==='Enter')applySearch()" oninput="updateTagState(this)"></div>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><div class="num" id="heroStat1">500+</div><div class="lbl" id="heroStat1Lbl">Properties</div></div>
+<div class="hero-stat"><div class="num" id="heroStat2">10K+</div><div class="lbl" id="heroStat2Lbl">Happy Clients</div></div>
+<div class="hero-stat"><div class="num" id="heroStat3">50+</div><div class="lbl" id="heroStat3Lbl">Awards</div></div>
+<div class="hero-stat"><div class="num" id="heroStat4">98%</div><div class="lbl" id="heroStat4Lbl">Satisfaction</div></div>
+</div></div></div></section>
+<section class="listings" id="listings"><div class="container">
+<div class="section-header"><div class="left">
+<span class="overline" id="featuredOverline">Featured</span>
+<h2 id="featuredTitle">Discover Properties</h2>
+<p id="featuredDesc">Explore our handpicked selection of exceptional properties</p>
+</div><span class="result-count" id="resultCount">9 properties</span></div>
+<div class="filter-tabs" id="filterTabs">
+<button class="filter-tab active" data-filter="all" onclick="setFilter('all')">All</button>
+<button class="filter-tab" data-filter="sale" onclick="setFilter('sale')">For Sale</button>
+<button class="filter-tab" data-filter="sold" onclick="setFilter('sold')">Sold</button>
+<button class="filter-tab" data-filter="pending" onclick="setFilter('pending')">Pending</button>
+</div>
+<div class="sort-bar"><label id="sortLabel">Sort by</label><select id="sortSelect" onchange="applySort()"><option value="default">Default</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="newest">Newest First</option></select></div>
+<div style="position:relative">
+<div class="property-grid" id="propertyGrid"></div>
+<div class="search-loading" id="searchLoading"><div class="spinner"></div></div>
+</div>
+<div class="load-more-wrap"><button class="btn-outline" id="loadMoreBtn" onclick="loadMore()">Load More</button></div>
+</div></section>
+<section class="map-section" id="mapSection"><div class="container"><div class="map-wrapper">
+<div class="map-info">
+<h3 id="mapTitle">Explore Our Coverage</h3>
+<p id="mapDesc">We serve clients across major metropolitan areas with prime real estate options in the most sought-after neighborhoods.</p>
+<ul class="map-features">
+<li><span class="dot"></span><span id="mapFeature1">Premium locations across 5 major cities</span></li>
+<li><span class="dot"></span><span id="mapFeature2">24/7 virtual tours and open houses</span></li>
+<li><span class="dot"></span><span id="mapFeature3">Expert local market insights</span></li>
+<li><span class="dot"></span><span id="mapFeature4">Dedicated agent support</span></li>
+</ul>
+</div>
+<div id="map"></div>
+</div></div></section>
+<section class="about-section" id="about"><div class="container"><div class="about-grid">
+<div class="about-text">
+<h2 id="aboutTitle">Why Choose HomeNest?</h2>
+<p id="aboutDesc1">With over 15 years of experience in the real estate industry, HomeNest has helped thousands of families find their perfect home. Our team of dedicated professionals brings unparalleled market knowledge and personalized service to every transaction.</p>
+<p id="aboutDesc2">We believe in making the home-buying process transparent, enjoyable, and stress-free. From first-time buyers to seasoned investors, we're committed to helping you achieve your real estate goals.</p>
+<div class="mission-cards">
+<div class="mission-card"><div class="icon">🎯</div><h5 id="mission1Title">Our Mission</h5><p id="mission1Desc">To deliver exceptional real estate experiences through integrity, innovation, and unwavering commitment to client satisfaction.</p></div>
+<div class="mission-card"><div class="icon">👁️</div><h5 id="mission2Title">Our Vision</h5><p id="mission2Desc">To be the most trusted and innovative real estate platform, redefining how people buy, sell, and invest in property.</p></div>
+</div>
+<div class="stats-row"><div class="stat-item"><h4>15+</h4><p id="stat1Label">Years Experience</p></div><div class="stat-item"><h4>10K+</h4><p id="stat2Label">Happy Clients</p></div><div class="stat-item"><h4>500+</h4><p id="stat3Label">Properties Sold</p></div></div>
+</div>
+<div class="about-img">🏘️</div>
+</div></div></section>
+<section class="agents-section" id="agents"><div class="container">
+<div class="section-header"><div class="left">
+<span class="overline" id="teamOverline">Our Team</span>
+<h2 id="teamTitle">Meet Our Agents</h2>
+<p id="teamDesc">Professional agents ready to help you find your dream home</p>
+</div></div>
+<div class="agents-grid" id="agentsGrid">
+<div class="agent-card"><div class="agent-avatar" style="background:rgba(224,122,95,.1)">👩‍💼</div><h4>Sarah Johnson</h4><p id="agent1Title">Senior Agent</p><div class="badge">🏆 Top 10%</div><div class="agent-phone">📞 (555) 123-4567</div><div class="agent-social"><a href="#" aria-label="Email">✉️</a><a href="#" aria-label="LinkedIn">💼</a><a href="#" aria-label="Twitter">🐦</a></div></div>
+<div class="agent-card"><div class="agent-avatar" style="background:rgba(129,178,154,.1)">👨‍💼</div><h4>Michael Chen</h4><p id="agent2Title">Luxury Specialist</p><div class="badge">⭐ 5-Star Rated</div><div class="agent-phone">📞 (555) 234-5678</div><div class="agent-social"><a href="#" aria-label="Email">✉️</a><a href="#" aria-label="LinkedIn">💼</a><a href="#" aria-label="Twitter">🐦</a></div></div>
+<div class="agent-card"><div class="agent-avatar" style="background:rgba(242,204,143,.1)">👩‍💼</div><h4>Emily Rodriguez</h4><p id="agent3Title">Property Advisor</p><div class="badge">💎 Premium Service</div><div class="agent-phone">📞 (555) 345-6789</div><div class="agent-social"><a href="#" aria-label="Email">✉️</a><a href="#" aria-label="LinkedIn">💼</a><a href="#" aria-label="Twitter">🐦</a></div></div>
+<div class="agent-card"><div class="agent-avatar" style="background:rgba(61,64,91,.1)">👨‍💼</div><h4>David Kim</h4><p id="agent4Title">Investment Agent</p><div class="badge">📈 Top Producer</div><div class="agent-phone">📞 (555) 456-7890</div><div class="agent-social"><a href="#" aria-label="Email">✉️</a><a href="#" aria-label="LinkedIn">💼</a><a href="#" aria-label="Twitter">🐦</a></div></div>
+</div>
+</div></section>
+<section class="testimonials" id="testimonials"><div class="container">
+<div class="section-header"><div class="left">
+<span class="overline" id="testOverline">Testimonials</span>
+<h2 id="testTitle">What Our Clients Say</h2>
+<p id="testDesc">Hear from families and investors who found their perfect property with us</p>
+</div></div>
+<div class="testimonial-grid" id="testimonialGrid">
+<div class="testimonial-card"><div class="stars">★★★★★</div><div class="quote" id="testQuote1">"HomeNest made finding our dream home an absolute joy. Their team understood exactly what we were looking for and found us the perfect place in no time."</div><div class="author"><div class="av" style="background:rgba(224,122,95,.1)">👨</div><div class="info"><div class="name">Robert Anderson</div><div class="role" id="testRole1">Home Buyer, Brooklyn</div></div></div></div>
+<div class="testimonial-card"><div class="stars">★★★★★</div><div class="quote" id="testQuote2">"As a real estate investor, I've worked with many agencies. HomeNest's market expertise and dedication to client satisfaction is truly second to none."</div><div class="author"><div class="av" style="background:rgba(129,178,154,.1)">👩</div><div class="info"><div class="name">Jennifer Liu</div><div class="role" id="testRole2">Investor, Manhattan</div></div></div></div>
+<div class="testimonial-card"><div class="stars">★★★★★</div><div class="quote" id="testQuote3">"From the first consultation to closing day, every step was handled with professionalism and care. We couldn't have asked for a better experience."</div><div class="author"><div class="av" style="background:rgba(242,204,143,.1)">👨</div><div class="info"><div class="name">James Mitchell</div><div class="role" id="testRole3">First-time Buyer, Queens</div></div></div></div>
+</div>
+</div></section>
+<section class="contact-section" id="contact"><div class="container"><div class="contact-wrapper">
+<div class="contact-info">
+<h2 id="contactTitle">Get In Touch</h2>
+<p id="contactDesc">Have questions or ready to find your dream home? Reach out to us and our team will get back to you within 24 hours.</p>
+<ul class="contact-details">
+<li><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> 123 Main Street, Suite 100, San Francisco, CA 94102</li>
+<li><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg> hello@homenest.com</li>
+<li><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg> (555) 789-0123</li>
+</ul>
+</div>
+<form class="contact-form" id="contactForm" onsubmit="handleContact(event)">
+<div class="form-group"><label for="formName" id="formNameLabel">Name</label><input type="text" id="formName" placeholder="Your Name" required><span class="error-msg" id="nameError">Please enter your name</span></div>
+<div class="form-group"><label for="formEmail" id="formEmailLabel">Email</label><input type="email" id="formEmail" placeholder="your@email.com" required><span class="error-msg" id="emailError">Please enter a valid email</span></div>
+<div class="form-group"><label for="formPhone" id="formPhoneLabel">Phone</label><input type="tel" id="formPhone" placeholder="(555) 000-0000"></div>
+<div class="form-group"><label for="formMsg" id="formMsgLabel">Message</label><textarea id="formMsg" placeholder="Tell us about your dream home..." required></textarea><span class="error-msg" id="msgError">Please enter a message</span></div>
+<p class="form-privacy" id="formPrivacy">We'll never share your information. By submitting, you agree to our <a href="#">Privacy Policy</a>.</p>
+<button type="submit" class="btn-primary" id="submitBtn" style="align-self:flex-start">Send Message</button>
+</form>
+</div></div></section>
+<section class="faq-section" id="faq"><div class="container">
+<div class="section-header"><div class="left">
+<span class="overline" id="faqOverline">FAQ</span>
+<h2 id="faqTitle">Frequently Asked Questions</h2>
+<p id="faqDesc">Everything you need to know about working with HomeNest</p>
+</div></div>
+<div class="faq-list">
+<div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span id="faqQ1">How do I schedule a property viewing?</span><span class="arrow">▼</span></button><div class="faq-a" id="faqA1">Simply browse our listings and click on any property you're interested in. Use the "Contact Agent" button in the property details to reach out, and our team will arrange a viewing at your earliest convenience.</div></div>
+<div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span id="faqQ2">What financing options are available?</span><span class="arrow">▼</span></button><div class="faq-a" id="faqA2">We work with a network of trusted mortgage lenders who offer a variety of financing options including conventional loans, FHA loans, VA loans, and adjustable-rate mortgages. Our agents can connect you with the right lender for your needs.</div></div>
+<div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span id="faqQ3">How long does the home buying process take?</span><span class="arrow">▼</span></button><div class="faq-a" id="faqA3">On average, the home buying process takes 30 to 45 days from accepted offer to closing. However, this timeline can vary depending on financing, inspections, and other contingencies. Our team will guide you through every step.</div></div>
+<div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span id="faqQ4">What are your agent commission rates?</span><span class="arrow">▼</span></button><div class="faq-a" id="faqA4">Our commission rates are competitive and transparent. We typically charge a standard market rate with no hidden fees. Contact us for a detailed breakdown and we'll be happy to discuss our fee structure.</div></div>
+<div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span id="faqQ5">Do you help with selling properties as well?</span><span class="arrow">▼</span></button><div class="faq-a" id="faqA5">Absolutely! HomeNest offers comprehensive selling services including professional staging, professional photography, targeted marketing campaigns, and expert negotiation. We maximize your property's visibility to attract qualified buyers.</div></div>
+</div>
+</div></section>
+<section class="newsletter" id="newsletter"><div class="container">
+<h2 id="newsTitle">Stay Updated</h2>
+<p id="newsDesc">Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
+<form class="newsletter-form" onsubmit="handleNewsletter(event)">
+<input type="email" id="newsEmail" required placeholder="your@email.com">
+<button type="submit" id="newsBtn">Subscribe</button>
+</form>
+</div></section>
+<footer class="footer"><div class="container">
+<div class="footer-grid">
+<div class="footer-brand"><h3><span>Home</span>Nest</h3><p id="footerDesc">Your trusted partner in finding the perfect home. We combine local expertise with personalized service to make your real estate journey seamless.</p>
+<div style="display:flex;gap:10px;margin-top:16px">
+<a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:.3s;font-size:1rem" aria-label="Facebook">📘</a>
+<a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:.3s;font-size:1rem" aria-label="Instagram">📸</a>
+<a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:.3s;font-size:1rem" aria-label="Twitter">🐦</a>
+<a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:.3s;font-size:1rem" aria-label="LinkedIn">💼</a>
+</div>
+</div>
+<div class="footer-col"><h4 id="footerQuickLinks">Quick Links</h4><a onclick="scrollToSection('listings')" id="footerProperties">Properties</a><a onclick="scrollToSection('about')" id="footerAbout">About Us</a><a onclick="scrollToSection('contact')" id="footerContact">Contact</a><a onclick="scrollToSection('faq')" id="footerFAQ2">FAQ</a></div>
+<div class="footer-col"><h4 id="footerCategories">Categories</h4><a href="#" id="footerHouse">Houses</a><a href="#" id="footerApartment">Apartments</a><a href="#" id="footerVilla">Villas</a><a href="#" id="footerCondo">Condos</a></div>
+<div class="footer-col"><h4 id="footerSupport">Hours</h4><span style="display:block;font-size:.82rem;margin-bottom:6px" id="footerHours">Mon-Fri: 9AM-7PM</span><span style="display:block;font-size:.82rem;margin-bottom:6px" id="footerHoursSat">Sat: 10AM-5PM</span><span style="display:block;font-size:.82rem;margin-bottom:10px" id="footerHoursSun">Sun: By Appointment</span><a href="#" id="footerPrivacy">Privacy Policy</a><a href="#" id="footerTerms">Terms of Service</a></div>
+</div>
+<div class="footer-bottom" id="footerCopyright">© 2025 HomeNest. All rights reserved.</div>
+</div></footer>
+<button class="back-top" id="backTopBtn" onclick="scrollToTop()">↑</button>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal" id="propertyModal">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <button class="modal-nav modal-prev" id="modalPrevBtn" onclick="event.stopPropagation();showPrevProperty()">‹</button>
+  <button class="modal-nav modal-next" id="modalNextBtn" onclick="event.stopPropagation();showNextProperty()">›</button>
+  <div class="modal-hero" id="modalHero"><div class="modal-badge" id="modalBadge"></div></div>
+  <div class="modal-body">
+    <h2 id="modalTitle"></h2>
+    <div class="modal-address" id="modalAddress"></div>
+    <div class="modal-price" id="modalPrice"></div>
+    <div class="modal-stats" id="modalStats"></div>
+    <div id="modalFeatures"></div>
+    <div class="modal-details" id="modalDetails"></div>
+    <div id="modalNearby" style="margin-bottom:16px"></div>
+    <div class="modal-agent" id="modalAgent"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="modalContactBtn" onclick="closeModal();scrollToSection('contact')">Contact Agent</button>
+      <button class="btn-outline" id="modalFavBtn" onclick="modalToggleFav()">❤ Save</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="favOverlay" onclick="closeFavorites()" style="z-index:9996"></div>
+<div class="modal" id="favModal" style="max-width:680px">
+  <button class="modal-close" onclick="closeFavorites()">✕</button>
+  <div class="modal-body" style="padding:28px">
+    <h2 id="favModalTitle" style="font-size:1.5rem;font-weight:800;margin-bottom:20px">My Favorites</h2>
+    <div id="favListContainer"></div>
+  </div>
+</div>
+<script>
+var LANGS=[
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'zh',name:'中文',flag:'🇨🇳'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'},
+  {code:'ko',name:'한국어',flag:'🇰🇷'}
+];
+var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
+var I18N={en:{
+nav:{home:'Home',properties:'Properties',about:'About',contact:'Contact'},
+hero:{badge:'🏡 Trusted by 10,000+ Families',title:'Find Your ',titleEm:'Dream Home',desc:'Discover the perfect property from our curated collection of premium homes, apartments, and villas in the most desirable neighborhoods.',stat1:'500+',stat1Lbl:'Properties',stat2:'10K+',stat2Lbl:'Happy Clients',stat3:'50+',stat3Lbl:'Awards',stat4:'98%',stat4Lbl:'Satisfaction'},
+search:{location:'Location',locationAll:'All Cities',type:'Type',typeAll:'All Types',price:'Price Range',priceAll:'Any Price',price1:'Under $500K',price2:'$500K - $1M',price3:'$1M - $2M',price4:'$2M+',btn:'Search',keyword:'Keyword',keywordPlaceholder:'Search by address...'},
+filters:{all:'All',sale:'For Sale',sold:'Sold',pending:'Pending'},
+featured:{overline:'Featured',title:'Discover Properties',desc:'Explore our handpicked selection of exceptional properties',noResultTitle:'No Properties Found',noResultDesc:'Try adjusting your search or filter criteria to discover more properties.'},
+property:{beds:'Beds',baths:'Baths',sqft:'Sq Ft',garage:'Garage',yearBuilt:'Year Built',forSale:'For Sale',sold:'Sold',pending:'Pending',owner:'Listed by',type:'Type',status:'Status'},
+map:{title:'Explore Our Coverage',desc:'We serve clients across major metropolitan areas with prime real estate options in the most sought-after neighborhoods.',feat1:'Premium locations across 5 major cities',feat2:'24/7 virtual tours and open houses',feat3:'Expert local market insights',feat4:'Dedicated agent support'},
+about:{title:'Why Choose HomeNest?',desc1:'With over 15 years of experience in the real estate industry, HomeNest has helped thousands of families find their perfect home. Our team of dedicated professionals brings unparalleled market knowledge and personalized service to every transaction.',desc2:'We believe in making the home-buying process transparent, enjoyable, and stress-free. From first-time buyers to seasoned investors, we\'re committed to helping you achieve your real estate goals.',mission1:'Our Mission',mission1Desc:'To deliver exceptional real estate experiences through integrity, innovation, and unwavering commitment to client satisfaction.',mission2:'Our Vision',mission2Desc:'To be the most trusted and innovative real estate platform, redefining how people buy, sell, and invest in property.',stat1:'Years Experience',stat2:'Happy Clients',stat3:'Properties Sold'},
+team:{overline:'Our Team',title:'Meet Our Agents',desc:'Professional agents ready to help you find your dream home',agent1:'Senior Agent',agent2:'Luxury Specialist',agent3:'Property Advisor',agent4:'Investment Agent'},
+contact:{title:'Get In Touch',desc:'Have questions or ready to find your dream home? Reach out to us and our team will get back to you within 24 hours.',name:'Name',email:'Email',phone:'Phone',message:'Message',namePlaceholder:'Your Name',emailPlaceholder:'your@email.com',phonePlaceholder:'(555) 000-0000',msgPlaceholder:'Tell us about your dream home...',privacy:'We\'ll never share your information. By submitting, you agree to our Privacy Policy.',submit:'Send Message',nameError:'Please enter your name',emailError:'Please enter a valid email',msgError:'Please enter a message'},
+footer:{desc:'Your trusted partner in finding the perfect home. We combine local expertise with personalized service to make your real estate journey seamless.',quickLinks:'Quick Links',categories:'Categories',support:'Hours',properties:'Properties',aboutUs:'About Us',contactUs:'Contact',houses:'Houses',apartments:'Apartments',villas:'Villas',condos:'Condos',faq:'FAQ',privacy:'Privacy Policy',terms:'Terms of Service',hours:'Mon-Fri: 9AM-7PM',hoursSat:'Sat: 10AM-5PM',hoursSun:'Sun: By Appointment',copyright:'© 2025 HomeNest. All rights reserved.'},
+toast:{saved:'Property saved to favorites!',removed:'Property removed from favorites!',sent:'Thanks for your inquiry! We\'ll be in touch soon.',loadMore:'Load More',resultCount:'{n} properties'},
+modal:{contactBtn:'Contact Agent',saveBtn:'❤ Save',details:'Property Details'},
+fav:{title:'My Favorites',empty:'No favorites yet. Browse properties and click the heart icon to save!',remove:'Remove'},
+testimonials:{overline:'Testimonials',title:'What Our Clients Say',desc:'Hear from families and investors who found their perfect property with us',q1:'"HomeNest made finding our dream home an absolute joy. Their team understood exactly what we were looking for and found us the perfect place in no time."',q2:'"As a real estate investor, I\'ve worked with many agencies. HomeNest\'s market expertise and dedication to client satisfaction is truly second to none."',q3:'"From the first consultation to closing day, every step was handled with professionalism and care. We couldn\'t have asked for a better experience."',r1:'Home Buyer, Brooklyn',r2:'Investor, Manhattan',r3:'First-time Buyer, Queens'},
+sort:{label:'Sort by',default:'Default',low:'Price: Low to High',high:'Price: High to Low',newest:'Newest First'},
+newsletter:{title:'Stay Updated',desc:'Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.',btn:'Subscribe',thanks:'Thanks for subscribing!',placeholder:'your@email.com'},
+faq:{overline:'FAQ',title:'Frequently Asked Questions',desc:'Everything you need to know about working with HomeNest',q1:'How do I schedule a property viewing?',a1:'Simply browse our listings and click on any property you\'re interested in. Use the "Contact Agent" button in the property details to reach out, and our team will arrange a viewing at your earliest convenience.',q2:'What financing options are available?',a2:'We work with a network of trusted mortgage lenders who offer a variety of financing options including conventional loans, FHA loans, VA loans, and adjustable-rate mortgages. Our agents can connect you with the right lender for your needs.',q3:'How long does the home buying process take?',a3:'On average, the home buying process takes 30 to 45 days from accepted offer to closing. However, this timeline can vary depending on financing, inspections, and other contingencies. Our team will guide you through every step.',q4:'What are your agent commission rates?',a4:'Our commission rates are competitive and transparent. We typically charge a standard market rate with no hidden fees. Contact us for a detailed breakdown and we\'ll be happy to discuss our fee structure.',q5:'Do you help with selling properties as well?',a5:'Absolutely! HomeNest offers comprehensive selling services including professional staging, professional photography, targeted marketing campaigns, and expert negotiation. We maximize your property\'s visibility to attract qualified buyers.'}
+},zh:{
+nav:{home:'首页',properties:'房源',about:'关于我们',contact:'联系我们'},
+hero:{badge:'🏡 值得超过10,000个家庭信赖',title:'找到您的',titleEm:'梦想之家',desc:'从我们精心策划的优质住宅、公寓和别墅系列中，在最理想的地段发现完美房产。',stat1:'500+',stat1Lbl:'房源',stat2:'10K+',stat2Lbl:'满意客户',stat3:'50+',stat3Lbl:'奖项',stat4:'98%',stat4Lbl:'满意度'},
+search:{location:'位置',locationAll:'所有城市',type:'类型',typeAll:'所有类型',price:'价格范围',priceAll:'任意价格',price1:'50万美元以下',price2:'50万-100万美元',price3:'100万-200万美元',price4:'200万美元以上',btn:'搜索',keyword:'关键词',keywordPlaceholder:'按地址搜索...'},
+filters:{all:'全部',sale:'在售',sold:'已售',pending:'待定'},
+featured:{overline:'精选推荐',title:'发现优质房源',desc:'探索我们精心挑选的卓越房产',noResultTitle:'未找到房源',noResultDesc:'请调整搜索或筛选条件以发现更多房源。'},
+property:{beds:'卧室',baths:'浴室',sqft:'平方英尺',garage:'车库',yearBuilt:'建成年份',forSale:'在售',sold:'已售',pending:'待定',owner:'发布者',type:'类型',status:'状态'},
+map:{title:'探索我们的覆盖范围',desc:'我们为各大都市区的客户提供服务，在最受欢迎的地段提供优质的房地产选择。',feat1:'覆盖5大主要城市的黄金地段',feat2:'全天候虚拟看房和开放日',feat3:'专业的本地市场洞察',feat4:'专属经纪人的全程支持'},
+about:{title:'为什么选择HomeNest？',desc1:'拥有超过15年的房地产行业经验，HomeNest已帮助数千个家庭找到他们的理想家园。我们专业的团队为每笔交易带来无与伦比的市场知识和个性化服务。',desc2:'我们致力于让购房过程透明、愉快且无压力。无论是首次购房者还是经验丰富的投资者，我们都致力于帮助您实现房地产目标。',mission1:'我们的使命',mission1Desc:'以诚信、创新和对客户满意度的坚定承诺，提供卓越的房地产体验。',mission2:'我们的愿景',mission2Desc:'成为最值得信赖和最具创新性的房地产平台，重新定义人们买卖和投资房产的方式。',stat1:'年经验',stat2:'满意客户',stat3:'已售房产'},
+team:{overline:'我们的团队',title:'认识我们的经纪人',desc:'专业经纪人随时准备帮助您找到梦想之家',agent1:'资深经纪人',agent2:'豪宅专家',agent3:'房产顾问',agent4:'投资经纪人'},
+contact:{title:'联系我们',desc:'有问题或准备好寻找梦想之家？请联系我们，我们的团队将在24小时内回复您。',name:'姓名',email:'邮箱',phone:'电话',message:'留言',namePlaceholder:'请输入您的姓名',emailPlaceholder:'your@email.com',phonePlaceholder:'(555) 000-0000',msgPlaceholder:'请描述您梦想中的家...',privacy:'我们绝不会分享您的信息。提交即表示您同意我们的隐私政策。',submit:'发送消息',nameError:'请输入您的姓名',emailError:'请输入有效的邮箱地址',msgError:'请输入留言内容'},
+footer:{desc:'您在寻找理想家园中的值得信赖的伙伴。我们将本地专业知识与个性化服务相结合，让您的房地产之旅顺畅无忧。',quickLinks:'快速链接',categories:'分类',support:'营业时间',properties:'房源',aboutUs:'关于我们',contactUs:'联系我们',houses:'住宅',apartments:'公寓',villas:'别墅',condos:' Condo',faq:'常见问题',privacy:'隐私政策',terms:'服务条款',hours:'周一至周五：9:00-19:00',hoursSat:'周六：10:00-17:00',hoursSun:'周日：预约看房',copyright:'© 2025 HomeNest。保留所有权利。'},
+toast:{saved:'房源已收藏！',removed:'房源已取消收藏！',sent:'感谢您的咨询！我们将尽快与您联系。',loadMore:'加载更多',resultCount:'共 {n} 套房源'},
+modal:{contactBtn:'联系经纪人',saveBtn:'❤ 收藏',details:'房源详情'},
+fav:{title:'我的收藏',empty:'暂无收藏。浏览房源并点击心形图标即可收藏！',remove:'移除'},
+testimonials:{overline:'客户评价',title:'客户心声',desc:'听听那些通过我们找到理想家园的家庭和投资者的心声',q1:'"HomeNest让寻找梦想之家变成了一件愉快的事。他们的团队完全理解我们的需求，很快就为我们找到了完美的家。"',q2:'"作为一名房产投资者，我和许多中介合作过。HomeNest的市场专业知识和对客户满意度的承诺确实是首屈一指的。"',q3:'"从第一次咨询到过户那天，每一步都专业且贴心。我们再也找不到更好的体验了。"',r1:'购房者，布鲁克林',r2:'投资者，曼哈顿',r3:'首次购房者，皇后区'},
+sort:{label:'排序方式',default:'默认',low:'价格：从低到高',high:'价格：从高到低',newest:'最新优先'},
+newsletter:{title:'订阅更新',desc:'订阅我们的新闻通讯，获取最新房源信息、市场洞察和独家优惠。',btn:'订阅',thanks:'感谢订阅！',placeholder:'your@email.com'},
+faq:{overline:'常见问题',title:'常见问题解答',desc:'关于与HomeNest合作您需要了解的一切',q1:'如何安排看房？',a1:'浏览我们的房源列表，点击感兴趣的房产。在房源详情中使用"联系经纪人"按钮联系我们，我们的团队将尽快为您安排看房。',q2:'有哪些融资选择？',a2:'我们与值得信赖的贷款机构网络合作，提供多种融资选择，包括常规贷款、FHA贷款、VA贷款和可调利率抵押贷款。我们的经纪人可以为您推荐合适的贷款机构。',q3:'购房过程需要多长时间？',a3:'平均而言，从接受报价到过户，购房过程需要30到45天。但具体时间可能因融资、检查和其他条件而异。我们的团队将全程指导您。',q4:'你们的经纪人佣金是多少？',a4:'我们的佣金费率具有竞争力且透明。我们通常收取标准市场费率，无隐藏费用。联系我们获取详细说明。',q5:'你们也帮助出售房产吗？',a5:'当然！HomeNest提供全面的销售服务，包括专业布置、专业摄影、定向营销活动和专家谈判。我们最大限度地提高您的房产曝光度，吸引合格买家。'}
+},ja:{
+nav:{home:'ホーム',properties:'物件一覧',about:'会社概要',contact:'お問い合わせ'},
+hero:{badge:'🏡 10,000世帯以上から信頼される',title:'理想の',titleEm:'マイホーム',desc:'厳選されたプレミアム住宅、アパートメント、ヴィラの中から、最も人気のあるエリアで理想の物件を見つけましょう。',stat1:'500+',stat1Lbl:'物件',stat2:'10K+',stat2Lbl:'満足顧客',stat3:'50+',stat3Lbl:'受賞',stat4:'98%',stat4Lbl:'満足度'},
+search:{location:'エリア',locationAll:'全都市',type:'種別',typeAll:'全種別',price:'価格帯',priceAll:'指定なし',price1:'50万ドル未満',price2:'50万〜100万ドル',price3:'100万〜200万ドル',price4:'200万ドル以上',btn:'検索',keyword:'キーワード',keywordPlaceholder:'住所で検索...'},
+filters:{all:'すべて',sale:'販売中',sold:'成約済み',pending:'審査中'},
+featured:{overline:'厳選物件',title:'物件を探す',desc:'厳選された特別な物件のコレクションをご覧ください',noResultTitle:'物件が見つかりません',noResultDesc:'検索条件を調整して、さらに多くの物件を見つけてください。'},
+property:{beds:'ベッドルーム',baths:'バスルーム',sqft:'平方フィート',garage:'ガレージ',yearBuilt:'築年数',forSale:'販売中',sold:'成約済み',pending:'審査中',owner:'掲載者',type:'種別',status:'状態'},
+map:{title:'サービスエリア',desc:'主要な大都市圏で最高級の不動産オプションを提供し、最も人気のある地域でサービスを展開しています。',feat1:'5大主要都市のプレミアムロケーション',feat2:'24時間バーチャルツアーと内見対応',feat3:'専門的なローカル市場分析',feat4:'専任エージェントによるサポート'},
+about:{title:'HomeNestを選ぶ理由',desc1:'不動産業界で15年以上の経験を持つHomeNestは、数千もの家族が理想の住まいを見つけるお手伝いをしてきました。専任のプロフェッショナルチームが、比類のない市場知識とパーソナライズされたサービスを提供します。',desc2:'私たちは、住宅購入のプロセスを透明で楽しく、ストレスのないものにすることを信条としています。初めての方も経験豊富な投資家の方も、お客様の不動産目標の達成をサポートします。',mission1:'私たちの使命',mission1Desc:'誠実さ、革新性、そして顧客満足への揺るぎないコミットメントを通じて、卓越した不動産体験を提供すること。',mission2:'私たちのビジョン',mission2Desc:'最も信頼され、革新的な不動産プラットフォームとなり、人々が物件を売買・投資する方法を再定義すること。',stat1:'年の経験',stat2:'満足いただいたお客様',stat3:'成約物件数'},
+team:{overline:'私たちのチーム',title:'エージェント紹介',desc:'プロフェッショナルなエージェントが理想の住まい探しをサポートします',agent1:'シニアエージェント',agent2:'ラグジュアリー専門',agent3:'物件アドバイザー',agent4:'投資エージェント'},
+contact:{title:'お問い合わせ',desc:'ご質問や理想の住まいをお探しですか？お気軽にご連絡ください。24時間以内にご返信いたします。',name:'お名前',email:'メールアドレス',phone:'電話番号',message:'メッセージ',namePlaceholder:'お名前をご入力ください',emailPlaceholder:'your@email.com',phonePlaceholder:'(555) 000-0000',msgPlaceholder:'理想の住まいについてお聞かせください...',privacy:'お客様の情報は決して共有されません。送信することで、プライバシーポリシーに同意したことになります。',submit:'送信',nameError:'お名前をご入力ください',emailError:'有効なメールアドレスをご入力ください',msgError:'メッセージをご入力ください'},
+footer:{desc:'理想の住まい探しにおける信頼できるパートナー。地域の専門知識とパーソナライズされたサービスを組み合わせ、不動産購入をスムーズにサポートします。',quickLinks:'クイックリンク',categories:'カテゴリー',support:'営業時間',properties:'物件一覧',aboutUs:'会社概要',contactUs:'お問い合わせ',houses:'住宅',apartments:'アパート',villas:'ヴィラ',condos:'コンドミニアム',faq:'よくある質問',privacy:'プライバシーポリシー',terms:'利用規約',hours:'月〜金：9:00〜19:00',hoursSat:'土：10:00〜17:00',hoursSun:'日：予約制',copyright:'© 2025 HomeNest。全著作権所有。'},
+toast:{saved:'物件をお気に入りに追加しました！',removed:'物件をお気に入りから削除しました！',sent:'お問い合わせありがとうございます。すぐにご連絡いたします。',loadMore:'もっと見る',resultCount:'全 {n} 件'},
+modal:{contactBtn:'エージェントに連絡',saveBtn:'❤ 保存',details:'物件詳細'},
+fav:{title:'お気に入り',empty:'まだお気に入りがありません。物件を閲覧してハートアイコンをクリック！',remove:'削除'},
+testimonials:{overline:'お客様の声',title:'お客様の声',desc:'私たちと一緒に理想の物件を見つけた家族や投資家の声をご紹介します',q1:'「HomeNestのおかげで、夢の家探しが本当に楽しくなりました。チームは私たちのニーズを完全に理解し、すぐに完璧な物件を見つけてくれました。」',q2:'「不動産投資家として多くの代理店と仕事をしてきましたが、HomeNestの市場知識と顧客満足へのこだわりは他に類を見ません。」',q3:'「初回相談から決済日まで、すべてのステップがプロフェッショナルで丁寧でした。これ以上の経験は求められません。」',r1:'住宅購入者、ブルックリン',r2:'投資家、マンハッタン',r3:'初めての購入者、クイーンズ'},
+sort:{label:'並び替え',default:'標準',low:'価格：安い順',high:'価格：高い順',newest:'新着順'},
+newsletter:{title:'最新情報を受け取る',desc:'ニュースレターを購読して、最新の物件情報、市場インサイト、特別オファーを入手しましょう。',btn:'購読',thanks:'ご購読ありがとうございます！',placeholder:'your@email.com'},
+faq:{overline:'よくある質問',title:'よくある質問',desc:'HomeNestとの連携について知っておくべきこと',q1:'物件見学の予約方法は？',a1:'物件一覧から興味のある物件をクリックしてください。詳細の「エージェントに連絡」ボタンからお問い合わせいただけます。できるだけ早く見学を手配いたします。',q2:'どのような融資オプションがありますか？',a2:'従来型ローン、FHAローン、VAローン、変動金利住宅ローンなど、さまざまな融資オプションを提供する信頼できる住宅ローン貸付機関のネットワークと提携しています。',q3:'住宅購入プロセスにはどのくらい時間がかかりますか？',a3:'平均して、オファー承諾から決済まで30〜45日かかります。ただし、融資や検査などの条件によって変動する場合があります。',q4:'エージェントの手数料はいくらですか？',a4:'競争力のある透明性の高い手数料を設定しています。隠れた費用はありません。詳細についてはお気軽にお問い合わせください。',q5:'物件販売のサポートも行っていますか？',a5:'もちろんです！HomeNestは、プロのステージング、写真撮影、ターゲットマーケティング、専門的な交渉など、包括的な販売サービスを提供しています。'}
+},ko:{
+nav:{home:'홈',properties:'매물',about:'회사소개',contact:'문의하기'},
+hero:{badge:'🏡 10,000가구 이상이 신뢰하는',title:'당신의',titleEm:'꿈의 집',desc:'프리미엄 주택, 아파트, 빌라 중에서 가장 선호되는 지역에 위치한 완벽한 매물을 찾아보세요.',stat1:'500+',stat1Lbl:'매물',stat2:'10K+',stat2Lbl:'만족 고객',stat3:'50+',stat3Lbl:'수상',stat4:'98%',stat4Lbl:'만족도'},
+search:{location:'위치',locationAll:'모든 도시',type:'유형',typeAll:'모든 유형',price:'가격대',priceAll:'모든 가격',price1:'$50만 미만',price2:'$50만 ~ $100만',price3:'$100만 ~ $200만',price4:'$200만 이상',btn:'검색',keyword:'키워드',keywordPlaceholder:'주소로 검색...'},
+filters:{all:'전체',sale:'판매중',sold:'판매완료',pending:'대기중'},
+featured:{overline:'추천 매물',title:'매물 둘러보기',desc:'엄선된 프리미엄 매물 컬렉션을 살펴보세요',noResultTitle:'매물을 찾을 수 없습니다',noResultDesc:'검색 또는 필터 조건을 조정하여 더 많은 매물을 찾아보세요.'},
+property:{beds:'침실',baths:'욕실',sqft:'평방피트',garage:'차고',yearBuilt:'준공년도',forSale:'판매중',sold:'판매완료',pending:'대기중',owner:'등록자',type:'유형',status:'상태'},
+map:{title:'서비스 지역',desc:'주요 대도시권 전역의 고객에게 가장 인기 있는 지역의 프리미엄 부동산 옵션을 제공합니다.',feat1:'5개 주요 도시의 프리미엄 입지',feat2:'연중무휴 가상 투어 및 공개 관람',feat3:'전문적인 현지 시장 인사이트',feat4:'전문 에이전트 지원'},
+about:{title:'왜 HomeNest인가요?',desc1:'15년 이상의 부동산 업계 경험을 바탕으로 HomeNest는 수천 가구가 완벽한 주택을 찾을 수 있도록 도왔습니다. 전문가 팀이 모든 거래에 비교할 수 없는 시장 지식과 맞춤형 서비스를 제공합니다.',desc2:'우리는 주택 구매 과정을 투명하고 즐겁고 스트레스 없이 만드는 것을 믿습니다. 첫 구매자부터 노련한 투자자까지, 귀하의 부동산 목표 달성을 지원하겠습니다.',mission1:'우리의 사명',mission1Desc:'진실성, 혁신, 고객 만족에 대한 확고한 헌신을 통해 탁월한 부동산 경험을 제공합니다.',mission2:'우리의 비전',mission2Desc:'가장 신뢰받고 혁신적인 부동산 플랫폼이 되어 사람들이 부동산을 매매하고 투자하는 방식을 재정의합니다.',stat1:'년 경력',stat2:'만족한 고객',stat3:'판매된 매물'},
+team:{overline:'팀 소개',title:'에이전트 소개',desc:'전문 에이전트가 꿈의 집을 찾을 수 있도록 준비되어 있습니다',agent1:'시니어 에이전트',agent2:'럭셔리 전문가',agent3:'부동산 어드바이저',agent4:'투자 에이전트'},
+contact:{title:'문의하기',desc:'질문이 있거나 꿈의 집을 찾을 준비가 되셨나요? 문의해 주세요. 24시간 이내에 답변드리겠습니다.',name:'이름',email:'이메일',phone:'전화번호',message:'메시지',namePlaceholder:'이름을 입력하세요',emailPlaceholder:'your@email.com',phonePlaceholder:'(555) 000-0000',msgPlaceholder:'꿈의 집에 대해 알려주세요...',privacy:'귀하의 정보는 절대 공유되지 않습니다. 제출함으로써 개인정보처리방침에 동의하게 됩니다.',submit:'메시지 보내기',nameError:'이름을 입력하세요',emailError:'유효한 이메일을 입력하세요',msgError:'메시지를 입력하세요'},
+footer:{desc:'완벽한 주택을 찾는 데 있어 신뢰할 수 있는 파트너입니다. 현지 전문성과 맞춤형 서비스를 결합하여 부동산 여정을 원활하게 만들어 드립니다.',quickLinks:'바로가기',categories:'카테고리',support:'영업시간',properties:'매물',aboutUs:'회사소개',contactUs:'문의하기',houses:'주택',apartments:'아파트',villas:'빌라',condos:'콘도',faq:'자주 묻는 질문',privacy:'개인정보처리방침',terms:'이용약관',hours:'월-금: 9:00-19:00',hoursSat:'토: 10:00-17:00',hoursSun:'일: 예약제',copyright:'© 2025 HomeNest. 모든 권리 보유.'},
+toast:{saved:'매물을 즐겨찾기에 추가했습니다!',removed:'매물을 즐겨찾기에서 제거했습니다!',sent:'문의해 주셔서 감사합니다! 곧 연락드리겠습니다.',loadMore:'더 보기',resultCount:'총 {n}개 매물'},
+modal:{contactBtn:'에이전트 연락',saveBtn:'❤ 저장',details:'매물 상세'},
+fav:{title:'즐겨찾기',empty:'아직 즐겨찾기가 없습니다. 매물을 탐색하고 하트 아이콘을 클릭하세요!',remove:'삭제'},
+testimonials:{overline:'고객 후기',title:'고객님의 말씀',desc:'저희와 함께 완벽한 매물을 찾은 가족과 투자자들의 이야기를 들어보세요',q1:'"HomeNest 덕분에 꿈의 집 찾기가 정말 즐거워졌어요. 팀이 우리의 니즈를 정확히 이해하고 곧바로 완벽한 집을 찾아줬습니다."',q2:'"부동산 투자자로서 많은 에이전시와 일해봤지만, HomeNest의 시장 전문성과 고객 만족에 대한 헌신은 정말 타의 추종을 불허합니다."',q3:'"첫 상담부터 마감일까지 모든 단계가 전문적이고 세심하게 처리되었습니다. 더 좋은 경험을 바랄 수 없었어요."',r1:'주택 구매자, 브루클린',r2:'투자자, 맨해튼',r3:'첫 구매자, 퀸즈'},
+sort:{label:'정렬',default:'기본',low:'가격: 낮은순',high:'가격: 높은순',newest:'최신순'},
+newsletter:{title:'최신 소식 받기',desc:'뉴스레터를 구독하고 최신 매물 정보, 시장 인사이트, 특별 혜택을 받아보세요.',btn:'구독',thanks:'구독해 주셔서 감사합니다!',placeholder:'your@email.com'},
+faq:{overline:'자주 묻는 질문',title:'자주 묻는 질문',desc:'HomeNest와 함께하는 데 알아야 할 모든 것',q1:'집을 보려면 어떻게 예약하나요?',a1:'매물 목록을 둘러보고 관심 있는 매물을 클릭하세요. 매물 상세 정보의 "에이전트 연락" 버튼을 통해 문의하시면, 저희 팀이 가능한 빠른 시일 내에 방문을 조정해 드립니다.',q2:'어떤 금융 옵션이 있나요?',a2:'일반 대출, FHA 대출, VA 대출, 변동금리 모기지 등 다양한 금융 옵션을 제공하는 신뢰할 수 있는 대출 기관 네트워크와 협력하고 있습니다.',q3:'주택 구매 과정은 얼마나 걸리나요?',a3:'평균적으로 제안 수락부터 마감까지 30~45일이 소요됩니다. 자금 조달, 검사 및 기타 조건에 따라 기간이 달라질 수 있습니다.',q4:'에이전트 수수료는 어떻게 되나요?',a4:'경쟁력 있고 투명한 수수료를 제공합니다. 숨겨진 비용 없이 표준 시장 요율을 청구합니다. 자세한 내용은 문의해 주세요.',q5:'매물 판매도 도와주시나요?',a5:'물론입니다! HomeNest는 전문 스테이징, 사진 촬영, 타겟 마케팅 캠페인, 전문 협상을 포함한 종합 판매 서비스를 제공합니다. 귀하의 매물 가시성을 최대화하여 적격 구매자를 유치합니다.'}
+}};
+function T(key){var keys=key.split('.');var val=I18N[curLang];for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}return(val===undefined||val===null)?key:val}
+function Tfmt(key,n){return T(key).replace('{n}',n)}
+function setLang(code){curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}renderLangSwitcher();afterLangChange()}
+function renderLangSwitcher(){
+  var el=document.getElementById('langSwitcher');if(!el)return;
+  var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #334155;border-radius:6px;padding:4px 8px;color:#cbd5e1;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e293b;border:1px solid #334155;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#3b82f6':'none')+';color:'+(l.code===curLang?'#fff':'#94a3b8')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+}
+function toggleLangMenu(){var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none'}
+function afterLangChange(){updateUIText();renderProperties();renderFilterTabs()}
+function updateUIText(){
+var _s=function(id,val){var e=document.getElementById(id);if(e)e.textContent=val};
+var _h=function(id,val){var e=document.getElementById(id);if(e)e.innerHTML=val};
+var _p=function(id,val){var e=document.getElementById(id);if(e)e.placeholder=val};
+_s('navHome',T('nav.home'));
+  _s('navProperties',T('nav.properties'));
+  _s('navAbout',T('nav.about'));
+  _s('navContact',T('nav.contact'));
+  _s('navFav',T('fav.title'));
+  _s('heroBadge',T('hero.badge'));
+  _h('heroTitle',T('hero.title')+'<em>'+T('hero.titleEm')+'</em>');
+  _s('heroDesc',T('hero.desc'));
+  _s('heroStat1',T('hero.stat1'));
+  _s('heroStat1Lbl',T('hero.stat1Lbl'));
+  _s('heroStat2',T('hero.stat2'));
+  _s('heroStat2Lbl',T('hero.stat2Lbl'));
+  _s('heroStat3',T('hero.stat3'));
+  _s('heroStat3Lbl',T('hero.stat3Lbl'));
+  _s('heroStat4',T('hero.stat4'));
+  _s('heroStat4Lbl',T('hero.stat4Lbl'));
+  _s('searchLocation',T('search.location'));
+  _s('searchType',T('search.type'));
+  _s('searchPrice',T('search.price'));
+  _s('searchBeds',T('property.beds'));
+  _s('searchBaths',T('property.baths'));
+  _s('searchBtnText',T('search.btn'));
+  _s('featuredOverline',T('featured.overline'));
+  _s('featuredTitle',T('featured.title'));
+  _s('featuredDesc',T('featured.desc'));
+  _s('mapTitle',T('map.title'));
+  _s('mapDesc',T('map.desc'));
+  _s('mapFeature1',T('map.feat1'));
+  _s('mapFeature2',T('map.feat2'));
+  _s('mapFeature3',T('map.feat3'));
+  _s('mapFeature4',T('map.feat4'));
+  _s('aboutTitle',T('about.title'));
+  _s('aboutDesc1',T('about.desc1'));
+  _s('aboutDesc2',T('about.desc2'));
+  _s('mission1Title',T('about.mission1'));
+  _s('mission1Desc',T('about.mission1Desc'));
+  _s('mission2Title',T('about.mission2'));
+  _s('mission2Desc',T('about.mission2Desc'));
+  _s('stat1Label',T('about.stat1'));
+  _s('stat2Label',T('about.stat2'));
+  _s('stat3Label',T('about.stat3'));
+  _s('teamOverline',T('team.overline'));
+  _s('teamTitle',T('team.title'));
+  _s('teamDesc',T('team.desc'));
+  _s('agent1Title',T('team.agent1'));
+  _s('agent2Title',T('team.agent2'));
+  _s('agent3Title',T('team.agent3'));
+  _s('agent4Title',T('team.agent4'));
+  _s('contactTitle',T('contact.title'));
+  _s('contactDesc',T('contact.desc'));
+  _s('formNameLabel',T('contact.name'));
+  _s('formEmailLabel',T('contact.email'));
+  _s('formPhoneLabel',T('contact.phone'));
+  _s('formMsgLabel',T('contact.message'));
+  _p('formName',T('contact.namePlaceholder'));
+  _p('formEmail',T('contact.emailPlaceholder'));
+  _p('formPhone',T('contact.phonePlaceholder'));
+  _p('formMsg',T('contact.msgPlaceholder'));
+  var privacyText=T('contact.privacy');
+  _h('formPrivacy',privacyText.replace('Privacy Policy','<a href="#">Privacy Policy</a>'));
+  _s('submitBtn',T('contact.submit'));
+  _s('nameError',T('contact.nameError'));
+  _s('emailError',T('contact.emailError'));
+  _s('msgError',T('contact.msgError'));
+  _s('searchKeyword',T('search.keyword'));
+  _p('keywordInput',T('search.keywordPlaceholder'));
+  _s('modalContactBtn',T('modal.contactBtn'));
+  _s('modalFavBtn',T('modal.saveBtn'));
+  _s('footerDesc',T('footer.desc'));
+  _s('footerQuickLinks',T('footer.quickLinks'));
+  _s('footerCategories',T('footer.categories'));
+  _s('footerSupport',T('footer.support'));
+  _s('footerHours',T('footer.hours'));
+  _s('footerHoursSat',T('footer.hoursSat'));
+  _s('footerHoursSun',T('footer.hoursSun'));
+  _s('footerProperties',T('footer.properties'));
+  _s('footerAbout',T('footer.aboutUs'));
+  _s('footerContact',T('footer.contactUs'));
+  _s('footerHouse',T('footer.houses'));
+  _s('footerApartment',T('footer.apartments'));
+  _s('footerVilla',T('footer.villas'));
+  _s('footerCondo',T('footer.condos'));
+  _s('footerFAQ2',T('footer.faq'));
+  _s('footerPrivacy',T('footer.privacy'));
+  _s('footerTerms',T('footer.terms'));
+  _s('footerCopyright',T('footer.copyright'));
+  _s('loadMoreBtn',T('toast.loadMore'));
+  _s('pageTitle','HomeNest — '+T('hero.title')+T('hero.titleEm'));
+  _s('testOverline',T('testimonials.overline'));
+  _s('testTitle',T('testimonials.title'));
+  _s('testDesc',T('testimonials.desc'));
+  _s('testQuote1',T('testimonials.q1'));
+  _s('testQuote2',T('testimonials.q2'));
+  _s('testQuote3',T('testimonials.q3'));
+  _s('testRole1',T('testimonials.r1'));
+  _s('testRole2',T('testimonials.r2'));
+  _s('testRole3',T('testimonials.r3'));
+  _s('sortLabel',T('sort.label'));
+  var sortSel=document.getElementById('sortSelect');if(sortSel){var sortOpts=sortSel.options;
+  sortOpts[0].text=T('sort.default');sortOpts[1].text=T('sort.low');sortOpts[2].text=T('sort.high');sortOpts[3].text=T('sort.newest');}
+  _s('newsTitle',T('newsletter.title'));
+  _s('newsDesc',T('newsletter.desc'));
+  _s('newsBtn',T('newsletter.btn'));
+  _p('newsEmail',T('newsletter.placeholder'));
+  _s('faqOverline',T('faq.overline'));
+  _s('faqTitle',T('faq.title'));
+  _s('faqDesc',T('faq.desc'));
+  _s('faqQ1',T('faq.q1'));_s('faqA1',T('faq.a1'));
+  _s('faqQ2',T('faq.q2'));_s('faqA2',T('faq.a2'));
+  _s('faqQ3',T('faq.q3'));_s('faqA3',T('faq.a3'));
+  _s('faqQ4',T('faq.q4'));_s('faqA4',T('faq.a4'));
+  _s('faqQ5',T('faq.q5'));_s('faqA5',T('faq.a5'));
+  _s('noResultTitle',T('featured.noResultTitle'));
+  _s('noResultDesc',T('featured.noResultDesc'));
+  updateSearchPlaceholders();
+}
+function updateSearchPlaceholders(){
+  var locSel=document.getElementById('locationSelect');if(locSel)locSel.options[0].text=T('search.locationAll');
+  var typeSel=document.getElementById('typeSelect');if(typeSel)typeSel.options[0].text=T('search.typeAll');
+  var priceSel=document.getElementById('priceSelect');if(priceSel){var p=priceSel.options;
+  p[0].text=T('search.priceAll');p[1].text=T('search.price1');p[2].text=T('search.price2');p[3].text=T('search.price3');p[4].text=T('search.price4');}
+}
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
+function scrollToSection(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
+var properties=[
+{id:1,address:'2450 Pacific Heights Blvd',city:'San Francisco',price:1850000,beds:4,baths:3,sqft:2800,garage:2,year:2020,type:'House',status:'sale',owner:'Sarah Johnson',img:1,lat:37.7849,lng:-122.4294},
+{id:2,address:'1200 Sunset Blvd',city:'Los Angeles',price:980000,beds:3,baths:2,sqft:1800,garage:1,year:2018,type:'House',status:'sale',owner:'Michael Chen',img:2,lat:34.0522,lng:-118.2437},
+{id:3,address:'350 Fifth Ave #2201',city:'New York',price:2200000,beds:2,baths:2,sqft:1500,garage:0,year:2022,type:'Condo',status:'pending',owner:'Emily Rodriguez',img:3,lat:40.7489,lng:-73.9856},
+{id:4,address:'15 Ocean Drive',city:'Miami',price:1450000,beds:4,baths:4,sqft:3200,garage:2,year:2021,type:'Villa',status:'sale',owner:'David Kim',img:4,lat:25.7617,lng:-80.1918},
+{id:5,address:'800 Pine Street',city:'Seattle',price:750000,beds:2,baths:1,sqft:1100,garage:1,year:2016,type:'Apartment',status:'sold',owner:'Sarah Johnson',img:5,lat:47.6062,lng:-122.3321},
+{id:6,address:'42 Maplewood Drive',city:'San Francisco',price:3200000,beds:5,baths:4,sqft:4200,garage:3,year:2023,type:'House',status:'sale',owner:'Michael Chen',img:6,lat:37.7749,lng:-122.4194},
+{id:7,address:'888 Wilshire Blvd #1500',city:'Los Angeles',price:620000,beds:1,baths:1,sqft:850,garage:0,year:2019,type:'Condo',status:'sale',owner:'Emily Rodriguez',img:7,lat:34.0597,lng:-118.2591},
+{id:8,address:'27 Harbor View',city:'Miami',price:1950000,beds:5,baths:3,sqft:3500,garage:2,year:2020,type:'Villa',status:'pending',owner:'David Kim',img:8,lat:25.7826,lng:-80.1340},
+{id:9,address:'632 Broadway #3B',city:'New York',price:890000,beds:2,baths:1,sqft:950,garage:0,year:2017,type:'Apartment',status:'sold',owner:'Sarah Johnson',img:9,lat:40.7256,lng:-73.9939},
+{id:10,address:'1800 Lake Washington Blvd',city:'Seattle',price:1650000,beds:4,baths:3,sqft:2600,garage:2,year:2021,type:'House',status:'sale',owner:'Michael Chen',img:1,lat:47.6398,lng:-122.2413},
+{id:11,address:'755 Mission St #420',city:'San Francisco',price:550000,beds:1,baths:1,sqft:700,garage:0,year:2015,type:'Condo',status:'sale',owner:'Emily Rodriguez',img:2,lat:37.7857,lng:-122.4016},
+{id:12, address:'100 Bel Air Road',city:'Los Angeles',price:5800000,beds:6,baths:6,sqft:5500,garage:4,year:2024,type:'Villa',status:'sale',owner:'David Kim',img:3,lat:34.0873,lng:-118.4366},
+{id:13, address:'200 Central Park S #12A',city:'New York',price:4500000,beds:3,baths:3,sqft:2000,garage:0,year:2020,type:'Condo',status:'sale',owner:'Sarah Johnson',img:4,lat:40.7654,lng:-73.9795},
+{id:14, address:'50 Riverside Blvd #7C',city:'New York',price:1750000,beds:2,baths:2,sqft:1400,garage:0,year:2019,type:'Apartment',status:'pending',owner:'Michael Chen',img:5,lat:40.7752,lng:-73.9934},
+{id:15, address:'123 Washington St #PH',city:'New York',price:3200000,beds:3,baths:3,sqft:2200,garage:1,year:2022,type:'Condo',status:'sale',owner:'Emily Rodriguez',img:6,lat:40.7135,lng:-74.0089},
+{id:16, address:'45 Park Avenue #18B',city:'New York',price:2800000,beds:3,baths:2,sqft:1800,garage:0,year:2021,type:'Condo',status:'sale',owner:'David Kim',img:7,lat:40.7529,lng:-73.9750},
+{id:17, address:'88 Greenwich St #4A',city:'New York',price:925000,beds:1,baths:1,sqft:750,garage:0,year:2018,type:'Apartment',status:'sold',owner:'Sarah Johnson',img:8,lat:40.7153,lng:-74.0140},
+{id:18, address:'320 West 72nd St #12C',city:'New York',price:1650000,beds:2,baths:2,sqft:1300,garage:0,year:2017,type:'Apartment',status:'pending',owner:'Michael Chen',img:9,lat:40.7806,lng:-73.9839},
+{id:19, address:'55 Broad Street #PH1',city:'New York',price:5200000,beds:4,baths:3,sqft:2800,garage:0,year:2023,type:'Condo',status:'sale',owner:'Emily Rodriguez',img:1,lat:40.7055,lng:-74.0099},
+{id:20, address:'150 East 57th St #32A',city:'New York',price:3800000,beds:3,baths:3,sqft:2100,garage:0,year:2020,type:'Condo',status:'sale',owner:'David Kim',img:2,lat:40.7607,lng:-73.9679},
+{id:21, address:'742 Evergreen Terrace',city:'Seattle',price:680000,beds:3,baths:2,sqft:1600,garage:1,year:2005,type:'House',status:'sale',owner:'Sarah Johnson',img:3,lat:47.6080,lng:-122.3352},
+{id:22, address:'221B Baker Street #3',city:'San Francisco',price:1250000,beds:2,baths:2,sqft:1200,garage:1,year:2016,type:'Apartment',status:'pending',owner:'Michael Chen',img:4,lat:37.7846,lng:-122.4082},
+{id:23, address:'1 MetroTech Center #15D',city:'New York',price:1100000,beds:2,baths:1,sqft:980,garage:0,year:2019,type:'Condo',status:'sale',owner:'Emily Rodriguez',img:5,lat:40.6949,lng:-73.9856},
+{id:24, address:'88 Pine Street #22A',city:'New York',price:1450000,beds:2,baths:2,sqft:1250,garage:0,year:2021,type:'Condo',status:'sale',owner:'Sarah Johnson',img:6,lat:40.7069,lng:-74.0067},
+{id:25, address:'3400 Main Street #501',city:'Los Angeles',price:520000,beds:1,baths:1,sqft:720,garage:0,year:2018,type:'Apartment',status:'sold',owner:'David Kim',img:7,lat:34.0200,lng:-118.2747},
+{id:26, address:'12 Pacific Heights Road',city:'San Francisco',price:4100000,beds:5,baths:4,sqft:3600,garage:2,year:2024,type:'Villa',status:'sale',owner:'Michael Chen',img:8,lat:37.7924,lng:-122.4362},
+{id:27, address:'800 Ocean Drive #PH3',city:'Miami',price:2900000,beds:3,baths:3,sqft:2400,garage:1,year:2022,type:'Condo',status:'pending',owner:'Emily Rodriguez',img:9,lat:25.7648,lng:-80.1297},
+{id:28, address:'60 Sutton Place #15A',city:'New York',price:5500000,beds:4,baths:4,sqft:3200,garage:0,year:2023,type:'Condo',status:'sale',owner:'Sarah Johnson',img:1,lat:40.7597,lng:-73.9601},
+{id:29, address:'2000 Broadway #9G',city:'New York',price:1350000,beds:2,baths:2,sqft:1150,garage:0,year:2019,type:'Apartment',status:'sale',owner:'David Kim',img:2,lat:40.7754,lng:-73.9817},
+{id:30, address:'30 Rockefeller Plaza #PH',city:'New York',price:8500000,beds:5,baths:5,sqft:4500,garage:1,year:2024,type:'Condo',status:'sale',owner:'Emily Rodriguez',img:3,lat:40.7587,lng:-73.9787}
+];
+var currentFilter='all';
+var displayCount=6;
+var favorites=JSON.parse(localStorage.getItem('reFav')||'[]');
+function statusBadge(status){
+  if(status==='sale')return '<span class="card-badge badge-sale">'+T('property.forSale')+'</span>';
+  if(status==='sold')return '<span class="card-badge badge-sold">'+T('property.sold')+'</span>';
+  return '<span class="card-badge badge-pending">'+T('property.pending')+'</span>';
+}
+function getEmoji(t){if(t==='House')return '🏠';if(t==='Apartment')return '🏢';if(t==='Villa')return '🏡';if(t==='Condo')return '🌆';return '🏠'}
+function getPropertyFeatures(p){
+  var all=[];
+  if(p.year>=2022)all.push('New Construction');
+  if(p.garage>0)all.push('Attached Garage');
+  if(p.beds>=4)all.push('Spacious Layout');
+  if(p.sqft>=2000)all.push('Open Floor Plan');
+  if(p.city==='New York'||p.city==='San Francisco')all.push('City View');
+  if(p.city==='Los Angeles'||p.city==='Miami')all.push('Pool Access');
+  if(p.type==='Villa')all.push('Private Garden');
+  if(p.type==='Condo')all.push('Concierge Service');
+  if(p.type==='Apartment')all.push('Fitness Center');
+  if(p.baths>=3)all.push('Master Suite');
+  if(p.sqft<=1000)all.push('Cozy Studio');
+  if(p.price>=2000000)all.push('Premium Finish');
+  all.push('Central AC');all.push('Hardwood Floors');
+  return all.slice(0,5);
+}
+function getNearbyPlaces(p){
+  var places=[];
+  if(p.city==='New York'){places.push('🏫 PS 6 School');places.push('🌳 Central Park');places.push('🚇 Subway 5min');places.push('🛒 Whole Foods');places.push('🏥 Lenox Hill')}
+  else if(p.city==='San Francisco'){places.push('🏫 Mission High');places.push('🌳 Golden Gate Park');places.push('🚌 Muni Stop 3min');places.push('🛒 Trader Joe\'s');places.push('🏥 UCSF Medical')}
+  else if(p.city==='Los Angeles'){places.push('🏫 Beverly Hills HS');places.push('🌳 Griffith Park');places.push('🚌 Metro 5min');places.push('🛒 Ralphs Grocery');places.push('🏥 Cedars-Sinai')}
+  else if(p.city==='Miami'){places.push('🏫 South Pointe');places.push('🏖️ South Beach');places.push('🚇 Metrorail 4min');places.push('🛒 Publix');places.push('🏥 Mount Sinai')}
+  else if(p.city==='Seattle'){places.push('🏫 Garfield High');places.push('🌳 Discovery Park');places.push('🚌 Bus 2min');places.push('🛒 QFC');places.push('🏥 Swedish Medical')}
+  else{places.push('🏫 Elementary School');places.push('🌳 City Park');places.push('🚌 Public Transit');places.push('🛒 Supermarket');places.push('🏥 Medical Center')}
+  return places;
+}
+function renderProperties(){
+  var grid=document.getElementById('propertyGrid');
+  var filtered=currentFilter==='all'?properties:properties.filter(function(p){return p.status===currentFilter});
+  var show=filtered.slice(0,displayCount);
+  var html='';
+  for(var i=0;i<show.length;i++){
+    var p=show[i];var isFav=favorites.indexOf(p.id)!==-1;
+    var priceStr='$'+p.price.toLocaleString();
+    html+='<div class="property-card card-img-'+p.img+'" onclick="showPropertyDetail('+p.id+')">'+
+      '<div class="card-img"><div class="card-img-inner">'+getEmoji(p.type)+'</div><div class="card-overlay"></div>'+statusBadge(p.status)+
+      '<button class="map-link" onclick="event.stopPropagation();document.getElementById(\'mapSection\').scrollIntoView({behavior:\'smooth\'})">🗺️ Map</button>'+
+      '<button class="card-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFav('+p.id+')">'+
+      '<svg viewBox="0 0 24 24" class="heart-outline"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'+
+      '<svg viewBox="0 0 24 24" class="heart-filled"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'+
+      '</button></div>'+
+      '<div class="card-body"><div class="card-price">'+priceStr+'</div>'+
+      '<div class="card-address"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>'+p.address+'</div>'+
+      '<div class="card-stats">'+
+      '<div class="card-stat">🛏️ <span>'+p.beds+'</span> '+T('property.beds')+'</div>'+
+      '<div class="card-stat">🚿 <span>'+p.baths+'</span> '+T('property.baths')+'</div>'+
+      '<div class="card-stat">📐 <span>'+p.sqft.toLocaleString()+'</span> '+T('property.sqft')+'</div>'+
+      (p.garage>0?'<div class="card-stat">🚗 <span>'+p.garage+'</span> '+T('property.garage')+'</div>':'')+
+      '</div>'+
+      '<div class="card-owner">'+T('property.owner')+' '+p.owner+'</div>'+
+      '<div class="card-date">📅 '+(new Date().getMonth()+1)+'/'+(10+p.id%20)+'/'+new Date().getFullYear()+'</div></div></div></div>';
+  }
+  grid.innerHTML=html;
+  var totalFiltered=filtered.length;
+  if(totalFiltered===0){grid.innerHTML='<div class="no-results"><div class="icon">🔍</div><h3 id="noResultTitle">No Properties Found</h3><p id="noResultDesc">Try adjusting your search or filter criteria to discover more properties.</p></div>'}
+  document.getElementById('resultCount').textContent=Tfmt('toast.resultCount',totalFiltered);
+  document.getElementById('loadMoreBtn').style.display=displayCount>=filtered.length?'none':'inline-block';
+}
+function renderFilterTabs(){
+  var tabs=document.querySelectorAll('.filter-tab');
+  tabs[0].textContent=T('filters.all');
+  tabs[1].textContent=T('filters.sale');
+  tabs[2].textContent=T('filters.sold');
+  tabs[3].textContent=T('filters.pending');
+}
+function setFilter(f){
+  currentFilter=f;
+  displayCount=6;
+  document.querySelectorAll('.filter-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-filter')===f)});
+  renderProperties();
+}
+function loadMore(){displayCount+=6;renderProperties()}
+function applySort(){
+  var val=document.getElementById('sortSelect').value;
+  if(val==='price-low')properties.sort(function(a,b){return a.price-b.price});
+  else if(val==='price-high')properties.sort(function(a,b){return b.price-a.price});
+  else if(val==='newest')properties.sort(function(a,b){return b.year-a.year});
+  else properties.sort(function(a,b){return a.id-b.id});
+  renderProperties();
+}
+function toggleFav(id){
+  var idx=favorites.indexOf(id);
+  if(idx===-1){favorites.push(id);showToast(T('toast.saved'),'success')}
+  else{favorites.splice(idx,1);showToast(T('toast.removed'),'error')}
+  localStorage.setItem('reFav',JSON.stringify(favorites));
+  renderProperties();
+}
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type||'')+' show';
+  setTimeout(function(){t.classList.remove('show')},2500);
+}
+function openFavorites(){
+  var container=document.getElementById('favListContainer');
+  var favProps=properties.filter(function(p){return favorites.indexOf(p.id)!==-1});
+  if(favProps.length===0){
+    container.innerHTML='<div class="fav-empty"><div class="icon">❤️</div><p>'+T('fav.empty')+'</p></div>';
+  }else{
+    var html='';
+    for(var i=0;i<favProps.length;i++){
+      var p=favProps[i];
+      html+='<div class="fav-item">'+
+        '<div class="fav-item-img card-img-'+p.img+'" style="display:flex;align-items:center;justify-content:center;font-size:2rem">'+getEmoji(p.type)+'</div>'+
+        '<div class="fav-item-info" onclick="closeFavorites();showPropertyDetail('+p.id+')" style="cursor:pointer">'+
+        '<div class="fav-item-price">$'+p.price.toLocaleString()+'</div>'+
+        '<div class="fav-item-addr">'+p.address+'</div>'+
+        '<div class="fav-item-stats">'+p.beds+' '+T('property.beds')+' · '+p.baths+' '+T('property.baths')+' · '+p.sqft.toLocaleString()+' '+T('property.sqft')+'</div>'+
+        '</div>'+
+        '<button class="fav-remove" onclick="toggleFav('+p.id+');openFavorites()">'+T('fav.remove')+'</button>'+
+        '</div>';
+    }
+    container.innerHTML=html;
+  }
+  document.getElementById('favModalTitle').textContent=T('fav.title')+' ('+favProps.length+')';
+  document.getElementById('favOverlay').classList.add('open');
+  document.getElementById('favModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeFavorites(){
+  document.getElementById('favOverlay').classList.remove('open');
+  document.getElementById('favModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function handleContact(e){
+  e.preventDefault();
+  var name=document.getElementById('formName').value.trim();
+  var email=document.getElementById('formEmail').value.trim();
+  var msg=document.getElementById('formMsg').value.trim();
+  var valid=true;
+  if(!name){document.getElementById('nameError').classList.add('show');valid=false}else{document.getElementById('nameError').classList.remove('show')}
+  if(!email||!email.includes('@')){document.getElementById('emailError').classList.add('show');valid=false}else{document.getElementById('emailError').classList.remove('show')}
+  if(!msg){document.getElementById('msgError').classList.add('show');valid=false}else{document.getElementById('msgError').classList.remove('show')}
+  if(!valid)return;
+  document.getElementById('contactForm').reset();
+  showToast(T('toast.sent'),'success');
+}
+function handleNewsletter(e){
+  e.preventDefault();
+  var email=document.getElementById('newsEmail').value.trim();
+  if(!email||!email.includes('@'))return;
+  document.getElementById('newsEmail').value='';
+  showToast(T('newsletter.thanks'),'success');
+}
+function animateCounters(){
+  var stats=document.querySelectorAll('.stat-item h4');
+  stats.forEach(function(el){
+    var txt=el.textContent;
+    var num=parseInt(txt);
+    if(isNaN(num))return;
+    var suffix=txt.replace(num,'');
+    var target=num;
+    var dur=1500;var start=null;
+    function step(ts){if(!start)start=ts;var p=Math.min((ts-start)/dur,1);var cur=Math.floor(p*target);el.textContent=cur+suffix;if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step);
+  });
+}
+var counterDone=false;
+function checkCounter(){if(counterDone)return;var about=document.getElementById('about');if(!about)return;var rect=about.getBoundingClientRect();if(rect.top<window.innerHeight-100){counterDone=true;animateCounters()}}
+var currentModalId=null;
+function showPropertyDetail(id){
+  var p=properties.find(function(p){return p.id===id});
+  if(!p)return;
+  currentModalId=id;
+  var isFav=favorites.indexOf(id)!==-1;
+  var priceStr='$'+p.price.toLocaleString();
+  document.getElementById('modalHero').style.background='linear-gradient(135deg,'+['#E07A5F','#3D405B','#81B29A','#F2CC8F','#5B7C99','#6C63FF'][p.img-1%6]+' 0%,'+['#F2CC8F','#81B29A','#3D405B','#E07A5F','#81B29A','#A78BFA'][p.img-1%6]+' 100%)';
+  document.getElementById('modalHero').innerHTML='<div class="modal-badge">'+statusBadge(p.status)+'</div>'+getEmoji(p.type);
+  document.getElementById('modalTitle').textContent=p.address;
+  document.getElementById('modalAddress').textContent=p.city+', '+p.address;
+  document.getElementById('modalPrice').textContent=priceStr;
+  document.getElementById('modalStats').innerHTML=
+    '<div class="modal-stat"><div class="val">'+p.beds+'</div><div class="lbl">'+T('property.beds')+'</div></div>'+
+    '<div class="modal-stat"><div class="val">'+p.baths+'</div><div class="lbl">'+T('property.baths')+'</div></div>'+
+    '<div class="modal-stat"><div class="val">'+p.sqft.toLocaleString()+'</div><div class="lbl">'+T('property.sqft')+'</div></div>';
+  var detailsHtml=
+    '<div class="modal-detail"><span class="k">'+T('property.type')+'</span><span class="v">'+p.type+'</span></div>'+
+    '<div class="modal-detail"><span class="k">'+T('property.status')+'</span><span class="v">'+T('property.'+p.status)+'</span></div>'+
+    '<div class="modal-detail"><span class="k">'+T('property.yearBuilt')+'</span><span class="v">'+p.year+'</span></div>'+
+    (p.garage>0?'<div class="modal-detail"><span class="k">'+T('property.garage')+'</span><span class="v">'+p.garage+'</span></div>':'<div class="modal-detail"><span class="k">'+T('property.garage')+'</span><span class="v">—</span></div>');
+  document.getElementById('modalDetails').innerHTML=detailsHtml;
+  var agentAvatars={0:'👩‍💼',1:'👨‍💼',2:'👩‍💼',3:'👨‍💼'};
+  var agentIdx=properties.filter(function(p){return p.owner===p.owner}).length%4;
+  var agentColors=['rgba(224,122,95,.1)','rgba(129,178,154,.1)','rgba(242,204,143,.1)','rgba(61,64,91,.1)'];
+  document.getElementById('modalAgent').innerHTML=
+    '<div class="av" style="background:'+agentColors[p.id%4]+'">'+(p.id%2===0?'👩‍💼':'👨‍💼')+'</div>'+
+    '<div class="info"><div class="name">'+p.owner+'</div><div class="role">'+(p.owner==='Sarah Johnson'||p.owner==='Emily Rodriguez'?T('team.agent1'):p.owner==='Michael Chen'?T('team.agent2'):T('team.agent4'))+'</div></div>';
+  var features=getPropertyFeatures(p);
+  var featHtml='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">';
+  for(var f=0;f<features.length;f++)featHtml+='<span style="padding:4px 10px;border-radius:20px;background:rgba(224,122,95,.08);color:var(--accent);font-size:.75rem;font-weight:600">'+features[f]+'</span>';
+   featHtml+='</div>';
+   document.getElementById('modalFeatures').innerHTML=featHtml;
+  var nearby=getNearbyPlaces(p);
+  var nearbyHtml='<div style="font-size:.82rem;font-weight:700;margin-bottom:8px;color:var(--text)">📍 Nearby Places</div><div style="display:flex;flex-wrap:wrap;gap:8px">';
+  for(var n=0;n<nearby.length;n++)nearbyHtml+='<span style="padding:5px 10px;border-radius:6px;background:var(--bg-alt);border:1px solid var(--border);font-size:.78rem;color:var(--text-mid)">'+nearby[n]+'</span>';
+  nearbyHtml+='</div>';
+  document.getElementById('modalNearby').innerHTML=nearbyHtml;
+  document.getElementById('modalFavBtn').textContent=(isFav?'❤ '+T('toast.saved').replace('!',''):T('modal.saveBtn'));
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('propertyModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  updateModalNav(p.id);
+}
+function updateModalNav(id){
+  var idx=properties.findIndex(function(p){return p.id===id});
+  var prevBtn=document.getElementById('modalPrevBtn');
+  var nextBtn=document.getElementById('modalNextBtn');
+  if(prevBtn)prevBtn.style.display=idx>0?'flex':'none';
+  if(nextBtn)nextBtn.style.display=idx<properties.length-1?'flex':'none';
+}
+function showPrevProperty(){
+  if(currentModalId===null)return;
+  var idx=properties.findIndex(function(p){return p.id===currentModalId});
+  if(idx>0)showPropertyDetail(properties[idx-1].id);
+}
+function showNextProperty(){
+  if(currentModalId===null)return;
+  var idx=properties.findIndex(function(p){return p.id===currentModalId});
+  if(idx<properties.length-1)showPropertyDetail(properties[idx+1].id);
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('propertyModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function modalToggleFav(){
+  if(currentModalId!==null){toggleFav(currentModalId);closeModal()}
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeModal();
+  if(e.key==='ArrowLeft')showPrevProperty();
+  if(e.key==='ArrowRight')showNextProperty();
+});
+function toggleFaq(btn){btn.parentElement.classList.toggle('open')}
+function updateTagState(el){
+  var tag=el.closest('.filter-tag');
+  if(!tag)return;
+  if(el.tagName==='SELECT'){
+    tag.classList.toggle('active',el.value!=='all');
+  }else if(el.tagName==='INPUT'){
+    tag.classList.toggle('active',el.value.trim().length>0);
+  }
+}
+function applySearch(){
+  var loader=document.getElementById('searchLoading');
+  if(loader)loader.classList.add('show');
+  setTimeout(function(){
+    doApplySearch();
+    if(loader)loader.classList.remove('show');
+  },500);
+}
+function doApplySearch(){
+  var loc=document.getElementById('locationSelect').value;
+  var type=document.getElementById('typeSelect').value;
+  var price=document.getElementById('priceSelect').value;
+  var keyword=document.getElementById('keywordInput').value.trim().toLowerCase();
+  var beds=document.getElementById('bedsSelect').value;
+  var baths=document.getElementById('bathsSelect').value;
+  var filtered=properties.filter(function(p){
+    if(loc!=='all'&&p.city!==loc)return false;
+    if(type!=='all'&&p.type!==type)return false;
+    if(price!=='all'){var parts=price.split('-');var min=parseInt(parts[0]),max=parseInt(parts[1]);if(p.price<min||p.price>max)return false}
+    if(beds!=='all'&&p.beds<parseInt(beds))return false;
+    if(baths!=='all'&&p.baths<parseInt(baths))return false;
+    if(keyword){var addr=p.address.toLowerCase()+p.city.toLowerCase();if(addr.indexOf(keyword)===-1)return false}
+    return true;
+  });
+  displayCount=filtered.length;
+  currentFilter='all';
+  document.querySelectorAll('.filter-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-filter')==='all')});
+  var grid=document.getElementById('propertyGrid');
+  var html='';
+  for(var i=0;i<filtered.length;i++){
+    var p=filtered[i];var isFav=favorites.indexOf(p.id)!==-1;
+    var priceStr='$'+p.price.toLocaleString();
+    html+='<div class="property-card card-img-'+p.img+'" onclick="showPropertyDetail('+p.id+')">'+
+      '<div class="card-img"><div class="card-img-inner">'+getEmoji(p.type)+'</div><div class="card-overlay"></div>'+statusBadge(p.status)+
+      '<button class="map-link" onclick="event.stopPropagation();document.getElementById(\'mapSection\').scrollIntoView({behavior:\'smooth\'})">🗺️ Map</button>'+
+      '<button class="card-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFav('+p.id+')">'+
+      '<svg viewBox="0 0 24 24" class="heart-outline"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'+
+      '<svg viewBox="0 0 24 24" class="heart-filled"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'+
+      '</button></div>'+
+      '<div class="card-body"><div class="card-price">'+priceStr+'</div>'+
+      '<div class="card-address"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>'+p.address+'</div>'+
+      '<div class="card-stats">'+
+      '<div class="card-stat">🛏️ <span>'+p.beds+'</span> '+T('property.beds')+'</div>'+
+      '<div class="card-stat">🚿 <span>'+p.baths+'</span> '+T('property.baths')+'</div>'+
+      '<div class="card-stat">📐 <span>'+p.sqft.toLocaleString()+'</span> '+T('property.sqft')+'</div>'+
+      (p.garage>0?'<div class="card-stat">🚗 <span>'+p.garage+'</span> '+T('property.garage')+'</div>':'')+
+      '</div>'+
+      '<div class="card-owner">'+T('property.owner')+' '+p.owner+'</div>'+
+      '<div class="card-date">📅 '+(new Date().getMonth()+1)+'/'+(10+p.id%20)+'/'+new Date().getFullYear()+'</div></div></div>';
+  }
+  grid.innerHTML=html;
+  document.getElementById('resultCount').textContent=Tfmt('toast.resultCount',filtered.length);
+  if(filtered.length===0){grid.innerHTML='<div class="no-results"><div class="icon">🔍</div><h3 id="noResultTitle">No Properties Found</h3><p id="noResultDesc">Try adjusting your search or filter criteria to discover more properties.</p></div>'}
+  document.getElementById('loadMoreBtn').style.display='none';
+}
+var mapInitialized=false;var mapRetries=0;
+function initMap(){
+  if(mapInitialized)return;
+  if(typeof L==='undefined'){mapRetries++;if(mapRetries<10){setTimeout(initMap,500)}else{mapInitialized=true;var mapEl=document.getElementById('map');if(mapEl)mapEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-light);font-size:.9rem">Map unavailable</div>'}return}
+  mapInitialized=true;
+  var map=L.map('map').setView([37.8,-96],4);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'&copy; Esri',maxZoom:19}).addTo(map);
+  var markers=L.markerClusterGroup();
+  var bounds=[];
+  properties.forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var m=L.marker([p.lat,p.lng]);
+    var priceStr='$'+p.price.toLocaleString();
+    m.bindPopup('<div class="popup-title">'+p.address+'</div><div class="popup-price">'+priceStr+'</div><div class="popup-addr">'+p.city+' | '+p.beds+' '+T('property.beds')+', '+p.baths+' '+T('property.baths')+'</div>');
+    markers.addLayer(m);
+    bounds.push([p.lat,p.lng]);
+  });
+  map.addLayer(markers);
+  if(bounds.length>0)map.fitBounds(bounds).setZoom(4);
+}
+renderLangSwitcher();
+afterLangChange();
+try{initMap()}catch(e){console.warn('Map init failed:',e)}
+var revealObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target)}})},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(function(el){revealObserver.observe(el)});
+setTimeout(function(){document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){el.classList.add('visible')})},3000);
+['listings','about','agents','testimonials','faq','contact','newsletter'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('reveal')});
+window.addEventListener('scroll',function(){
+  var btn=document.getElementById('backTopBtn');if(btn)btn.classList.toggle('show',window.scrollY>500);checkCounter();
+  var nav=document.getElementById('navbar');if(nav)nav.classList.toggle('scrolled',window.scrollY>50)
+});
+  </script>
+</body>
+</html>

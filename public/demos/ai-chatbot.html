@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Studio — Enterprise Chatbot Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-primary:#0a0a14;--bg-secondary:#111122;--bg-tertiary:#181830;--bg-hover:#1f1f42;
+  --bg-user-msg:#252560;--bg-assistant-msg:#13132a;--border-color:#252548;
+  --text-primary:#eaeaf4;--text-secondary:#9898c0;--text-muted:#5e5e90;
+  --accent:#8b5cf6;--accent-2:#6366f1;--accent-3:#3b82f6;
+  --accent-gradient:linear-gradient(135deg,#8b5cf6,#6366f1,#3b82f6);
+  --accent-gradient-soft:linear-gradient(135deg,rgba(139,92,246,.12),rgba(99,102,241,.12));
+  --green:#22c55e;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;--pink:#ec4899;
+  --code-bg:#0a0a18;--scrollbar-thumb:#3a3a6a;
+  --font-main:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 16px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.5);
+  --sidebar-w:290px;
+}
+[data-theme="light"]{
+  --bg-primary:#f4f4fa;--bg-secondary:#ffffff;--bg-tertiary:#eeeef5;--bg-hover:#e0e0f0;
+  --bg-user-msg:#e8e0ff;--bg-assistant-msg:#f2f2f9;--border-color:#d0d0e0;
+  --text-primary:#1a1a2e;--text-secondary:#555580;--text-muted:#8888a8;
+  --code-bg:#f0f0f8;--scrollbar-thumb:#c0c0d0;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-main);background:var(--bg-primary);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font-family:var(--font-main)}
+.app{display:flex;height:100vh;width:100vw}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:4px}
+
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;color:#fff;pointer-events:auto;animation:toastIn .3s ease-out;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast.info{background:linear-gradient(135deg,#6366f1,#8b5cf6)}.toast.success{background:linear-gradient(135deg,#22c55e,#16a34a)}.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(2px)}
+.overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-lg);width:600px;max-width:92vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);transform:scale(.92);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.overlay.open .modal{transform:scale(1)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-color)}
+.modal-header h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.modal-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;font-size:16px;transition:all .15s}
+.modal-close:hover{color:var(--text-primary);border-color:var(--accent)}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border-color);display:flex;gap:8px;justify-content:flex-end}
+
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.form-group label{font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em}
+.form-input{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:9px 12px;color:var(--text-primary);font-family:var(--font-main);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+textarea.form-input{min-height:80px;resize:vertical;line-height:1.6}
+select.form-input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239898b8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
+.btn{padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-main);border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent-gradient);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-secondary{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}.btn-secondary:hover{border-color:var(--accent);color:var(--text-primary)}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.btn-ghost{background:none;border:none;color:var(--text-muted);padding:4px 8px;font-size:12px}.btn-ghost:hover{color:var(--text-primary)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+.confirm-overlay .modal{width:400px}
+
+/* ─── Sidebar ─── */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;position:relative;z-index:10;transition:transform .3s}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:100px;background:var(--accent-gradient);opacity:.05;pointer-events:none}
+.sidebar-header{padding:16px 16px 12px;border-bottom:1px solid var(--border-color);position:relative;display:flex;align-items:center;justify-content:space-between}
+.sidebar-header h2{font-size:14px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.sidebar-header h2 .logo-icon{width:24px;height:24px;border-radius:6px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:13px}
+.sidebar-actions{display:flex;gap:3px}
+.sidebar-actions button{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;font-size:13px;transition:all .15s}
+.sidebar-actions button:hover{color:var(--text-primary);border-color:var(--accent)}
+
+.sidebar-section{padding:8px 10px 2px}
+.sidebar-section-title{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:700;padding:4px 8px;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between}
+.sidebar-section-title button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;line-height:1}
+
+/* Folders */
+.folder-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;font-size:12px;color:var(--text-secondary)}
+.folder-item:hover{background:var(--bg-hover)}
+.folder-item .folder-icon{font-size:13px}
+.folder-item .folder-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder-item .folder-count{font-size:10px;color:var(--text-muted);background:var(--bg-tertiary);padding:1px 6px;border-radius:10px}
+.folder-item .folder-del{display:none;width:18px;height:18px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;border-radius:4px}
+.folder-item:hover .folder-del{display:flex;align-items:center;justify-content:center}
+
+/* Conv List */
+.conv-list{display:flex;flex-direction:column;gap:1px;max-height:260px;overflow-y:auto;padding:0 2px}
+.conv-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;position:relative;draggable:true}
+.conv-item:hover{background:var(--bg-hover)}.conv-item.active{background:var(--accent-gradient-soft)}.conv-item.active .conv-name{color:var(--accent)}
+.conv-item.pinned .conv-name::before{content:'📌';font-size:9px;margin-right:4px}
+.conv-item.drag-over{border:1px dashed var(--accent);background:rgba(139,92,246,.08)}
+.conv-icon{width:26px;height:26px;border-radius:6px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.conv-info{flex:1;min-width:0}.conv-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-primary)}
+.conv-time{font-size:10px;color:var(--text-muted);margin-top:1px}
+.conv-acts{display:none;gap:1px;flex-shrink:0}
+.conv-item:hover .conv-acts{display:flex}
+.conv-act{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;border-radius:4px}
+.conv-act:hover{color:var(--text-primary);background:var(--bg-hover)}
+.conv-act.del:hover{color:#f87171;background:rgba(248,113,113,.1)}
+
+.sidebar-divider{height:1px;background:var(--border-color);margin:6px 10px}
+
+.search-box{padding:6px 10px;position:relative}
+.search-box input{width:100%;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:6px 10px 6px 28px;color:var(--text-primary);font-family:var(--font-main);font-size:12px;outline:none}
+.search-box input::placeholder{color:var(--text-muted)}
+.search-box input:focus{border-color:var(--accent)}
+.search-box .s-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+
+.doc-list{flex:1;overflow-y:auto;padding:2px 10px}
+.doc-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;position:relative}
+.doc-item:hover{background:var(--bg-hover)}
+.doc-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;text-transform:uppercase;letter-spacing:.03em}
+.doc-icon.pdf{background:rgba(239,68,68,.12);color:#f87171}.doc-icon.md{background:rgba(59,130,246,.12);color:#60a5fa}.doc-icon.html{background:rgba(249,115,22,.12);color:#fb923c}.doc-icon.txt{background:rgba(34,197,94,.12);color:#4ade80}.doc-icon.json{background:rgba(168,85,247,.12);color:#c084fc}.doc-icon.csv{background:rgba(20,184,166,.12);color:#2dd4bf}
+.doc-info{min-width:0;flex:1}.doc-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.doc-meta{font-size:10px;color:var(--text-muted);margin-top:1px}
+.doc-acts{display:none;gap:1px;flex-shrink:0}.doc-item:hover .doc-acts{display:flex}
+.doc-act-btn{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;border-radius:4px}
+.doc-act-btn:hover{color:var(--text-primary);background:var(--bg-hover)}
+.doc-relevance{font-size:10px;color:var(--accent);font-weight:600;margin-left:auto;padding:2px 6px;background:rgba(139,92,246,.1);border-radius:8px;white-space:nowrap}
+.doc-chunks{margin-top:8px;padding:8px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm)}
+.doc-chunk{padding:6px 8px;border-left:2px solid var(--accent);margin-bottom:6px;font-size:11px;color:var(--text-secondary);line-height:1.5}
+.doc-chunk-score{font-size:10px;color:var(--accent);font-weight:600}
+
+.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border-color);display:flex;gap:6px}
+.upload-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:var(--accent-gradient);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font-main);font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.upload-btn:hover{opacity:.9}
+.footer-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;transition:all .15s;font-size:14px;flex-shrink:0}
+.footer-btn:hover{color:var(--text-primary);border-color:var(--accent)}
+.footer-btn.syncing{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ─── Chat Main ─── */
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.chat-header{display:flex;align-items:center;padding:10px 20px;border-bottom:1px solid var(--border-color);background:var(--bg-secondary);position:relative;z-index:5;gap:12px;flex-wrap:wrap}
+.chat-header-left{display:flex;align-items:center;gap:10px}
+.chat-header-left h1{font-size:17px;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(74,222,128,.4);animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.5}}
+
+.model-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--border-color);background:var(--bg-tertiary)}
+.model-badge:hover{border-color:var(--accent)}
+.model-badge .model-dot{width:6px;height:6px;border-radius:50%}
+.model-badge .model-dot.gpt{background:#22c55e}.model-badge .model-dot.claude{background:#f59e0b}.model-badge .model-dot.gemini{background:#3b82f6}
+
+.header-controls{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.slider-control{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted)}.slider-control label{white-space:nowrap;font-weight:600}
+.slider-control input[type=range]{width:70px;height:3px;-webkit-appearance:none;appearance:none;background:var(--bg-tertiary);border-radius:2px;outline:none;cursor:pointer}
+.slider-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-secondary)}
+.slider-val{min-width:28px;text-align:right;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);font-weight:600}
+.token-badge{display:flex;align-items:center;gap:5px;padding:3px 10px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:20px;font-size:11px;color:var(--text-muted);font-weight:500;cursor:pointer;transition:all .15s}
+.token-badge:hover{border-color:var(--accent)}
+.token-badge .t-val{color:var(--text-secondary);font-family:var(--font-mono);font-weight:700}
+.cost-badge{font-size:10px;color:var(--green);font-weight:600;background:rgba(34,197,94,.1);padding:2px 8px;border-radius:10px}
+.hdr-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.hdr-btn:hover{border-color:var(--accent);color:var(--text-primary)}
+.hdr-btn svg{width:14px;height:14px}
+
+/* ─── Messages ─── */
+.messages{flex:1;overflow-y:auto;padding:20px 0;scroll-behavior:smooth}
+.message{max-width:820px;margin:0 auto;padding:0 28px;animation:fadeSlideIn .35s ease-out both}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg-wrapper{display:flex;gap:12px;margin-bottom:6px}.msg-wrapper.user{flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;margin-top:2px;font-weight:700}
+.msg-avatar.user-av{background:var(--accent-gradient);color:#fff;font-size:12px}
+.msg-avatar.ai-av{background:var(--bg-tertiary);border:1px solid var(--border-color)}
+.msg-content{flex:1;min-width:0}
+.msg-bubble{padding:12px 16px;border-radius:var(--radius-lg);font-size:13.5px;line-height:1.75;position:relative}
+.msg-wrapper.user .msg-bubble{background:var(--bg-user-msg);border:1px solid rgba(139,92,246,.15);border-top-right-radius:var(--radius-sm)}
+.msg-wrapper.assistant .msg-bubble{background:var(--bg-assistant-msg);border:1px solid var(--border-color);border-top-left-radius:var(--radius-sm)}
+.msg-meta{display:flex;align-items:center;gap:8px;margin-top:4px;padding:0 4px;font-size:10px;color:var(--text-muted)}
+.msg-wrapper.user .msg-meta{justify-content:flex-end}
+.msg-edited{font-style:italic;color:var(--text-muted)}
+.msg-tokens{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);background:var(--bg-tertiary);padding:1px 5px;border-radius:4px}
+.msg-model-tag{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600}
+.msg-model-tag.gpt{background:rgba(34,197,94,.1);color:#4ade80}
+.msg-model-tag.claude{background:rgba(245,158,11,.1);color:#fbbf24}
+.msg-model-tag.gemini{background:rgba(59,130,246,.1);color:#60a5fa}
+
+.msg-actions{display:flex;align-items:center;gap:3px;margin-top:5px;padding:0 4px;opacity:0;transition:opacity .2s}
+.msg-wrapper:hover .msg-actions{opacity:1}
+.msg-action-btn{display:flex;align-items:center;gap:3px;padding:3px 7px;background:none;border:1px solid transparent;border-radius:var(--radius-sm);color:var(--text-muted);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.msg-action-btn:hover{background:var(--bg-hover);border-color:var(--border-color);color:var(--text-primary)}
+.msg-action-btn.copied{color:var(--green);border-color:rgba(34,197,94,.2)}
+.feedback-btns{display:flex;gap:1px;margin-left:auto}
+.feedback-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text-muted);cursor:pointer;border-radius:var(--radius-sm);transition:all .15s}
+.feedback-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+.feedback-btn.active-up{color:#4ade80}.feedback-btn.active-down{color:#f87171}
+.feedback-btn svg{width:14px;height:14px}
+
+.msg-edit-area{display:flex;gap:6px;align-items:flex-end;margin-top:6px}
+.msg-edit-area textarea{flex:1;background:var(--bg-tertiary);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text-primary);font-family:var(--font-main);font-size:13px;outline:none;resize:none;min-height:40px}
+
+.msg-bubble p{margin-bottom:8px}.msg-bubble p:last-child{margin-bottom:0}
+.msg-bubble strong{color:#c4b5fd;font-weight:600}
+.msg-bubble code:not(.code-block code){background:var(--code-bg);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:#c084fc;border:1px solid rgba(139,92,246,.12)}
+.code-block{background:var(--code-bg);border:1px solid var(--border-color);border-radius:var(--radius-md);margin:10px 0;overflow:hidden}
+.code-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:rgba(139,92,246,.06);border-bottom:1px solid var(--border-color);font-size:11px;color:var(--text-muted);font-family:var(--font-mono)}
+.code-block-btns{display:flex;gap:4px}
+.code-block-btn{background:none;border:1px solid var(--border-color);color:var(--text-muted);cursor:pointer;font-size:11px;font-family:var(--font-main);padding:2px 8px;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:3px}
+.code-block-btn:hover{color:var(--text-primary);border-color:var(--accent)}
+.code-block-btn.run-btn{border-color:rgba(34,197,94,.3);color:var(--green)}.code-block-btn.run-btn:hover{background:rgba(34,197,94,.1)}
+.code-block pre{padding:12px;overflow-x:auto;font-family:var(--font-mono);font-size:12px;line-height:1.7;tab-size:2}
+.code-output{background:rgba(0,0,0,.3);border-top:1px solid var(--border-color);padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--green);line-height:1.5;max-height:150px;overflow-y:auto;display:none}
+.code-output.visible{display:block}
+.code-output-label{font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+
+.hl-keyword{color:#c084fc}.hl-string{color:#34d399}.hl-comment{color:#525270;font-style:italic}.hl-function{color:#60a5fa}.hl-number{color:#f9a8d4}.hl-type{color:#fbbf24}.hl-operator{color:#94a3b8}.hl-property{color:#67e8f9}
+
+.msg-table{width:100%;border-collapse:separate;border-spacing:0;margin:10px 0;font-size:12px;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color)}
+.msg-table th{background:rgba(139,92,246,.08);padding:8px 12px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary);border-bottom:1px solid var(--border-color)}
+.msg-table td{padding:8px 12px;border-bottom:1px solid var(--border-color);color:var(--text-primary);font-size:12px}
+.msg-table tr:last-child td{border-bottom:none}
+
+.mention-tag{background:rgba(139,92,246,.15);color:var(--accent);padding:1px 6px;border-radius:4px;font-weight:600;font-size:12px}
+
+.typing-indicator{display:flex;align-items:center;gap:4px;padding:4px 0}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:.3;animation:typingBounce .9s ease-in-out infinite}
+.typing-indicator span:nth-child(2){animation-delay:.15s}.typing-indicator span:nth-child(3){animation-delay:.3s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-6px);opacity:1}}
+
+.suggestions{max-width:820px;margin:0 auto;padding:6px 28px 12px;display:flex;gap:6px;flex-wrap:wrap}
+.suggestion-chip{padding:7px 14px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:100px;font-size:11px;color:var(--text-secondary);cursor:pointer;transition:all .2s;font-weight:500}
+.suggestion-chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(139,92,246,.06)}
+
+.input-bar{padding:10px 28px 14px;border-top:1px solid var(--border-color);background:var(--bg-secondary);position:relative}
+.input-bar::before{content:'';position:absolute;top:-30px;left:0;right:0;height:30px;background:linear-gradient(to top,var(--bg-secondary),transparent);pointer-events:none}
+.input-wrapper{max-width:820px;margin:0 auto;display:flex;align-items:flex-end;gap:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:5px 5px 5px 12px;transition:border-color .2s,box-shadow .2s}
+.input-wrapper:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+.input-wrapper textarea{flex:1;background:none;border:none;color:var(--text-primary);font-family:var(--font-main);font-size:13.5px;line-height:1.5;resize:none;outline:none;max-height:120px;min-height:20px;padding:5px 0}
+.input-wrapper textarea::placeholder{color:var(--text-muted)}
+.input-actions{display:flex;align-items:center;gap:3px}
+.action-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text-muted);cursor:pointer;border-radius:var(--radius-sm);transition:all .15s}
+.action-btn:hover{color:var(--text-primary);background:rgba(255,255,255,.05)}
+.send-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--accent-gradient);border:none;color:#fff;cursor:pointer;border-radius:var(--radius-md);transition:opacity .15s,transform .1s}
+.send-btn:hover{opacity:.9}.send-btn:active{transform:scale(.95)}
+.input-hint{max-width:820px;margin:4px auto 0;text-align:center;font-size:10px;color:var(--text-muted)}
+
+.welcome-msg{max-width:820px;margin:0 auto;padding:50px 28px;text-align:center}
+.welcome-msg h2{font-size:22px;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.welcome-msg p{color:var(--text-muted);font-size:13px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ─── Prompt Builder ─── */
+.prompt-template-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.prompt-template-card{padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-md);cursor:pointer;transition:all .2s;text-align:center}
+.prompt-template-card:hover{border-color:var(--accent);background:rgba(139,92,246,.05)}
+.prompt-template-card.selected{border-color:var(--accent);background:rgba(139,92,246,.1)}
+.prompt-template-card .tpl-icon{font-size:22px;margin-bottom:4px}
+.prompt-template-card .tpl-name{font-size:12px;font-weight:600;color:var(--text-primary)}
+.prompt-template-card .tpl-desc{font-size:10px;color:var(--text-muted);margin-top:2px}
+
+/* ─── Model Compare ─── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.compare-card{border:1px solid var(--border-color);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column}
+.compare-card-header{padding:10px 12px;background:rgba(139,92,246,.06);border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+.compare-card-body{padding:12px;font-size:12px;color:var(--text-secondary);line-height:1.6;flex:1;overflow-y:auto;max-height:200px}
+.compare-card-meta{padding:8px 12px;border-top:1px solid var(--border-color);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between}
+
+/* ─── Analytics ─── */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.analytics-card{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:14px;position:relative}
+.analytics-card h4{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.analytics-card .stat-value{font-size:24px;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.analytics-card canvas{width:100%;height:140px;display:block}
+.analytics-full{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:14px}
+.analytics-full h4{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.analytics-full canvas{width:100%;height:200px;display:block}
+
+/* ─── Team ─── */
+.team-member{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);transition:background .15s}
+.team-member:hover{background:var(--bg-hover)}
+.team-member-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.team-member-info{flex:1}.team-member-name{font-size:12px;font-weight:600}.team-member-role{font-size:10px;color:var(--text-muted)}
+.team-member-status{width:8px;height:8px;border-radius:50%}
+.team-member-status.online{background:var(--green)}.team-member-status.offline{background:var(--text-muted)}
+
+.shared-room{padding:10px;border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.shared-room:hover{border-color:var(--accent)}
+.shared-room-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.shared-room-name{font-size:13px;font-weight:600}
+.shared-room-members{display:flex;gap:-4px}
+.shared-room-members .avatar-stack{display:flex}
+.shared-room-members .avatar-stack div{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg-secondary);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;margin-left:-6px}
+.shared-room-members .avatar-stack div:first-child{margin-left:0}
+
+/* ─── Export ─── */
+.export-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.export-card{padding:16px;border:1px solid var(--border-color);border-radius:var(--radius-md);cursor:pointer;transition:all .2s;text-align:center}
+.export-card:hover{border-color:var(--accent);background:rgba(139,92,246,.05)}
+.export-card .exp-icon{font-size:24px;margin-bottom:6px}
+.export-card .exp-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.export-card .exp-desc{font-size:10px;color:var(--text-muted);margin-top:2px}
+
+/* ─── Responsive ─── */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .chat-header{padding:8px 12px;gap:8px}
+  .header-controls .slider-control{display:none}
+  .message{padding:0 12px}
+  .input-bar{padding:8px 12px 10px}
+}
+
+.thinking-text{display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:13px}
+.thinking-dots{display:inline-flex;gap:2px}
+.thinking-dots span{display:inline-block;opacity:.3;animation:thinkingDot 1.4s ease-in-out infinite}
+.thinking-dots span:nth-child(2){animation-delay:.2s}
+.thinking-dots span:nth-child(3){animation-delay:.4s}
+@keyframes thinkingDot{0%,80%,100%{opacity:.3}40%{opacity:1}}
+
+@media print{
+  .sidebar,.chat-header,.input-bar,.suggestions,.toast-container,.sidebar-footer{display:none!important}
+  .chat-main{flex:1;width:100%}
+  .messages{overflow:visible;padding:10px 0}
+  .message{break-inside:avoid;page-break-inside:avoid}
+  .msg-actions{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2><span class="logo-icon">✦</span><span id="appTitle">AI Studio</span></h2>
+      <div style="display:flex;align-items:center;gap:6px"><div id="langSwitcher" style="position:relative;display:inline-block;"></div><div class="sidebar-actions">
+        <button id="newFolderBtn" title="New Folder">📁</button>
+        <button id="newChatBtn" title="New Chat">＋</button>
+        <button id="sidebarClose" title="Close" style="display:none">✕</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Pinned <button id="pinFilterBtn" title="Show pinned">📌</button></div>
+      <div class="conv-list" id="pinnedList"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Folders</div>
+      <div id="folderList"></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Recent Conversations</div>
+      <div class="conv-list" id="convList"></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="search-box">
+      <span class="s-icon">🔍</span>
+      <input type="text" placeholder="Search documents..." id="searchInput">
+    </div>
+    <div class="doc-list" id="docList"></div>
+    <div class="sidebar-footer">
+      <button class="upload-btn" id="uploadBtn">📤 Upload</button>
+      <button class="footer-btn" id="syncBtn" title="Sync">🔄</button>
+    </div>
+  </aside>
+
+  <main class="chat-main">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <button class="hdr-btn" id="menuBtn" style="display:none" title="Menu">☰</button>
+        <h1>AI Studio</h1>
+        <span class="status-dot"></span>
+        <span class="model-badge" id="modelBadge"><span class="model-dot gpt"></span><span id="modelName">GPT-4 Turbo</span>▾</span>
+      </div>
+      <div class="header-controls">
+        <div class="slider-control"><label>Temp</label><input type="range" min="0" max="200" value="70" id="tempSlider"><span class="slider-val" id="tempVal">0.7</span></div>
+        <div class="slider-control"><label>Max</label><input type="range" min="256" max="4096" value="2048" step="256" id="maxTokensSlider"><span class="slider-val" id="maxTokensVal">2048</span></div>
+        <div class="token-badge" id="tokenBadge" title="Token usage"><span class="t-val" id="tokenCount">0</span> tokens <span class="cost-badge" id="costBadge">$0.00</span></div>
+        <button class="hdr-btn" id="promptBuilderBtn">🧩 Prompt</button>
+        <button class="hdr-btn" id="exportBtn">📥 Export</button>
+        <button class="hdr-btn" id="analyticsBtn">📊 Analytics</button>
+        <button class="hdr-btn" id="teamBtn">👥 Team</button>
+        <button class="hdr-btn" id="settingsBtn">⚙</button>
+      </div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="suggestions" id="suggestions"></div>
+    <div class="input-bar">
+      <div class="input-wrapper">
+        <button class="action-btn" id="attachBtn" title="Attach">📎</button>
+        <textarea rows="1" placeholder="Type your message... (@ to mention team members)" id="chatInput"></textarea>
+        <div class="input-actions">
+          <button class="action-btn" id="voiceBtn" title="Voice">🎙</button>
+          <button class="send-btn" id="sendBtn" title="Send">➤</button>
+        </div>
+      </div>
+      <div class="input-hint">AI responses are simulated. Press Enter to send, Shift+Enter for new line.</div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="overlay confirm-overlay" id="confirmOverlay">
+  <div class="modal" style="width:400px">
+    <div class="modal-header"><h3 id="confirmTitle">Confirm</h3><button class="modal-close" id="confirmClose">✕</button></div>
+    <div class="modal-body"><p id="confirmMsg" style="font-size:13px;color:var(--text-secondary)"></p></div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="confirmCancel">Cancel</button><button class="btn btn-danger" id="confirmOk">Delete</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="settingsOverlay">
+  <div class="modal" style="width:480px">
+    <div class="modal-header"><h3>⚙ Settings</h3><button class="modal-close" id="settingsClose">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Default System Prompt</label><textarea class="form-input" id="sysPrompt" placeholder="You are a helpful AI assistant..."></textarea></div>
+      <div class="form-group"><label>Theme</label><div style="display:flex;gap:8px"><button class="btn btn-secondary theme-btn" data-theme-val="dark">🌙 Dark</button><button class="btn btn-secondary theme-btn" data-theme-val="light">☀ Light</button></div></div>
+      <div class="form-group"><label>Streaming Speed</label><select class="form-input" id="streamSpeed"><option value="fast">Fast</option><option value="normal" selected>Normal</option><option value="slow">Slow</option></select></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="modelOverlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-header"><h3>🤖 Select Model</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body" id="modelList"></div>
+    <div class="modal-footer"><button class="btn btn-primary" id="compareModelsBtn">⚡ Compare Models</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="compareOverlay">
+  <div class="modal" style="width:900px">
+    <div class="modal-header"><h3>⚡ Model Comparison</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body"><div class="compare-grid" id="compareGrid"></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.overlay').classList.remove('open')">Close</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="promptOverlay">
+  <div class="modal" style="width:560px">
+    <div class="modal-header"><h3>🧩 System Prompt Builder</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Templates</label>
+        <div class="prompt-template-grid" id="promptTemplates"></div>
+      </div>
+      <div class="form-group"><label>Custom System Prompt</label><textarea class="form-input" id="promptBuilderText" style="min-height:120px" placeholder="Build your system prompt here..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.overlay').classList.remove('open')">Cancel</button><button class="btn btn-primary" id="promptApplyBtn">Apply to Conversation</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="exportOverlay">
+  <div class="modal" style="width:500px">
+    <div class="modal-header"><h3>📥 Export Conversation</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="export-options">
+        <div class="export-card" data-format="markdown"><div class="exp-icon">📝</div><div class="exp-name">Markdown</div><div class="exp-desc">.md format with formatting</div></div>
+        <div class="export-card" data-format="json"><div class="exp-icon">{ }</div><div class="exp-name">JSON</div><div class="exp-desc">Structured data export</div></div>
+        <div class="export-card" data-format="pdf"><div class="exp-icon">📄</div><div class="exp-name">PDF</div><div class="exp-desc">Print-friendly format</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="analyticsOverlay">
+  <div class="modal" style="width:800px">
+    <div class="modal-header"><h3>📊 Usage Analytics</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body" id="analyticsBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="teamOverlay">
+  <div class="modal" style="width:560px">
+    <div class="modal-header"><h3>👥 Team &amp; Shared</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body" id="teamBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="docPreviewOverlay">
+  <div class="modal" style="width:600px">
+    <div class="modal-header"><h3 id="docPreviewTitle">Document</h3><button class="modal-close" onclick="this.closest('.overlay').classList.remove('open')">✕</button></div>
+    <div class="modal-body" id="docPreviewBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="addDocOverlay">
+  <div class="modal" style="width:500px">
+    <div class="modal-header"><h3 id="addDocTitle">Upload Document</h3><button class="modal-close" id="addDocClose">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Title</label><input type="text" class="form-input" id="addDocName" placeholder="Document title..."></div>
+      <div class="form-group"><label>Type</label><select class="form-input" id="addDocType"><option value="pdf">PDF</option><option value="md">Markdown</option><option value="txt">Text</option><option value="json">JSON</option><option value="csv">CSV</option><option value="html">HTML</option></select></div>
+      <div class="form-group"><label>Content</label><textarea class="form-input" id="addDocContent" placeholder="Paste document content..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="addDocCancelBtn">Cancel</button><button class="btn btn-primary" id="addDocSaveBtn">Save</button></div>
+  </div>
+</div>
+
+<script>
+var LANGS=[
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'zh',name:'中文',flag:'🇨🇳'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'},
+  {code:'ko',name:'한국어',flag:'🇰🇷'}
+];
+var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
+function T(key){
+  var keys=key.split('.');var val=I18N[curLang];
+  for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
+  return(val===undefined||val===null)?key:val;
+}
+function setLang(code){
+  curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
+  renderLangSwitcher();
+  afterLangChange();
+}
+function renderLangSwitcher(){
+  var el=document.getElementById('langSwitcher');if(!el)return;
+  var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#6366f1)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+}
+function toggleLangMenu(){
+  var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+var I18N={
+  en:{
+    'app.title':'AI Studio',
+    'sidebar.pinned':'Pinned',
+    'sidebar.folders':'Folders',
+    'sidebar.recent':'Recent Conversations',
+    'sidebar.search':'Search documents...',
+    'sidebar.upload':'📤 Upload',
+    'sidebar.sync':'Sync',
+    'sidebar.newFolder':'New Folder',
+    'sidebar.newChat':'New Chat',
+    'sidebar.close':'Close',
+    'sidebar.noPinned':'No pinned conversations',
+    'sidebar.noConversations':'No conversations yet',
+    'sidebar.noDocs':'No documents yet',
+    'sidebar.noDocsMatch':'No documents match "',
+    'sidebar.quote':'"',
+    'chat.welcome':'How can I help you today?',
+    'chat.welcomeSub':'Start a new conversation or ask me anything.',
+    'chat.inputPlaceholder':'Type your message... (@ to mention team members)',
+    'chat.inputHint':'AI responses are simulated. Press Enter to send, Shift+Enter for new line.',
+    'chat.send':'Send',
+    'chat.newChat':'New Chat',
+    'chat.loaded':'Loaded: ',
+    'chat.started':'New chat started',
+    'chat.typing':'AI is thinking',
+    'chat.edited':'(edited)',
+    'chat.copy':'📋 Copy',
+    'chat.copied':'✓ Copied',
+    'chat.regen':'🔄 Regen',
+    'chat.edit':'✎ Edit',
+    'chat.save':'Save',
+    'chat.cancel':'Cancel',
+    'chat.justNow':'Just now',
+    'chat.searchDocs':'Search documents...',
+    'chat.noDocsYet':'No documents yet',
+    'chat.noDocsMatchQuery':'No documents match',
+    'model.gpt4':'GPT-4 Turbo',
+    'model.gpt4o':'GPT-4o',
+    'model.claude':'Claude 3.5 Sonnet',
+    'model.gemini':'Gemini 1.5 Pro',
+    'model.select':'🤖 Select Model',
+    'model.compare':'⚡ Compare Models',
+    'model.comparison':'⚡ Model Comparison',
+    'model.close':'Close',
+    'prompt.title':'🧩 System Prompt Builder',
+    'prompt.templates':'Templates',
+    'prompt.custom':'Custom System Prompt',
+    'prompt.apply':'Apply to Conversation',
+    'prompt.cancel':'Cancel',
+    'prompt.general':'General Assistant',
+    'prompt.cs':'Customer Service',
+    'prompt.coding':'Coding Assistant',
+    'prompt.creative':'Creative Writer',
+    'prompt.translator':'Translator',
+    'prompt.analyst':'Data Analyst',
+    'prompt.generalDesc':'Balanced, helpful responses',
+    'prompt.csDesc':'Professional support agent',
+    'prompt.codingDesc':'Expert developer mentor',
+    'prompt.creativeDesc':'Imaginative storytelling',
+    'prompt.translatorDesc':'Multi-language expert',
+    'prompt.analystDesc':'Insight-driven analysis',
+    'prompt.generalPrompt':'You are a helpful, harmless, and honest AI assistant. Provide clear and accurate responses.',
+    'prompt.csPrompt':'You are a professional customer service agent. Be empathetic, solution-oriented, and always address the customer by name when provided. Follow up to ensure satisfaction.',
+    'prompt.codingPrompt':'You are an expert software engineer. Write clean, well-documented code with error handling. Explain your reasoning. Suggest best practices and potential improvements.',
+    'prompt.creativePrompt':'You are a creative writer with a vivid imagination. Use rich descriptions, engaging narratives, and compelling characters. Adapt your tone to the requested genre.',
+    'prompt.translatorPrompt':'You are an expert translator. Translate text accurately while preserving tone, idioms, and cultural context. Explain nuances when relevant.',
+    'prompt.analystPrompt':'You are a data analyst expert. Provide data-driven insights, identify trends, and present findings clearly with visual descriptions. Always cite your reasoning.',
+    'export.title':'📥 Export Conversation',
+    'export.markdown':'Markdown',
+    'export.json':'JSON',
+    'export.pdf':'PDF',
+    'export.mdDesc':'.md format with formatting',
+    'export.jsonDesc':'Structured data export',
+    'export.pdfDesc':'Print-friendly format',
+    'export.success':'Exported as ',
+    'export.noConv':'No conversation to export',
+    'analytics.title':'📊 Usage Analytics',
+    'analytics.totalMessages':'Total Messages',
+    'analytics.totalTokens':'Total Tokens',
+    'analytics.totalCost':'Total Cost',
+    'analytics.documents':'Documents',
+    'analytics.dailyMessages':'Daily Messages',
+    'analytics.modelUsage':'Model Usage',
+    'analytics.tokenDist':'Token Distribution',
+    'analytics.noData':'No data yet',
+    'team.title':'👥 Team & Shared',
+    'team.members':'Team Members',
+    'team.rooms':'Shared Rooms',
+    'team.admin':'Admin',
+    'team.member':'Member',
+    'settings.title':'⚙ Settings',
+    'settings.systemPrompt':'Default System Prompt',
+    'settings.theme':'Theme',
+    'settings.dark':'🌙 Dark',
+    'settings.light':'☀ Light',
+    'settings.streamSpeed':'Streaming Speed',
+    'settings.fast':'Fast',
+    'settings.normal':'Normal',
+    'settings.slow':'Slow',
+    'confirm.title':'Confirm',
+    'confirm.delete':'Delete',
+    'confirm.cancel':'Cancel',
+    'confirm.deleteConv':'Delete this conversation?',
+    'confirm.deleteDoc':'Delete this document?',
+    'confirm.deleteFolder':'Delete this folder? Conversations will be ungrouped.',
+    'confirm.ok':'Confirm',
+    'doc.chunks':'Document Chunks',
+    'doc.relevance':'Relevance',
+    'docs.upload':'Upload Document',
+    'docs.edit':'Edit Document',
+    'docs.title':'Title',
+    'docs.type':'Type',
+    'docs.content':'Content',
+    'docs.save':'Save',
+    'docs.cancel':'Cancel',
+    'docs.updated':'Updated',
+    'docs.uploaded':'Uploaded',
+    'docs.deleted':'Deleted',
+    'docs.titleRequired':'Title required',
+    'folder.create':'Folder created',
+    'folder.name':'Folder name:',
+    'folder.exists':'A folder with this name already exists',
+    'folder.nameEmpty':'Folder name cannot be empty',
+    'folder.moved':'Moved to folder',
+    'folder.deleted':'Folder deleted',
+    'conv.pinned':'Pinned',
+    'conv.unpinned':'Unpinned',
+    'conv.deleted':'Deleted',
+    'conv.moved':'Moved to',
+    'sync.success':'Synced',
+    'voice.na':'Voice input not available in simulation',
+    'attach.sim':'Attachments simulated — use document upload',
+    'model.selected':'Model: ',
+    'per1kTokens':'per 1K tokens',
+    'pinned.title':'Pinned',
+    'pinned.show':'Show pinned',
+    'suggestions.payment':'How do I integrate the payment API?',
+    'suggestions.pricing':'What are the pricing plans?',
+    'suggestions.code':'Show me a code example',
+    'suggestions.refund':'How do refunds work?',
+    'suggestions.webhooks':'What webhooks are available?',
+    'suggestions.errors':'Show error handling',
+    'suggestions.partial':'Can I do partial refunds?',
+    'suggestions.refundTime':'How long do refunds take?',
+    'suggestions.refundWebhook':'Show refund webhook',
+    'suggestions.testWebhook':'How to test webhooks locally?',
+    'suggestions.retryLogic':'Show retry logic',
+    'suggestions.webhookSecurity':'Webhook security?',
+    'suggestions.security':'Security best practices',
+    'suggestions.env':'Environment setup',
+    'suggestions.deploy':'Deployment steps',
+    'kb.title':'Knowledge Base',
+    'kb.noDocs':'No documents yet',
+    'kb.chunks':' chunks',
+    'button.newFolder':'📁',
+    'button.newChat':'＋',
+    'button.close':'✕',
+    'button.menu':'☰',
+    'token.total':'tokens',
+    'input.attach':'📎',
+    'input.voice':'🎙',
+    'feedback.up':'👍',
+    'feedback.down':'👎',
+    'document.preview':'Document Preview',
+    'document.chunks':'Document Chunks',
+    'document.relevance':'Relevance',
+    'error.copyFailed':'Copy failed',
+    'error.nameRequired':'Title required',
+    'error.folderNameEmpty':'Folder name cannot be empty',
+    'error.folderExists':'A folder with this name already exists',
+    'model.badge':'Select Model',
+    'compare.card':'Comparison',
+    'chart.daily':'Daily Messages',
+    'chart.models':'Model Usage',
+    'chart.tokens':'Token Distribution',
+    'exporting':'Exporting',
+    'syncing':'Syncing',
+    'team.name':'Name',
+    'team.role':'Role',
+    'team.online':'Online',
+    'team.offline':'Offline',
+    'room.active':'Active',
+    'room.lastActivity':'Last Activity',
+    'preview.title':'Document Preview',
+    'docs.noMatch':'No documents match',
+    'addDoc.title':'Upload Document',
+    'addDoc.editTitle':'Edit Document',
+    'addDoc.titleLabel':'Title',
+    'addDoc.typeLabel':'Type',
+    'addDoc.contentLabel':'Content',
+    'addDoc.save':'Save',
+    'addDoc.cancel':'Cancel',
+    'addDoc.namePlaceholder':'Document title...',
+    'addDoc.contentPlaceholder':'Paste document content...',
+    'prompt.applySuccess':'System prompt applied',
+    'conv.moved':'Moved to',
+    'conv.folderPrompt':'Folder name:',
+    'exported':'Exported as',
+    'members.prompt':'Members: ',
+    'settings.themeSet':'Theme: ',
+    'docs.namePlaceholder':'Document title...',
+    'docs.contentPlaceholder':'Paste document content...',
+    'doc.chunks':'Document Chunks',
+    'doc.relevance':'Relevance',
+    'kb.title':'Knowledge Base',
+    'kb.noDocs':'No documents yet',
+    'kb.chunks':' chunks',
+    'pinned.title':'Pinned',
+    'pinned.show':'Show pinned',
+    'suggestions.payment':'How do I integrate the payment API?',
+    'suggestions.pricing':'What are the pricing plans?',
+    'suggestions.code':'Show me a code example',
+    'suggestions.refund':'How do refunds work?',
+    'suggestions.webhooks':'What webhooks are available?',
+    'suggestions.errors':'Show error handling',
+    'suggestions.partial':'Can I do partial refunds?',
+    'suggestions.refundTime':'How long do refunds take?',
+    'suggestions.refundWebhook':'Show refund webhook',
+    'suggestions.testWebhook':'How to test webhooks locally?',
+    'suggestions.retryLogic':'Show retry logic',
+    'suggestions.webhookSecurity':'Webhook security?',
+    'suggestions.security':'Security best practices',
+    'suggestions.env':'Environment setup',
+    'suggestions.deploy':'Deployment steps',
+    'document.preview':'Document Preview',
+    'document.chunks':'Document Chunks',
+    'document.relevance':'Relevance',
+    'error.copyFailed':'Copy failed',
+    'error.nameRequired':'Title required',
+    'error.folderNameEmpty':'Folder name cannot be empty',
+    'error.folderExists':'A folder with this name already exists',
+    'model.badge':'Select Model',
+    'compare.card':'Comparison',
+    'chart.daily':'Daily Messages',
+    'chart.models':'Model Usage',
+    'chart.tokens':'Token Distribution',
+    'exporting':'Exporting',
+    'syncing':'Syncing',
+    'team.name':'Name',
+    'team.role':'Role',
+    'team.online':'Online',
+    'team.offline':'Offline',
+    'room.active':'Active',
+    'room.lastActivity':'Last Activity',
+    'preview.title':'Document Preview',
+    'docs.noMatch':'No documents match',
+    'prompt.generalDesc':'Balanced, helpful responses',
+    'prompt.csDesc':'Professional support agent',
+    'prompt.codingDesc':'Expert developer mentor',
+    'prompt.creativeDesc':'Imaginative storytelling',
+    'prompt.translatorDesc':'Multi-language expert',
+    'prompt.analystDesc':'Insight-driven analysis'
+  },
+  zh:{
+    'app.title':'AI Studio',
+    'sidebar.pinned':'已置顶',
+    'sidebar.folders':'文件夹',
+    'sidebar.recent':'最近对话',
+    'sidebar.search':'搜索文档...',
+    'sidebar.upload':'📤 上传',
+    'sidebar.sync':'同步',
+    'sidebar.newFolder':'新建文件夹',
+    'sidebar.newChat':'新建对话',
+    'sidebar.close':'关闭',
+    'sidebar.noPinned':'没有置顶的对话',
+    'sidebar.noConversations':'暂无对话',
+    'sidebar.noDocs':'暂无文档',
+    'sidebar.noDocsMatch':'没有匹配"',
+    'sidebar.quote':'」的文档',
+    'chat.welcome':'今天能为您做些什么？',
+    'chat.welcomeSub':'开始一段新对话或向我提问任何问题。',
+    'chat.inputPlaceholder':'输入您的消息... (@ 提及团队成员)',
+    'chat.inputHint':'AI 回复为模拟。按 Enter 发送，Shift+Enter 换行。',
+    'chat.send':'发送',
+    'chat.newChat':'新建对话',
+    'chat.loaded':'已加载: ',
+    'chat.started':'新对话已开始',
+    'chat.typing':'AI 思考中',
+    'chat.edited':'（已编辑）',
+    'chat.copy':'📋 复制',
+    'chat.copied':'✓ 已复制',
+    'chat.regen':'🔄 重新生成',
+    'chat.edit':'✎ 编辑',
+    'chat.save':'保存',
+    'chat.cancel':'取消',
+    'chat.justNow':'刚刚',
+    'chat.searchDocs':'搜索文档...',
+    'chat.noDocsYet':'暂无文档',
+    'chat.noDocsMatchQuery':'没有文档匹配',
+    'model.gpt4':'GPT-4 Turbo',
+    'model.gpt4o':'GPT-4o',
+    'model.claude':'Claude 3.5 Sonnet',
+    'model.gemini':'Gemini 1.5 Pro',
+    'model.select':'🤖 选择模型',
+    'model.compare':'⚡ 对比模型',
+    'model.comparison':'⚡ 模型对比',
+    'model.close':'关闭',
+    'prompt.title':'🧩 系统提示词构建器',
+    'prompt.templates':'模板',
+    'prompt.custom':'自定义系统提示词',
+    'prompt.apply':'应用到对话',
+    'prompt.cancel':'取消',
+    'prompt.applySuccess':'系统提示词已应用',
+    'prompt.general':'通用助手',
+    'prompt.cs':'客户服务',
+    'prompt.coding':'编程助手',
+    'prompt.creative':'创意写作',
+    'prompt.translator':'翻译',
+    'prompt.analyst':'数据分析',
+    'export.title':'📥 导出对话',
+    'export.markdown':'Markdown',
+    'export.json':'JSON',
+    'export.pdf':'PDF',
+    'export.mdDesc':'.md 格式含排版',
+    'export.jsonDesc':'结构化数据导出',
+    'export.pdfDesc':'适合打印的格式',
+    'export.success':'已导出为 ',
+    'export.noConv':'没有可导出的对话',
+    'analytics.title':'📊 使用分析',
+    'analytics.totalMessages':'总消息数',
+    'analytics.totalTokens':'总 Token 数',
+    'analytics.totalCost':'总费用',
+    'analytics.documents':'文档数',
+    'analytics.dailyMessages':'每日消息',
+    'analytics.modelUsage':'模型使用',
+    'analytics.tokenDist':'Token 分布',
+    'analytics.noData':'暂无数据',
+    'team.title':'👥 团队与共享',
+    'team.members':'团队成员',
+    'team.rooms':'共享房间',
+    'team.admin':'管理员',
+    'team.member':'成员',
+    'settings.title':'⚙ 设置',
+    'settings.systemPrompt':'默认系统提示词',
+    'settings.theme':'主题',
+    'settings.dark':'🌙 深色',
+    'settings.light':'☀ 浅色',
+    'settings.streamSpeed':'流式速度',
+    'settings.fast':'快速',
+    'settings.normal':'正常',
+    'settings.slow':'慢速',
+    'settings.themeSet':'主题: ',
+    'confirm.title':'确认',
+    'confirm.delete':'删除',
+    'confirm.cancel':'取消',
+    'confirm.deleteConv':'删除该对话？',
+    'confirm.deleteDoc':'删除该文档？',
+    'confirm.deleteFolder':'删除文件夹？对话将取消分组。',
+    'confirm.ok':'确认',
+    'doc.chunks':'文档片段',
+    'doc.relevance':'相关度',
+    'docs.upload':'上传文档',
+    'docs.edit':'编辑文档',
+    'docs.title':'标题',
+    'docs.type':'类型',
+    'docs.content':'内容',
+    'docs.save':'保存',
+    'docs.cancel':'取消',
+    'docs.updated':'已更新',
+    'docs.uploaded':'已上传',
+    'docs.deleted':'已删除',
+    'docs.titleRequired':'标题为必填项',
+    'folder.create':'已创建文件夹',
+    'folder.name':'文件夹名称:',
+    'folder.exists':'同名文件夹已存在',
+    'folder.nameEmpty':'文件夹名称不能为空',
+    'folder.moved':'已移动到文件夹',
+    'folder.deleted':'文件夹已删除',
+    'conv.pinned':'已置顶',
+    'conv.unpinned':'已取消置顶',
+    'conv.deleted':'已删除',
+    'conv.moved':'移动到',
+    'conv.folderPrompt':'文件夹名称:',
+    'sync.success':'已同步',
+    'voice.na':'语音输入在模拟中不可用',
+    'attach.sim':'附件已模拟 — 请使用文档上传',
+    'exported':'已导出为',
+    'model.selected':'已选择模型: ',
+    'prompt.applySuccess':'系统提示词已应用',
+    'prompt.cancel':'取消',
+    'prompt.custom':'自定义系统提示词',
+    'members.prompt':'成员: ',
+    'per1kTokens':'每 1K tokens',
+    'addDoc.title':'上传文档',
+    'addDoc.editTitle':'编辑文档',
+    'addDoc.titleLabel':'标题',
+    'addDoc.typeLabel':'类型',
+    'addDoc.contentLabel':'内容',
+    'addDoc.save':'保存',
+    'addDoc.cancel':'取消',
+    'addDoc.namePlaceholder':'文档标题...',
+    'addDoc.contentPlaceholder':'粘贴文档内容...',
+    'pinned.title':'已置顶',
+    'pinned.show':'显示已置顶',
+    'suggestions.payment':'如何集成支付 API？',
+    'suggestions.pricing':'套餐价格是多少？',
+    'suggestions.code':'给我一个代码示例',
+    'suggestions.refund':'退款如何操作？',
+    'suggestions.webhooks':'有哪些 webhook 可用？',
+    'suggestions.errors':'显示错误处理',
+    'suggestions.partial':'可以部分退款吗？',
+    'suggestions.refundTime':'退款需要多长时间？',
+    'suggestions.refundWebhook':'显示退款 webhook',
+    'suggestions.testWebhook':'如何在本地测试 webhook？',
+    'suggestions.retryLogic':'显示重试逻辑',
+    'suggestions.webhookSecurity':'Webhook 安全？',
+    'suggestions.security':'安全最佳实践',
+    'suggestions.env':'环境配置',
+    'suggestions.deploy':'部署步骤',
+    'kb.title':'知识库',
+    'kb.noDocs':'暂无文档',
+    'kb.chunks':'个片段',
+    'button.newFolder':'📁',
+    'button.newChat':'＋',
+    'button.close':'✕',
+    'button.menu':'☰',
+    'token.total':'tokens',
+    'input.attach':'📎',
+    'input.voice':'🎙',
+    'feedback.up':'👍',
+    'feedback.down':'👎',
+    'document.preview':'文档预览',
+    'document.chunks':'文档片段',
+    'document.relevance':'相关度',
+    'error.copyFailed':'复制失败',
+    'error.nameRequired':'标题为必填项',
+    'error.folderNameEmpty':'文件夹名称不能为空',
+    'error.folderExists':'同名文件夹已存在',
+    'model.badge':'选择模型',
+    'prompt.generalDesc':'平衡、有用的回复',
+    'prompt.csDesc':'专业客服代理',
+    'prompt.codingDesc':'专家开发者导师',
+    'prompt.creativeDesc':'富有想象力的故事创作',
+    'prompt.translatorDesc':'多语言专家',
+    'prompt.analystDesc':'洞察驱动分析',
+    'compare.card':'对比卡片',
+    'chart.daily':'每日消息',
+    'chart.models':'模型使用',
+    'chart.tokens':'Token 分布',
+    'exporting':'导出中',
+    'syncing':'同步中',
+    'team.name':'名字',
+    'team.role':'角色',
+    'team.online':'在线',
+    'team.offline':'离线',
+    'room.active':'活跃',
+    'room.lastActivity':'最后活动',
+    'preview.title':'文档预览',
+    'docs.noMatch':'没有文档匹配',
+    'prompt.generalPrompt':'你是一个有用、无害且诚实的 AI 助手。提供清晰准确的回复。',
+    'prompt.csPrompt':'你是一名专业的客服代理。要有同情心、以解决方案为导向，并在提供姓名时始终以客户名称称呼。跟进以确保满意度。',
+    'prompt.codingPrompt':'你是一名专家软件工程师。编写干净、文档完善且带有错误处理的代码。解释你的推理过程。建议最佳实践和潜在的改进。',
+    'prompt.creativePrompt':'你是一名富有想象力的创意写作者。使用丰富的描述、引人入胜的叙事和令人信服的角色。根据要求的体裁调整语气。',
+    'prompt.translatorPrompt':'你是一名专家翻译。准确翻译文本，同时保留语气、习语和文化背景。在相关时解释细微差别。',
+    'prompt.analystPrompt':'你是一名数据分析专家。提供数据驱动的见解，识别趋势，并以视觉描述清晰地呈现发现。始终引用你的推理过程。'
+  },
+  ja:{
+    'app.title':'AI Studio',
+    'sidebar.pinned':'ピン留め',
+    'sidebar.folders':'フォルダ',
+    'sidebar.recent':'最近の会話',
+    'sidebar.search':'ドキュメントを検索...',
+    'sidebar.upload':'📤 アップロード',
+    'sidebar.sync':'同期',
+    'sidebar.newFolder':'新規フォルダ',
+    'sidebar.newChat':'新規チャット',
+    'sidebar.close':'閉じる',
+    'sidebar.noPinned':'ピン留めされた会話はありません',
+    'sidebar.noConversations':'会話がまだありません',
+    'sidebar.noDocs':'ドキュメントがまだありません',
+    'sidebar.noDocsMatch':'一致するドキュメントはありません「',
+    'sidebar.quote':'」',
+    'chat.welcome':'今日はどのようなお手伝いができますか？',
+    'chat.welcomeSub':'新しい会話を始めるか、何でも質問してください。',
+    'chat.inputPlaceholder':'メッセージを入力... (@ でチームメンバーをメンション)',
+    'chat.inputHint':'AI応答はシミュレーションです。Enterで送信、Shift+Enterで改行。',
+    'chat.send':'送信',
+    'chat.newChat':'新規チャット',
+    'chat.loaded':'読み込み完了: ',
+    'chat.started':'新しい会話を開始しました',
+    'chat.typing':'AIが考えています',
+    'chat.edited':'（編集済み）',
+    'chat.copy':'📋 コピー',
+    'chat.copied':'✓ コピーしました',
+    'chat.regen':'🔄 再生成',
+    'chat.edit':'✎ 編集',
+    'chat.save':'保存',
+    'chat.cancel':'キャンセル',
+    'chat.justNow':'たった今',
+    'button.newFolder':'📁',
+    'button.newChat':'＋',
+    'button.close':'✕',
+    'button.menu':'☰',
+    'token.total':'トークン',
+    'input.attach':'📎',
+    'input.voice':'🎙',
+    'settings.title':'⚙ 設定',
+    'settings.systemPrompt':'デフォルトシステムプロンプト',
+    'settings.theme':'テーマ',
+    'settings.dark':'🌙 ダーク',
+    'settings.light':'☀ ライト',
+    'settings.streamSpeed':'ストリーム速度',
+    'settings.fast':'高速',
+    'settings.normal':'通常',
+    'settings.slow':'低速',
+    'settings.themeSet':'テーマ: ',
+    'confirm.title':'確認',
+    'confirm.delete':'削除',
+    'confirm.cancel':'キャンセル',
+    'confirm.deleteConv':'この会話を削除しますか？',
+    'confirm.deleteDoc':'このドキュメントを削除しますか？',
+    'confirm.deleteFolder':'フォルダを削除しますか？会話はグループ解除されます。',
+    'chat.searchDocs':'ドキュメントを検索...',
+    'chat.noDocsYet':'ドキュメントがまだありません',
+    'chat.noDocsMatchQuery':'一致するドキュメントはありません',
+    'docs.deleted':'削除しました',
+    'docs.updated':'更新しました',
+    'docs.uploaded':'アップロードしました',
+    'docs.titleRequired':'タイトルは必須です',
+    'docs.upload':'ドキュメントをアップロード',
+    'docs.edit':'ドキュメントを編集',
+    'docs.title':'タイトル',
+    'docs.type':'タイプ',
+    'docs.content':'内容',
+    'docs.save':'保存',
+    'docs.cancel':'キャンセル',
+    'docs.namePlaceholder':'ドキュメントタイトル...',
+    'docs.contentPlaceholder':'ドキュメント内容を貼り付け...',
+    'model.select':'🤖 モデル選択',
+    'model.compare':'⚡ モデル比較',
+    'model.comparison':'⚡ モデル比較',
+    'model.close':'閉じる',
+    'model.selected':'選択モデル: ',
+    'model.gpt4':'GPT-4 Turbo',
+    'model.gpt4o':'GPT-4o',
+    'model.claude':'Claude 3.5 Sonnet',
+    'model.gemini':'Gemini 1.5 Pro',
+    'prompt.title':'🧩 システムプロンプトビルダー',
+    'prompt.templates':'テンプレート',
+    'prompt.custom':'カスタムシステムプロンプト',
+    'prompt.apply':'会話に適用',
+    'prompt.cancel':'キャンセル',
+    'prompt.applySuccess':'システムプロンプトを適用しました',
+    'prompt.general':'汎用アシスタント',
+    'prompt.cs':'カスタマーサービス',
+    'prompt.coding':'コーディングアシスタント',
+    'prompt.creative':'クリエイティブライター',
+    'prompt.translator':'翻訳',
+    'prompt.analyst':'データ分析',
+    'prompt.generalDesc':'バランスの取れた有用な応答',
+    'prompt.csDesc':'プロフェッショナルなサポートエージェント',
+    'prompt.codingDesc':'エキスパート開発者メンター',
+    'prompt.creativeDesc':'想像力豊かなストーリーテリング',
+    'prompt.translatorDesc':'多言語エキスパート',
+    'prompt.analystDesc':'洞察駆動の分析',
+    'export.title':'📥 会話をエクスポート',
+    'export.markdown':'Markdown',
+    'export.json':'JSON',
+    'export.pdf':'PDF',
+    'export.mdDesc':'.md 書式付き形式',
+    'export.jsonDesc':'構造化データエクスポート',
+    'export.pdfDesc':'印刷に適した形式',
+    'export.success':'としてエクスポートしました ',
+    'export.noConv':'エクスポートする会話がありません',
+    'analytics.title':'📊 使用状況分析',
+    'analytics.totalMessages':'総メッセージ数',
+    'analytics.totalTokens':'総トークン数',
+    'analytics.totalCost':'総費用',
+    'analytics.documents':'ドキュメント数',
+    'analytics.dailyMessages':'日別メッセージ',
+    'analytics.modelUsage':'モデル使用状況',
+    'analytics.tokenDist':'トークン分布',
+    'analytics.noData':'データがまだありません',
+    'team.title':'👥 チームと共有',
+    'team.members':'チームメンバー',
+    'team.rooms':'共有ルーム',
+    'team.admin':'管理者',
+    'team.member':'メンバー',
+    'confirm.ok':'確認',
+    'confirm.cancel':'キャンセル',
+    'conv.pinned':'ピン留めしました',
+    'conv.unpinned':'ピン留め解除しました',
+    'conv.deleted':'削除しました',
+    'folder.create':'フォルダを作成しました',
+    'folder.name':'フォルダ名:',
+    'folder.exists':'同じ名前のフォルダが既に存在します',
+    'folder.nameEmpty':'フォルダ名は空にできません',
+    'folder.moved':'フォルダに移動しました',
+    'folder.deleted':'フォルダを削除しました',
+    'sync.success':'同期しました',
+    'voice.na':'音声入力はシミュレーションでは利用できません',
+    'attach.sim':'添付ファイルはシミュレーションです — ドキュメントアップロードを使用してください',
+    'exported':'エクスポートしました',
+    'error.copyFailed':'コピーに失敗しました',
+    'docs.titleRequired':'タイトルは必須です',
+    'error.folderNameEmpty':'フォルダ名は空にできません',
+    'error.folderExists':'同じ名前のフォルダが既に存在します',
+    'model.badge':'モデル選択',
+    'per1kTokens':'1K トークンあたり',
+    'addDoc.title':'ドキュメントをアップロード',
+    'addDoc.editTitle':'ドキュメントを編集',
+    'addDoc.titleLabel':'タイトル',
+    'addDoc.typeLabel':'タイプ',
+    'addDoc.contentLabel':'内容',
+    'addDoc.save':'保存',
+    'addDoc.cancel':'キャンセル',
+    'addDoc.namePlaceholder':'ドキュメントタイトル...',
+    'addDoc.contentPlaceholder':'ドキュメント内容を貼り付け...',
+    'pinned.title':'ピン留め',
+    'pinned.show':'ピン留めを表示',
+    'prompt.generalPrompt':'あなたは役立つ、無害で、誠実なAIアシスタントです。明確で正確な応答を提供してください。',
+    'prompt.csPrompt':'あなたはプロフェッショナルなカスタマーサービスエージェントです。共感的で、解決志向であり、名前が提供された場合は常に顧客の名前で対応してください。満足を確認するフォローアップを行ってください。',
+    'prompt.codingPrompt':'あなたはエキスパートソフトウェアエンジニアです。エラーハンドリングを含むクリーンで文書化されたコードを書いてください。あなたの思考プロセスを説明してください。ベストプラクティスと改善点を提案してください。',
+    'prompt.creativePrompt':'あなたは豊かな想像力を持つクリエイティブライターです。豊かな描写、魅力的なナラティブ、説得力のあるキャラクターを使用してください。要求されたジャンルに合わせてトーンを調整してください。',
+    'prompt.translatorPrompt':'あなたはエキスパート翻訳者です。トーン、イディオム、文化的コンテキストを保持しながら正確に翻訳してください。関連する場合にニュアンスを説明してください。',
+    'prompt.analystPrompt':'あなたはデータ分析エキスパートです。データ駆動の洞察を提供し、トレンドを特定し、視覚的な説明とともに明確に調査結果を提示してください。常にあなたの推論を引用してください。',
+    'doc.chunks':'ドキュメントチャンク',
+    'doc.relevance':'関連性',
+    'conv.moved':'移動しました',
+    'conv.folderPrompt':'フォルダ名:',
+    'suggestions.payment':'決済APIの連携方法は？',
+    'suggestions.pricing':'料金プランを教えてください',
+    'suggestions.code':'コード例を見せてください',
+    'suggestions.refund':'返金の流れを教えてください',
+    'suggestions.webhooks':'利用可能なwebhookは？',
+    'suggestions.errors':'エラー処理を表示',
+    'suggestions.partial':'部分返金は可能ですか？',
+    'suggestions.refundTime':'返金にはどのくらいかかりますか？',
+    'suggestions.refundWebhook':'返金webhookを表示',
+    'suggestions.testWebhook':'webhookをローカルでテストする方法は？',
+    'suggestions.retryLogic':'リトライロジックを表示',
+    'suggestions.webhookSecurity':'Webhookセキュリティは？',
+    'suggestions.security':'セキュリティのベストプラクティス',
+    'suggestions.env':'環境設定',
+    'suggestions.deploy':'デプロイ手順',
+    'kb.title':'ナレッジベース',
+    'kb.noDocs':'ドキュメントがまだありません',
+    'kb.chunks':'チャンク',
+    'feedback.up':'👍',
+    'feedback.down':'👎',
+    'document.preview':'ドキュメントプレビュー',
+    'document.chunks':'ドキュメントチャンク',
+    'document.relevance':'関連性',
+    'error.nameRequired':'タイトルは必須です',
+    'compare.card':'比較',
+    'chart.daily':'日別メッセージ',
+    'chart.models':'モデル使用状況',
+    'chart.tokens':'トークン分布',
+    'exporting':'エクスポート中',
+    'syncing':'同期中',
+    'team.name':'名前',
+    'team.role':'役割',
+    'team.online':'オンライン',
+    'team.offline':'オフライン',
+    'room.active':'アクティブ',
+    'room.lastActivity':'最終アクティビティ',
+    'preview.title':'ドキュメントプレビュー',
+    'docs.noMatch':'一致するドキュメントはありません',
+    'members.prompt':'メンバー: '
+  },
+  ko:{
+    'app.title':'AI Studio',
+    'sidebar.pinned':'고정됨',
+    'sidebar.folders':'폴더',
+    'sidebar.recent':'최근 대화',
+    'sidebar.search':'문서 검색...',
+    'sidebar.upload':'📤 업로드',
+    'sidebar.sync':'동기화',
+    'sidebar.newFolder':'새 폴더',
+    'sidebar.newChat':'새 채팅',
+    'sidebar.close':'닫기',
+    'sidebar.noPinned':'고정된 대화가 없습니다',
+    'sidebar.noConversations':'대화가 아직 없습니다',
+    'sidebar.noDocs':'문서가 아직 없습니다',
+    'sidebar.noDocsMatch':'일치하는 문서가 없습니다 "',
+    'sidebar.quote':'"',
+    'chat.welcome':'오늘 무엇을 도와드릴까요?',
+    'chat.welcomeSub':'새 대화를 시작하거나 무엇이든 물어보세요.',
+    'chat.inputPlaceholder':'메시지를 입력하세요... (@로 팀원 언급)',
+    'chat.inputHint':'AI 응답은 시뮬레이션입니다. Enter로 전송, Shift+Enter로 줄바꿈.',
+    'chat.send':'전송',
+    'chat.newChat':'새 채팅',
+    'chat.loaded':'불러옴: ',
+    'chat.started':'새 대화를 시작했습니다',
+    'chat.typing':'AI가 생각 중입니다',
+    'chat.edited':'（수정됨）',
+    'chat.copy':'📋 복사',
+    'chat.copied':'✓ 복사됨',
+    'chat.regen':'🔄 재생성',
+    'chat.edit':'✎ 수정',
+    'chat.save':'저장',
+    'chat.cancel':'취소',
+    'chat.justNow':'방금 전',
+    'chat.searchDocs':'문서 검색...',
+    'chat.noDocsYet':'문서가 아직 없습니다',
+    'chat.noDocsMatchQuery':'일치하는 문서가 없습니다',
+    'button.newFolder':'📁',
+    'button.newChat':'＋',
+    'button.close':'✕',
+    'button.menu':'☰',
+    'token.total':'토큰',
+    'input.attach':'📎',
+    'input.voice':'🎙',
+    'settings.title':'⚙ 설정',
+    'settings.systemPrompt':'기본 시스템 프롬프트',
+    'settings.theme':'테마',
+    'settings.dark':'🌙 다크',
+    'settings.light':'☀ 라이트',
+    'settings.streamSpeed':'스트리밍 속도',
+    'settings.fast':'빠름',
+    'settings.normal':'보통',
+    'settings.slow':'느림',
+    'settings.themeSet':'테마: ',
+    'confirm.title':'확인',
+    'confirm.delete':'삭제',
+    'confirm.cancel':'취소',
+    'confirm.deleteConv':'이 대화를 삭제하시겠습니까?',
+    'confirm.deleteDoc':'이 문서를 삭제하시겠습니까?',
+    'confirm.deleteFolder':'폴더를 삭제하시겠습니까? 대화는 그룹 해제됩니다.',
+    'docs.deleted':'삭제됨',
+    'docs.updated':'업데이트됨',
+    'docs.uploaded':'업로드됨',
+    'docs.titleRequired':'제목은 필수입니다',
+    'model.select':'🤖 모델 선택',
+    'model.compare':'⚡ 모델 비교',
+    'model.comparison':'⚡ 모델 비교',
+    'model.close':'닫기',
+    'model.selected':'선택 모델: ',
+    'model.gpt4':'GPT-4 Turbo',
+    'model.gpt4o':'GPT-4o',
+    'model.claude':'Claude 3.5 Sonnet',
+    'model.gemini':'Gemini 1.5 Pro',
+    'prompt.title':'🧩 시스템 프롬프트 빌더',
+    'prompt.templates':'템플릿',
+    'prompt.custom':'커스텀 시스템 프롬프트',
+    'prompt.apply':'대화에 적용',
+    'prompt.cancel':'취소',
+    'prompt.applySuccess':'시스템 프롬프트가 적용되었습니다',
+    'prompt.general':'일반 어시스턴트',
+    'prompt.cs':'고객 서비스',
+    'prompt.coding':'코딩 어시스턴트',
+    'prompt.creative':'크리에이티브 라이터',
+    'prompt.translator':'번역',
+    'prompt.analyst':'데이터 분석',
+    'prompt.generalDesc':'균형 잡히고 유용한 응답',
+    'prompt.csDesc':'전문 지원 에이전트',
+    'prompt.codingDesc':'전문 개발자 멘토',
+    'prompt.creativeDesc':'상상력 넘치는 스토리텔링',
+    'prompt.translatorDesc':'다국어 전문가',
+    'prompt.analystDesc':'통찰력 기반 분석',
+    'export.title':'📥 대화 내보내기',
+    'export.markdown':'Markdown',
+    'export.json':'JSON',
+    'export.pdf':'PDF',
+    'export.mdDesc':'.md 형식 포함',
+    'export.jsonDesc':'구조화된 데이터 내보내기',
+    'export.pdfDesc':'인쇄 친화적 형식',
+    'export.success':'로 내보냈습니다 ',
+    'export.noConv':'내보낼 대화가 없습니다',
+    'analytics.title':'📊 사용 분석',
+    'analytics.totalMessages':'총 메시지 수',
+    'analytics.totalTokens':'총 토큰 수',
+    'analytics.totalCost':'총 비용',
+    'analytics.documents':'문서 수',
+    'analytics.dailyMessages':'일별 메시지',
+    'analytics.modelUsage':'모델 사용',
+    'analytics.tokenDist':'토큰 분포',
+    'analytics.noData':'데이터가 아직 없습니다',
+    'team.title':'👥 팀 및 공유',
+    'team.members':'팀 멤버',
+    'team.rooms':'공유 룸',
+    'team.admin':'관리자',
+    'team.member':'멤버',
+    'confirm.ok':'확인',
+    'conv.pinned':'고정됨',
+    'conv.unpinned':'고정 해제됨',
+    'conv.deleted':'삭제됨',
+    'folder.create':'폴더가 생성되었습니다',
+    'folder.name':'폴더 이름:',
+    'folder.exists':'같은 이름의 폴더가 이미 존재합니다',
+    'folder.nameEmpty':'폴더 이름은 비워둘 수 없습니다',
+    'folder.moved':'폴더로 이동됨',
+    'folder.deleted':'폴더가 삭제되었습니다',
+    'sync.success':'동기화 완료',
+    'voice.na':'음성 입력은 시뮬레이션에서 사용할 수 없습니다',
+    'attach.sim':'첨부 파일은 시뮬레이션입니다 — 문서 업로드를 사용하세요',
+    'exported':'로 내보냄',
+    'error.copyFailed':'복사 실패',
+    'error.folderNameEmpty':'폴더 이름은 비워둘 수 없습니다',
+    'error.folderExists':'같은 이름의 폴더가 이미 존재합니다',
+    'model.badge':'모델 선택',
+    'per1kTokens':'1K 토큰당',
+    'addDoc.title':'문서 업로드',
+    'addDoc.editTitle':'문서 편집',
+    'addDoc.titleLabel':'제목',
+    'addDoc.typeLabel':'유형',
+    'addDoc.contentLabel':'내용',
+    'addDoc.save':'저장',
+    'addDoc.cancel':'취소',
+    'addDoc.namePlaceholder':'문서 제목...',
+    'addDoc.contentPlaceholder':'문서 내용 붙여넣기...',
+    'pinned.title':'고정됨',
+    'pinned.show':'고정 표시',
+    'prompt.generalPrompt':'당신은 유용하고, 해롭지 않으며, 정직한 AI 어시스턴트입니다. 명확하고 정확한 응답을 제공하세요.',
+    'prompt.csPrompt':'당신은 전문 고객 서비스 에이전트입니다. 공감적이고, 해결 지향적이며, 이름이 제공된 경우 항상 고객 이름으로 호칭하세요. 만족을 확인하기 위해 후속 조치하세요.',
+    'prompt.codingPrompt':'당신은 전문 소프트웨어 엔지니어입니다. 오류 처리를 포함한 깨끗하고 문서화된 코드를 작성하세요. 당신의 추론 과정을 설명하세요. 모범 사례와 개선 사항을 제안하세요.',
+    'prompt.creativePrompt':'당신은 생생한 상상력을 가진 크리에이티브 라이터입니다. 풍부한 설명, 매력적인 내러티브, 설득력 있는 캐릭터를 사용하세요. 요청된 장르에 맞게 어조를 조정하세요.',
+    'prompt.translatorPrompt':'당신은 전문 번역가입니다. 어조, 관용구, 문화적 맥락을 유지하면서 정확하게 번역하세요. 관련된 경우 뉘앙스를 설명하세요.',
+    'prompt.analystPrompt':'당신은 데이터 분석 전문가입니다. 데이터 기반 통찰력을 제공하고, 트렌드를 식별하며, 시각적 설명과 함께 명확하게 결과를 제시하세요. 항상 당신의 추론을 인용하세요.',
+    'doc.chunks':'문서 청크',
+    'doc.relevance':'관련성',
+    'docs.upload':'문서 업로드',
+    'docs.edit':'문서 편집',
+    'docs.title':'제목',
+    'docs.type':'유형',
+    'docs.content':'내용',
+    'docs.save':'저장',
+    'docs.cancel':'취소',
+    'docs.namePlaceholder':'문서 제목...',
+    'docs.contentPlaceholder':'문서 내용 붙여넣기...',
+    'conv.moved':'이동됨',
+    'conv.folderPrompt':'폴더 이름:',
+    'suggestions.payment':'결제 API 연동 방법은?',
+    'suggestions.pricing':'요금제를 알려주세요',
+    'suggestions.code':'코드 예시를 보여주세요',
+    'suggestions.refund':'환불은 어떻게 되나요?',
+    'suggestions.webhooks':'사용 가능한 webhook은?',
+    'suggestions.errors':'오류 처리 보기',
+    'suggestions.partial':'부분 환불이 가능한가요?',
+    'suggestions.refundTime':'환불은 얼마나 걸리나요?',
+    'suggestions.refundWebhook':'환불 webhook 보기',
+    'suggestions.testWebhook':'로컬에서 webhook 테스트 방법?',
+    'suggestions.retryLogic':'재시도 로직 보기',
+    'suggestions.webhookSecurity':'Webhook 보안?',
+    'suggestions.security':'보안 모범 사례',
+    'suggestions.env':'환경 설정',
+    'suggestions.deploy':'배포 단계',
+    'kb.title':'지식 베이스',
+    'kb.noDocs':'문서가 아직 없습니다',
+    'kb.chunks':'청크',
+    'feedback.up':'👍',
+    'feedback.down':'👎',
+    'document.preview':'문서 미리보기',
+    'document.chunks':'문서 청크',
+    'document.relevance':'관련성',
+    'error.nameRequired':'제목은 필수입니다',
+    'compare.card':'비교',
+    'chart.daily':'일별 메시지',
+    'chart.models':'모델 사용',
+    'chart.tokens':'토큰 분포',
+    'exporting':'내보내는 중',
+    'syncing':'동기화 중',
+    'team.name':'이름',
+    'team.role':'역할',
+    'team.online':'온라인',
+    'team.offline':'오프라인',
+    'room.active':'활성',
+    'room.lastActivity':'마지막 활동',
+    'preview.title':'문서 미리보기',
+    'docs.noMatch':'일치하는 문서가 없습니다',
+    'members.prompt':'멤버: '
+  }
+};
+(function(){
+var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+var MODELS=[
+  {id:'gpt4',name:'GPT-4 Turbo',provider:'OpenAI',family:'gpt',speed:30,costIn:0.01,costOut:0.03,color:'#22c55e',icon:'🟢',
+   style:function(t){return 'Based on my analysis, here is a comprehensive response:\n\n'+t+'\n\nI hope this helps! Let me know if you need further clarification on any of these points.'}},
+  {id:'gpt4o',name:'GPT-4o',provider:'OpenAI',family:'gpt',speed:20,costIn:0.005,costOut:0.015,color:'#22c55e',icon:'🟢',
+   style:function(t){return 'Here\'s what I found:\n\n'+t+'\n\nFeel free to ask follow-up questions!'}},
+  {id:'claude',name:'Claude 3.5 Sonnet',provider:'Anthropic',family:'claude',speed:25,costIn:0.003,costOut:0.015,color:'#f59e0b',icon:'🟡',
+   style:function(t){return 'I\'d be happy to help with that. Let me think through this carefully.\n\n'+t+'\n\nWould you like me to elaborate on any aspect of this?'}},
+  {id:'gemini',name:'Gemini 1.5 Pro',provider:'Google',family:'gemini',speed:22,costIn:0.00125,costOut:0.005,color:'#3b82f6',icon:'🔵',
+   style:function(t){return 'Great question! Let me break this down:\n\n'+t+'\n\nLet me know if you\'d like to explore any of these topics further.'}}
+];
+
+var PROMPT_TEMPLATES=[
+  {id:'default',name:'General Assistant',icon:'🤖',desc:'Balanced, helpful responses',prompt:'You are a helpful, harmless, and honest AI assistant. Provide clear and accurate responses.'},
+  {id:'cs',name:'Customer Service',icon:'🎧',desc:'Professional support agent',prompt:'You are a professional customer service agent. Be empathetic, solution-oriented, and always address the customer by name when provided. Follow up to ensure satisfaction.'},
+  {id:'coding',name:'Coding Assistant',icon:'💻',desc:'Expert developer mentor',prompt:'You are an expert software engineer. Write clean, well-documented code with error handling. Explain your reasoning. Suggest best practices and potential improvements.'},
+  {id:'creative',name:'Creative Writer',icon:'✍️',desc:'Imaginative storytelling',prompt:'You are a creative writer with a vivid imagination. Use rich descriptions, engaging narratives, and compelling characters. Adapt your tone to the requested genre.'},
+  {id:'translator',name:'Translator',icon:'🌍',desc:'Multi-language expert',prompt:'You are an expert translator. Translate text accurately while preserving tone, idioms, and cultural context. Explain nuances when relevant.'},
+  {id:'analyst',name:'Data Analyst',icon:'📊',desc:'Insight-driven analysis',prompt:'You are a data analyst expert. Provide data-driven insights, identify trends, and present findings clearly with visual descriptions. Always cite your reasoning.'}
+];
+
+var TEAM_MEMBERS=[
+  {id:'u1',name:'Alice Chen',avatar:'AC',color:'#8b5cf6',role:'Admin',online:true},
+  {id:'u2',name:'Bob Smith',avatar:'BS',color:'#3b82f6',role:'Member',online:true},
+  {id:'u3',name:'Carol Wu',avatar:'CW',color:'#ec4899',role:'Member',online:false},
+  {id:'u4',name:'Dave Park',avatar:'DP',color:'#22c55e',role:'Member',online:true}
+];
+
+var SHARED_ROOMS=[
+  {id:'sr1',name:'API Design Discussion',members:['u1','u2','u3'],lastActivity:Date.now()-1800000},
+  {id:'sr2',name:'Sprint Planning Bot',members:['u1','u2','u4'],lastActivity:Date.now()-7200000}
+];
+
+var state={
+  conversations:LS.get('ai_conv',[]),
+  folders:LS.get('ai_folders',[]),
+  knowledge:LS.get('ai_kb',[]),
+  analytics:LS.get('ai_analytics',{dailyMessages:[],modelUsage:{},tokenHistory:[],costHistory:[],sessions:[]}),
+  settings:LS.get('ai_settings',{model:'gpt4',temperature:0.7,maxTokens:2048,systemPrompt:'You are a helpful AI assistant.',theme:'dark',streamSpeed:'normal'}),
+  currentConvId:null,
+  isTyping:false,
+  editingDocId:null,
+  dragConvId:null,
+  currentUser:{id:'u1',name:'Alice Chen'}
+};
+
+function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,8)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtTime(ts){var d=new Date(ts),h=d.getHours(),m=d.getMinutes(),ap=h>=12?'PM':'AM';return (h%12||12)+':'+(m<10?'0':'')+m+' '+ap}
+function timeAgo(ts){var d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return 'Just now';if(m<60)return m+'m';var h=Math.floor(m/60);if(h<24)return h+'h';var dd=Math.floor(h/24);if(dd<7)return dd+'d';return new Date(ts).toLocaleDateString()}
+function getModel(id){return MODELS.find(function(m){return m.id===id})||MODELS[0]}
+function countTokens(text){return Math.ceil(text.length*0.4)}
+function calcCost(tokens,model,isOutput){return isOutput?tokens*(model.costOut/1000):tokens*(model.costIn/1000)}
+
+if(!state.conversations.length){
+  var now=Date.now();
+  state.conversations=[
+    {id:genId(),title:'Payment API Integration',folderId:null,pinned:true,model:'gpt4',systemPrompt:'',messages:[
+      {role:'user',content:'How do I integrate the payment API?',timestamp:now-3600000,feedback:'none',edited:false,tokens:8},
+      {role:'assistant',content:'Great question! Here\'s a step-by-step guide:\n\n**1. Get your API key**\nNavigate to `Settings → API Keys` and generate a new key.\n\n**2. Install the SDK**\n```bash\nnpm install @acme/payments-sdk\n```\n\n**3. Initialize the client**\n```javascript\nconst client = new PaymentClient({\n  apiKey: process.env.PAYMENT_API_KEY,\n  environment: \'sandbox\',\n});\n```\n\nCheck the Authentication section for full details.',timestamp:now-3590000,feedback:'up',edited:false,tokens:85,model:'gpt4'},
+      {role:'user',content:'What are the pricing plans?',timestamp:now-3500000,feedback:'none',edited:false,tokens:6},
+      {role:'assistant',content:'We offer three flexible tiers:\n\n| Plan | Price/mo | API Calls | Features |\n|------|----------|-----------|----------|\n| Starter | $29 | 10,000 | Basic analytics, email support |\n| Pro | $99 | 100,000 | Advanced analytics, priority support |\n| Enterprise | Custom | Unlimited | Dedicated support, SLA |\n\nAll plans include **SSL encryption** and **PCI DSS compliance**.',timestamp:now-3490000,feedback:'none',edited:false,tokens:95,model:'gpt4'}
+    ],createdAt:now-3600000,updatedAt:now-3490000},
+    {id:genId(),title:'Analytics Dashboard Setup',folderId:null,pinned:false,model:'claude',systemPrompt:'',messages:[
+      {role:'user',content:'How do I set up the analytics dashboard?',timestamp:now-86400000,feedback:'none',edited:false,tokens:9},
+      {role:'assistant',content:'I\'d be happy to help with that. Let me think through this carefully.\n\nTo set up the analytics dashboard:\n\n**1.** Enable the Analytics module in project settings\n**2.** Configure data sources (databases, APIs, streaming)\n**3.** Choose dashboard templates or create custom widgets\n**4.** Set up automated reports and KPI alerts\n\nWould you like me to elaborate on any aspect of this?',timestamp:now-86300000,feedback:'none',edited:false,tokens:72,model:'claude'}
+    ],createdAt:now-86400000,updatedAt:now-86300000}
+  ];
+  LS.set('ai_conv',state.conversations);
+}
+
+if(!state.folders.length){
+  state.folders=[
+    {id:'f1',name:'Development',createdAt:Date.now()-86400000},
+    {id:'f2',name:'Research',createdAt:Date.now()-172800000}
+  ];
+  state.conversations[1].folderId='f1';
+  LS.set('ai_folders',state.folders);
+  LS.set('ai_conv',state.conversations);
+}
+
+if(!state.knowledge.length){
+  state.knowledge=[
+    {id:'k1',title:'FAQ.pdf',type:'pdf',content:'Frequently asked questions covering pricing, integration, security, and support policies. 24 pages.',createdAt:Date.now()-7200000,updatedAt:Date.now()-7200000,chunks:[
+      {id:'c1',text:'Q: What is the pricing? A: We offer Starter ($29/mo), Pro ($99/mo), and Enterprise plans.',score:0.95},
+      {id:'c2',text:'Q: How do I get support? A: Email support@acme.dev or use the in-app chat for priority assistance.',score:0.88},
+      {id:'c3',text:'Q: Is there a free trial? A: Yes, 14-day free trial on all plans with full feature access.',score:0.82}
+    ]},
+    {id:'k2',title:'Product Docs.md',type:'md',content:'Complete product documentation including API reference, SDK guides, and configuration options.',createdAt:Date.now()-86400000,updatedAt:Date.now()-86400000,chunks:[
+      {id:'c4',text:'The PaymentClient SDK supports Node.js 18+ and all modern browsers.',score:0.91},
+      {id:'c5',text:'Webhook signatures use HMAC-SHA256. Always verify before processing.',score:0.87}
+    ]},
+    {id:'k3',title:'API Reference.html',type:'html',content:'REST API endpoints, authentication methods, request/response schemas, and error codes.',createdAt:Date.now()-259200000,updatedAt:Date.now()-259200000,chunks:[
+      {id:'c6',text:'POST /v1/payments — Create a new payment intent. Requires Bearer token authentication.',score:0.93},
+      {id:'c7',text:'Rate limit: 1000 requests per minute per API key. Exceeding returns HTTP 429.',score:0.79}
+    ]},
+    {id:'k4',title:'Changelog.txt',type:'txt',content:'Version history with breaking changes, new features, and bug fixes.',createdAt:Date.now()-604800000,updatedAt:Date.now()-604800000,chunks:[]},
+    {id:'k5',title:'Config Guide.json',type:'json',content:'Configuration schema with environment variables and deployment settings.',createdAt:Date.now()-1209600000,updatedAt:Date.now()-1209600000,chunks:[]},
+    {id:'k6',title:'Pricing Data.csv',type:'csv',content:'Current pricing tiers, volume discounts, and add-on costs across all regions.',createdAt:Date.now()-1814400000,updatedAt:Date.now()-1814400000,chunks:[]}
+  ];
+  LS.set('ai_kb',state.knowledge);
+}
+
+function persist(){
+  LS.set('ai_conv',state.conversations);
+  LS.set('ai_folders',state.folders);
+  LS.set('ai_kb',state.knowledge);
+  LS.set('ai_analytics',state.analytics);
+  LS.set('ai_settings',state.settings);
+}
+
+function toast(msg,type){
+  type=type||'info';
+  var c=document.getElementById('toastContainer');
+  var t=document.createElement('div');t.className='toast '+type;t.textContent=msg;c.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(function(){t.remove()},300)},3000);
+}
+
+var confirmCb=null;
+function showConfirm(title,msg,cb){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  document.getElementById('confirmOverlay').classList.add('open');
+  confirmCb=cb;
+}
+document.getElementById('confirmClose').onclick=document.getElementById('confirmCancel').onclick=function(){document.getElementById('confirmOverlay').classList.remove('open');confirmCb=null};
+document.getElementById('confirmOk').onclick=function(){document.getElementById('confirmOverlay').classList.remove('open');if(confirmCb)confirmCb();confirmCb=null};
+
+function applySettings(){
+  var m=getModel(state.settings.model);
+  document.getElementById('modelName').textContent=m.name;
+  document.getElementById('modelBadge').querySelector('.model-dot').className='model-dot '+m.family;
+  document.getElementById('tempSlider').value=Math.round(state.settings.temperature*100);
+  document.getElementById('tempVal').textContent=state.settings.temperature.toFixed(1);
+  document.getElementById('maxTokensSlider').value=state.settings.maxTokens;
+  document.getElementById('maxTokensVal').textContent=state.settings.maxTokens;
+  document.getElementById('sysPrompt').value=state.settings.systemPrompt;
+  document.getElementById('streamSpeed').value=state.settings.streamSpeed;
+  document.documentElement.setAttribute('data-theme',state.settings.theme);
+  document.querySelectorAll('.theme-btn').forEach(function(b){b.classList.toggle('active',b.dataset.themeVal===state.settings.theme);if(b.dataset.themeVal===state.settings.theme){b.style.borderColor='var(--accent)';b.style.color='var(--accent)';b.style.background='rgba(139,92,246,.1)'}else{b.style.borderColor='';b.style.color='';b.style.background=''}});
+  var mobile=window.innerWidth<=768;
+  document.getElementById('menuBtn').style.display=mobile?'flex':'none';
+  document.getElementById('sidebarClose').style.display=mobile?'flex':'none';
+}
+applySettings();
+
+function openOverlay(id){document.getElementById(id).classList.add('open')}
+function closeOverlay(id){document.getElementById(id).classList.remove('open')}
+
+function hlCode(code){
+  var kw='const|let|var|function|return|if|else|for|while|import|from|export|default|new|await|async|class|extends|try|catch|throw|typeof|instanceof|switch|case|break|continue|true|false|null|undefined|this|of|in|yield|def|print|self|lambda|elif';
+  code=code.replace(new RegExp('(^|\\W)('+kw+')(?=\\W|$)','g'),'$1<span class="hl-keyword">$2</span>');
+  code=code.replace(/('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")/g,'<span class="hl-string">$1</span>');
+  code=code.replace(/(\/\/.*)/g,'<span class="hl-comment">$1</span>');
+  code=code.replace(/\b(\d+\.?\d*)\b/g,'<span class="hl-number">$1</span>');
+  code=code.replace(/\b([a-zA-Z_]\w*)\s*\(/g,'<span class="hl-function">$1</span>(');
+  code=code.replace(/\.([a-zA-Z_]\w*)/g,'.<span class="hl-property">$1</span>');
+  return code;
+}
+
+function formatMsg(text){
+  text=esc(text);
+  text=text.replace(/```(\w*)\n([\s\S]*?)```/g,function(m,lang,code){
+    var bid='cb'+genId();
+    return '<div class="code-block" data-bid="'+bid+'"><div class="code-block-header"><span>'+(lang||'code')+'</span><div class="code-block-btns"><button class="code-block-btn copy-cb-btn">📋 Copy</button><button class="code-block-btn run-btn" data-lang="'+(lang||'js')+'">▶ Run</button></div></div><pre>'+hlCode(code.trim())+'</pre><div class="code-output" id="out_'+bid+'"><div class="code-output-label">Output</div><div class="code-output-text"></div></div></div>';
+  });
+  text=text.replace(/`([^`]+)`/g,'<code>$1</code>');
+  text=text.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  text=text.replace(/@(\w+)/g,'<span class="mention-tag">@$1</span>');
+  text=text.replace(/\|(.+)\|\n\|[-| ]+\|\n((?:\|.+\|\n?)+)/g,function(m,hdr,body){
+    var ths=hdr.split('|').filter(function(s){return s.trim()}).map(function(s){return '<th>'+s.trim()+'</th>'}).join('');
+    var rows=body.trim().split('\n').map(function(r){var tds=r.split('|').filter(function(s){return s.trim()}).map(function(s){return '<td>'+s.trim()+'</td>'}).join('');return '<tr>'+tds+'</tr>'}).join('');
+    return '<table class="msg-table"><thead><tr>'+ths+'</tr></thead><tbody>'+rows+'</tbody></table>';
+  });
+  var parts=text.split('\n\n');
+  return parts.map(function(p){if(p.indexOf('<div class="code-block"')===0||p.indexOf('<table')===0)return p;return '<p>'+p.replace(/\n/g,'<br>')+'</p>'}).join('');
+}
+
+function renderConvList(){
+  var pinned=state.conversations.filter(function(c){return c.pinned}).sort(function(a,b){return b.updatedAt-a.updatedAt});
+  var recent=state.conversations.filter(function(c){return !c.pinned&&!c.folderId}).sort(function(a,b){return b.updatedAt-a.updatedAt});
+
+  var icons={'Payment':'💳','Analytics':'📊','Auth':'🔒','Webhook':'⚙','Deploy':'🚀','API':'📄','Code':'💻','Help':'❓','Debug':'🔧','Design':'🎨','Chat':'💬'};
+  function getIcon(t){for(var k in icons)if(t.indexOf(k)!==-1)return icons[k];return '💬'}
+
+  function renderItem(c){
+    return '<div class="conv-item'+(c.id===state.currentConvId?' active':'')+'" data-id="'+c.id+'" draggable="true"><div class="conv-icon">'+getIcon(c.title)+'</div><div class="conv-info"><div class="conv-name" title="'+esc(c.title)+'">'+esc(c.title)+'</div><div class="conv-time">'+timeAgo(c.updatedAt)+'</div></div><div class="conv-acts"><button class="conv-act" data-act="pin" title="'+T('conv.pinned')+'">📌</button><button class="conv-act del" data-act="del" title="'+T('confirm.delete')+'">✕</button></div></div>';
+  }
+
+  document.getElementById('pinnedList').innerHTML=pinned.length?pinned.map(renderItem).join(''):'<div style="font-size:11px;color:var(--text-muted);padding:6px 8px">'+T('sidebar.noPinned')+'</div>';
+  document.getElementById('convList').innerHTML=recent.length?recent.map(renderItem).join(''):'<div style="font-size:11px;color:var(--text-muted);padding:6px 8px">'+T('sidebar.noConversations')+'</div>';
+
+  function bindConvEvents(list){
+    list.querySelectorAll('.conv-item').forEach(function(item){
+      item.addEventListener('click',function(e){if(e.target.closest('[data-act]'))return;loadConversation(item.dataset.id)});
+      item.addEventListener('dragstart',function(e){state.dragConvId=item.dataset.id;e.dataTransfer.effectAllowed='move';item.style.opacity='.5'});
+      item.addEventListener('dragend',function(){item.style.opacity='';state.dragConvId=null});
+    });
+    list.querySelectorAll('[data-act="del"]').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();var id=btn.closest('.conv-item').dataset.id;
+        var conv=state.conversations.find(function(c){return c.id===id});
+        showConfirm(T('confirm.delete'),T('confirm.deleteConv'),function(){
+          state.conversations=state.conversations.filter(function(c){return c.id!==id});
+          persist();if(state.currentConvId===id){state.currentConvId=null;renderMessages()}renderConvList();renderFolders();toast(T('conv.deleted'),'success');
+        });
+      });
+    });
+    list.querySelectorAll('[data-act="pin"]').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();var id=btn.closest('.conv-item').dataset.id;
+        var conv=state.conversations.find(function(c){return c.id===id});
+        if(conv){conv.pinned=!conv.pinned;persist();renderConvList();renderFolders();toast(conv.pinned?T('conv.pinned'):T('conv.unpinned'),'success')}
+      });
+    });
+  }
+  bindConvEvents(document.getElementById('pinnedList'));
+  bindConvEvents(document.getElementById('convList'));
+}
+
+function renderFolders(){
+  var el=document.getElementById('folderList');
+  el.innerHTML=state.folders.map(function(f){
+    var count=state.conversations.filter(function(c){return c.folderId===f.id}).length;
+    var convs=state.conversations.filter(function(c){return c.folderId===f.id}).sort(function(a,b){return b.updatedAt-a.updatedAt});
+    var convHtml=convs.map(function(c){
+      var icons={'Payment':'💳','Analytics':'📊','Auth':'🔒','API':'📄','Code':'💻','Help':'❓','Debug':'🔧','Design':'🎨'};
+      var icon='💬';for(var k in icons)if(c.title.indexOf(k)!==-1){icon=icons[k];break}
+      return '<div class="conv-item'+(c.id===state.currentConvId?' active':'')+'" data-id="'+c.id+'" draggable="true"><div class="conv-icon">'+icon+'</div><div class="conv-info"><div class="conv-name" title="'+esc(c.title)+'">'+esc(c.title)+'</div><div class="conv-time">'+timeAgo(c.updatedAt)+'</div></div><div class="conv-acts"><button class="conv-act" data-act="pin" title="'+T('conv.pinned')+'">📌</button><button class="conv-act del" data-act="del" title="'+T('confirm.delete')+'">✕</button></div></div>';
+    }).join('');
+    return '<div class="folder-item" data-folder-id="'+f.id+'"><span class="folder-icon">📁</span><span class="folder-name">'+esc(f.name)+'</span><span class="folder-count">'+count+'</span><button class="folder-del" data-folder-del="'+f.id+'" title="'+T('folder.deleted')+'">✕</button></div><div class="conv-list folder-conv-list" data-folder="'+f.id+'" style="padding-left:18px">'+convHtml+'</div>';
+  }).join('');
+  el.querySelectorAll('.folder-item').forEach(function(fi){
+    fi.addEventListener('click',function(e){
+      if(e.target.closest('[data-folder-del]'))return;
+      var list=el.querySelector('.folder-conv-list[data-folder="'+fi.dataset.folderId+'"]');
+      if(list)list.style.display=list.style.display==='none'?'flex':'none';
+    });
+    fi.addEventListener('dragover',function(e){e.preventDefault();fi.classList.add('drag-over')});
+    fi.addEventListener('dragleave',function(){fi.classList.remove('drag-over')});
+    fi.addEventListener('drop',function(e){
+      e.preventDefault();fi.classList.remove('drag-over');
+      if(state.dragConvId){
+        var conv=state.conversations.find(function(c){return c.id===state.dragConvId});
+        if(conv){conv.folderId=fi.dataset.folderId;conv.pinned=false;persist();renderConvList();renderFolders();toast(T('folder.moved'),'success')}
+      }
+    });
+  });
+  el.querySelectorAll('[data-folder-del]').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();var fid=btn.dataset.folderDel;
+      showConfirm(T('confirm.delete'),T('confirm.deleteFolder'),function(){
+        state.conversations.forEach(function(c){if(c.folderId===fid)c.folderId=null});
+        state.folders=state.folders.filter(function(f){return f.id!==fid});
+        persist();renderConvList();renderFolders();toast(T('folder.deleted'),'success');
+      });
+    });
+  });
+  el.querySelectorAll('.conv-item').forEach(function(item){
+    item.addEventListener('click',function(e){if(e.target.closest('[data-act]'))return;loadConversation(item.dataset.id)});
+  });
+  el.querySelectorAll('[data-act="del"]').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();var id=btn.closest('.conv-item').dataset.id;
+      showConfirm('Delete','Delete this conversation?',function(){
+        state.conversations=state.conversations.filter(function(c){return c.id!==id});
+        persist();if(state.currentConvId===id){state.currentConvId=null;renderMessages()}renderConvList();renderFolders();toast('Deleted','success');
+      });
+    });
+  });
+}
+
+function loadConversation(id){
+  state.currentConvId=id;renderConvList();renderFolders();renderMessages();renderSuggestions();
+  var conv=getConv();if(conv)toast('Loaded: '+conv.title,'info');
+}
+function getConv(){return state.conversations.find(function(c){return c.id===state.currentConvId})}
+
+function newChat(){
+  var conv={id:genId(),title:'New Chat',folderId:null,pinned:false,model:state.settings.model,systemPrompt:'',messages:[],createdAt:Date.now(),updatedAt:Date.now()};
+  state.conversations.push(conv);persist();state.currentConvId=conv.id;
+  renderConvList();renderFolders();renderMessages();renderSuggestions();toast('New chat started','info');
+}
+
+function renderMessages(){
+  var el=document.getElementById('messages');
+  var conv=getConv();
+  if(!conv||conv.messages.length===0){
+    el.innerHTML='<div class="welcome-msg"><h2>How can I help you today?</h2><p>Start a new conversation or ask me anything.</p></div>';
+    updateTokenCount();return;
+  }
+  el.innerHTML=conv.messages.map(function(m,i){return buildMsgHtml(m,i)}).join('');
+  updateTokenCount();el.scrollTop=el.scrollHeight;
+}
+
+function buildMsgHtml(msg,idx){
+  var gid='g'+idx+'_'+Date.now();
+  var model=getModel(msg.model||state.settings.model);
+  var family=model.family;
+  if(msg.role==='user'){
+    var editTag=msg.edited?'<span class="msg-edited">(edited)</span>':'';
+    var toks=msg.tokens||countTokens(msg.content);
+    return '<div class="message"><div class="msg-wrapper user"><div class="msg-avatar user-av">U</div><div class="msg-content"><div class="msg-bubble" data-idx="'+idx+'">'+esc(msg.content)+editTag+'</div><div class="msg-meta"><span>'+fmtTime(msg.timestamp)+'</span><span class="msg-tokens">'+toks+' tok</span></div><div class="msg-actions"><button class="msg-action-btn edit-btn" data-idx="'+idx+'">✎ Edit</button></div></div></div></div>';
+  }
+  var fbUp=msg.feedback==='up'?' active-up':'';
+  var fbDown=msg.feedback==='down'?' active-down':'';
+  var toks=msg.tokens||countTokens(msg.content);
+  var cost=calcCost(toks,model,true).toFixed(4);
+  return '<div class="message"><div class="msg-wrapper assistant"><div class="msg-avatar ai-av">✦</div><div class="msg-content"><div class="msg-bubble" data-idx="'+idx+'">'+formatMsg(msg.content)+'</div><div class="msg-meta"><span>'+fmtTime(msg.timestamp)+'</span><span class="msg-model-tag '+family+'">'+model.name+'</span><span class="msg-tokens">'+toks+' tok · $'+cost+'</span></div><div class="msg-actions"><button class="msg-action-btn copy-btn" data-idx="'+idx+'">📋 Copy</button><button class="msg-action-btn regen-btn" data-idx="'+idx+'">🔄 Regen</button><div class="feedback-btns"><button class="feedback-btn'+fbUp+'" data-idx="'+idx+'" data-fb="up">👍</button><button class="feedback-btn'+fbDown+'" data-idx="'+idx+'" data-fb="down">👎</button></div></div></div></div></div>';
+}
+
+function updateTokenCount(){
+  var conv=getConv();
+  if(!conv){document.getElementById('tokenCount').textContent='0';document.getElementById('costBadge').textContent='$0.00';return}
+  var totalIn=0,totalOut=0,modelId=conv.model||state.settings.model;
+  conv.messages.forEach(function(m){
+    var t=m.tokens||countTokens(m.content);
+    if(m.role==='user')totalIn+=t;else totalOut+=t;
+  });
+  document.getElementById('tokenCount').textContent=(totalIn+totalOut).toLocaleString();
+  var m=getModel(modelId);
+  var cost=calcCost(totalIn,m,false)+calcCost(totalOut,m,true);
+  document.getElementById('costBadge').textContent='$'+cost.toFixed(4);
+}
+
+var AI_RESPONSES=[
+  'Here\'s a complete working example:\n\n```javascript\nconst checkout = await client.processPayment({\n  intentId: intent.id,\n  paymentMethod: { type: \'card\' }\n});\nconsole.log(checkout.status);\n```\n\nThis returns a confirmation object with the payment status.',
+  'Great question! Let me break that down:\n\n**Key Points:**\n1. Always validate input on the server side\n2. Use environment variables for sensitive config\n3. Implement proper error handling with try/catch blocks\n\nWould you like me to elaborate on any of these points?',
+  'Here\'s what I recommend:\n\n```python\nimport payments\n\nclient = payments.Client(api_key="your_key")\nresult = client.create_payment(amount=1999, currency="usd")\nprint(result.status)\n```\n\nThis ensures type safety and proper error handling.',
+  'I\'d be happy to help! Based on the documentation:\n\n• **Step 1:** Configure your webhook endpoint\n• **Step 2:** Implement signature verification\n• **Step 3:** Return a 200 status code promptly\n\nFor security, always verify the webhook signature before processing.',
+  'That\'s a common scenario. Here\'s the recommended approach:\n\n1. Use idempotency keys to prevent duplicate operations\n2. Implement exponential backoff for retries\n3. Log all API interactions for debugging\n\n```javascript\nconst result = await client.processPayment({\n  idempotencyKey: crypto.randomUUID(),\n  amount: 2999,\n  currency: \'usd\'\n});\n```',
+  'Absolutely! Here are some best practices:\n\n**Security:**\n- Never expose API keys in client-side code\n- Use HTTPS for all API calls\n- Implement rate limiting\n\n**Performance:**\n- Cache frequently accessed data\n- Use connection pooling\n- Implement pagination for large datasets'
+];
+var respIdx=0;
+
+function getContextResponse(conv){
+  var last='';var i;
+  for(i=conv.messages.length-1;i>=0;i--){if(conv.messages[i].role==='user'){last=conv.messages[i].content;break}}
+  var lower=last.toLowerCase();
+  if(lower.indexOf('refund')!==-1)return 'Here\'s how to process refunds:\n\n```javascript\nconst refund = await client.createRefund({\n  paymentIntentId: \'pi_abc123\',\n  amount: 1000,\n  reason: \'requested_by_customer\'\n});\n```\n\nRefunds typically take 5-10 business days.';
+  if(lower.indexOf('webhook')!==-1)return 'Our webhook system supports:\n\n| Event | Description |\n|-------|------------|\n| payment.created | New payment created |\n| payment.succeeded | Payment completed |\n| payment.failed | Payment declined |\n\n```javascript\napp.post(\'/webhooks\', (req, res) => {\n  const event = verifySignature(req.body, req.headers[\'sig\']);\n  handleEvent(event);\n  res.sendStatus(200);\n});\n```';
+  if(lower.indexOf('error')!==-1||lower.indexOf('debug')!==-1)return 'Common error codes:\n\n| Code | Meaning | Solution |\n|------|---------|----------|\n| 400 | Bad Request | Check body format |\n| 401 | Unauthorized | Verify API key |\n| 429 | Rate Limited | Backoff and retry |\n| 500 | Server Error | Contact support |\n\n```javascript\ntry {\n  const result = await client.createPayment(params);\n} catch (error) {\n  if (error.code === 429) await sleep(error.retryAfter * 1000);\n}\n```';
+  return AI_RESPONSES[respIdx++%AI_RESPONSES.length];
+}
+
+function getSuggestions(conv){
+  if(!conv||conv.messages.length===0)return['How do I integrate the payment API?','What are the pricing plans?','Show me a code example'];
+  var last='';var i;
+  for(i=conv.messages.length-1;i>=0;i--){if(conv.messages[i].role==='assistant'){last=conv.messages[i].content;break}}
+  var lower=last.toLowerCase();
+  if(lower.indexOf('payment')!==-1)return['How do refunds work?','What webhooks are available?','Show error handling'];
+  if(lower.indexOf('refund')!==-1)return['Can I do partial refunds?','How long do refunds take?','Show refund webhook'];
+  if(lower.indexOf('webhook')!==-1)return['How to test webhooks locally?','Show retry logic','Webhook security?'];
+  return['Security best practices','Environment setup','Deployment steps'];
+}
+
+function renderSuggestions(){
+  var el=document.getElementById('suggestions');
+  var conv=getConv();
+  var s=getSuggestions(conv);
+  el.innerHTML=s.map(function(t){return '<div class="suggestion-chip">'+esc(t)+'</div>'}).join('');
+  el.style.display='flex';
+  el.querySelectorAll('.suggestion-chip').forEach(function(chip){
+    chip.addEventListener('click',function(){
+      document.getElementById('chatInput').value=chip.textContent;
+      sendMessage();el.style.display='none';
+    });
+  });
+}
+
+function sendMessage(){
+  var input=document.getElementById('chatInput');
+  var text=input.value.trim();
+  if(!text||state.isTyping)return;
+  if(!state.currentConvId)newChat();
+  var conv=getConv();
+  var toks=countTokens(text);
+  conv.messages.push({role:'user',content:text,timestamp:Date.now(),feedback:'none',edited:false,tokens:toks,model:null});
+  conv.updatedAt=Date.now();
+  if(conv.title==='New Chat'){conv.title=text.substring(0,40);renderConvList();renderFolders()}
+  trackAnalytics('user',toks);
+  persist();input.value='';input.style.height='auto';
+  renderMessages();
+  document.getElementById('suggestions').style.display='none';
+  state.isTyping=true;showTyping();
+  var model=getModel(conv.model||state.settings.model);
+  var responseText=model.style(getContextResponse(conv));
+  var baseDelay=model.speed;
+  var speedMul=state.settings.streamSpeed==='fast'?0.5:state.settings.streamSpeed==='slow'?2:1;
+  var delay=baseDelay*speedMul;
+  setTimeout(function(){removeTyping();streamResponse(responseText,delay,conv,model)},1000+Math.random()*1000);
+}
+
+function showTyping(){
+  var el=document.getElementById('messages');
+  var div=document.createElement('div');div.className='message typing-msg';
+  div.innerHTML='<div class="msg-wrapper assistant"><div class="msg-avatar ai-av">✦</div><div class="msg-content"><div class="msg-bubble"><div class="thinking-text">AI is thinking<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span></div></div></div></div>';
+  el.appendChild(div);el.scrollTop=el.scrollHeight;
+}
+function removeTyping(){var el=document.querySelector('.typing-msg');if(el)el.remove()}
+
+function streamResponse(text,delay,conv,model){
+  if(!conv)return;
+  var msgIdx=conv.messages.length;
+  var toks=countTokens(text);
+  conv.messages.push({role:'assistant',content:'',timestamp:Date.now(),feedback:'none',edited:false,tokens:toks,model:model.id});
+  conv.updatedAt=Date.now();persist();
+  trackAnalytics('assistant',toks,model.id);
+
+  var el=document.getElementById('messages');
+  var div=document.createElement('div');div.className='message';
+  div.innerHTML='<div class="msg-wrapper assistant"><div class="msg-avatar ai-av">✦</div><div class="msg-content"><div class="msg-bubble" id="streamBubble"></div><div class="msg-meta"><span>'+fmtTime(Date.now())+'</span><span class="msg-model-tag '+model.family+'">'+model.name+'</span><span class="msg-tokens">'+toks+' tok</span></div></div></div>';
+  el.appendChild(div);el.scrollTop=el.scrollHeight;
+
+  var bubble=document.getElementById('streamBubble');
+  var chars=text.split('');var ci=0;var accumulated='';
+  function nextChar(){
+    if(ci>=chars.length){
+      conv.messages[msgIdx].content=text;persist();
+      bubble.removeAttribute('id');state.isTyping=false;
+      updateTokenCount();renderSuggestions();el.scrollTop=el.scrollHeight;return;
+    }
+    accumulated+=chars[ci];
+    if(ci%3===0||ci===chars.length-1){
+      bubble.innerHTML=formatMsg(accumulated)+'<span style="display:inline-block;width:2px;height:14px;background:var(--accent);margin-left:1px;animation:blink 1s step-end infinite;vertical-align:text-bottom"></span>';
+      el.scrollTop=el.scrollHeight;
+    }
+    ci++;
+    var d=delay+Math.random()*delay*0.5;
+    if(chars[ci-1]==='.')d+=delay*3;
+    if(chars[ci-1]==='\n')d+=delay*2;
+    setTimeout(nextChar,d);
+  }
+  nextChar();
+}
+
+function trackAnalytics(role,tokens,modelId){
+  var a=state.analytics;var today=new Date().toISOString().split('T')[0];
+  var day=a.dailyMessages.find(function(d){return d.date===today});
+  if(!day){day={date:today,count:0};a.dailyMessages.push(day)}
+  day.count++;
+  if(modelId){a.modelUsage[modelId]=(a.modelUsage[modelId]||0)+1}
+  a.tokenHistory.push({date:today,tokens:tokens,role:role,model:modelId||state.settings.model});
+  var cost=0;var m=getModel(modelId||state.settings.model);
+  cost=role==='user'?calcCost(tokens,m,false):calcCost(tokens,m,true);
+  a.costHistory.push({date:today,cost:cost});
+  if(a.dailyMessages.length>30)a.dailyMessages.shift();
+  if(a.tokenHistory.length>200)a.tokenHistory=a.tokenHistory.slice(-200);
+  if(a.costHistory.length>200)a.costHistory=a.costHistory.slice(-200);
+  persist();
+}
+
+function initMsgActions(){
+  document.getElementById('messages').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-idx]');
+    if(!btn)return;
+    var idx=parseInt(btn.dataset.idx);var conv=getConv();if(!conv||!conv.messages[idx])return;
+    if(btn.classList.contains('copy-btn')){
+      var txt=conv.messages[idx].content;
+      navigator.clipboard.writeText(txt).then(function(){btn.classList.add('copied');btn.textContent='✓ Copied';setTimeout(function(){btn.classList.remove('copied');btn.textContent='📋 Copy'},2000)}).catch(function(){toast('Copy failed','error')});
+    }
+    if(btn.classList.contains('regen-btn')){
+      if(state.isTyping)return;
+      if(conv.messages[idx].role==='assistant'){
+        conv.messages=conv.messages.slice(0,idx);persist();
+        state.isTyping=true;showTyping();
+        var model=getModel(conv.model||state.settings.model);
+        var responseText=model.style(getContextResponse(conv));
+        setTimeout(function(){removeTyping();streamResponse(responseText,model.speed,conv,model)},600);
+      }
+    }
+    if(btn.classList.contains('edit-btn')){
+      var msg=conv.messages[idx];
+      var bubble=document.querySelector('.msg-bubble[data-idx="'+idx+'"]');
+      if(!bubble||bubble.querySelector('.msg-edit-area'))return;
+      var orig=msg.content;
+      bubble.innerHTML='<div class="msg-edit-area"><textarea class="form-input">'+esc(orig)+'</textarea><button class="btn btn-primary btn-sm save-edit-btn">Save</button><button class="btn btn-secondary btn-sm cancel-edit-btn">Cancel</button></div>';
+      var ta=bubble.querySelector('textarea');
+      ta.style.height=Math.min(Math.max(ta.scrollHeight,50),200)+'px';ta.focus();
+      bubble.querySelector('.save-edit-btn').onclick=function(){
+        var val=ta.value.trim();if(!val||val===orig){renderMessages();return}
+        msg.content=val;msg.edited=true;msg.tokens=countTokens(val);msg.timestamp=Date.now();
+        persist();renderMessages();
+      };
+      bubble.querySelector('.cancel-edit-btn').onclick=function(){renderMessages()};
+    }
+    if(btn.dataset.fb==='up'||btn.dataset.fb==='down'){
+      var fb=btn.dataset.fb;
+      conv.messages[idx].feedback=conv.messages[idx].feedback===fb?'none':fb;
+      persist();renderMessages();
+    }
+  });
+
+  document.getElementById('messages').addEventListener('click',function(e){
+    var runBtn=e.target.closest('.run-btn');
+    if(runBtn){
+      var block=runBtn.closest('.code-block');
+      var output=block.querySelector('.code-output');
+      var outText=block.querySelector('.code-output-text');
+      output.classList.add('visible');
+      runBtn.textContent='⏳ Running...';
+      setTimeout(function(){
+        var fakeOutputs={
+          javascript:'→ { status: \'success\', id: \'pay_3fK9x2\', amount: 2999 }',
+          python:'→ PaymentResult(status=\'success\', amount=19.99)',
+          bash:'✓ Installed @acme/payments-sdk@2.4.1\n✓ 1 package updated',
+          default:'✓ Execution completed\n→ Output: { result: "ok" }'
+        };
+        var lang=runBtn.dataset.lang||'default';
+        outText.textContent=fakeOutputs[lang]||fakeOutputs.default;
+        runBtn.textContent='▶ Run';
+      },800+Math.random()*600);
+    }
+    var copyBtn=e.target.closest('.copy-cb-btn');
+    if(copyBtn){
+      var block=copyBtn.closest('.code-block');
+      var pre=block.querySelector('pre');
+      var text=pre.textContent;
+      navigator.clipboard.writeText(text).then(function(){
+        copyBtn.textContent='✓ Copied';setTimeout(function(){copyBtn.textContent='📋 Copy'},2000);
+      });
+    }
+  });
+}
+initMsgActions();
+
+function renderKnowledge(){
+  var el=document.getElementById('docList');
+  var q=document.getElementById('searchInput').value.trim().toLowerCase();
+  var docs=state.knowledge;
+  if(q){
+    docs=docs.map(function(d){
+      var nameMatch=d.title.toLowerCase().indexOf(q)!==-1;
+      var contentMatch=d.content.toLowerCase().indexOf(q)!==-1;
+      var chunkScore=0;
+      if(d.chunks){d.chunks.forEach(function(ch){if(ch.text.toLowerCase().indexOf(q)!==-1)chunkScore=Math.max(chunkScore,ch.score)})}
+      var rel=nameMatch?0.99:contentMatch?0.85:chunkScore;
+      return Object.assign({},d,{relevance:rel});
+    }).filter(function(d){return d.relevance>0}).sort(function(a,b){return b.relevance-a.relevance});
+  }
+  el.innerHTML=docs.map(function(d){
+    var relHtml=d.relevance?'<span class="doc-relevance">'+(d.relevance*100).toFixed(0)+'%</span>':'';
+    return '<div class="doc-item" data-docid="'+d.id+'"><div class="doc-icon '+d.type+'">'+d.type.toUpperCase().substring(0,3)+'</div><div class="doc-info"><div class="doc-name">'+esc(d.title)+'</div><div class="doc-meta">'+d.type.toUpperCase()+' · '+timeAgo(d.createdAt)+(d.chunks&&d.chunks.length?' · '+d.chunks.length+' chunks':'')+'</div></div>'+relHtml+'<div class="doc-acts"><button class="doc-act-btn view-doc-btn" data-docid="'+d.id+'" title="View">👁</button><button class="doc-act-btn edit-doc-btn" data-docid="'+d.id+'" title="Edit">✎</button><button class="doc-act-btn del-doc-btn" data-docid="'+d.id+'" title="Delete">✕</button></div></div>';
+  }).join('')||'<div style="font-size:11px;color:var(--text-muted);padding:10px;text-align:center">'+(q?'No documents match "'+esc(q)+'"':'No documents yet')+'</div>';
+
+  el.querySelectorAll('.doc-item').forEach(function(item){
+    if(!item.dataset.docid)return;
+    item.addEventListener('click',function(e){
+      if(e.target.closest('.doc-act-btn'))return;
+      openDocPreview(item.dataset.docid);
+    });
+  });
+  el.querySelectorAll('.view-doc-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();openDocPreview(btn.dataset.docid)});
+  });
+  el.querySelectorAll('.edit-doc-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();openDocEditor(btn.dataset.docid)});
+  });
+  el.querySelectorAll('.del-doc-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();var did=btn.dataset.docid;
+      showConfirm(T('confirm.delete'),T('confirm.deleteDoc'),function(){
+        state.knowledge=state.knowledge.filter(function(d){return d.id!==did});
+        persist();renderKnowledge();toast(T('docs.deleted'),'success');
+      });
+    });
+  });
+}
+
+function openDocPreview(docId){
+  var doc=state.knowledge.find(function(d){return d.id===docId});
+  if(!doc)return;
+  document.getElementById('docPreviewTitle').textContent=doc.title;
+  var html='<div style="margin-bottom:12px;padding:10px;background:var(--bg-tertiary);border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary);line-height:1.6">'+esc(doc.content)+'</div>';
+  if(doc.chunks&&doc.chunks.length){
+    html+='<h4 style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Document Chunks ('+doc.chunks.length+')</h4>';
+    html+=doc.chunks.map(function(ch){
+      return '<div class="doc-chunk"><div>'+esc(ch.text)+'</div><div class="doc-chunk-score">Relevance: '+(ch.score*100).toFixed(0)+'%</div></div>';
+    }).join('');
+  }
+  document.getElementById('docPreviewBody').innerHTML=html;
+  openOverlay('docPreviewOverlay');
+}
+
+function openDocEditor(docId){
+  var doc=docId?state.knowledge.find(function(d){return d.id===docId}):null;
+  state.editingDocId=docId;
+  document.getElementById('addDocTitle').textContent=doc?'Edit Document':'Upload Document';
+  document.getElementById('addDocName').value=doc?doc.title:'';
+  document.getElementById('addDocType').value=doc?doc.type:'txt';
+  document.getElementById('addDocContent').value=doc?doc.content:'';
+  openOverlay('addDocOverlay');
+}
+
+function initModals(){
+  document.getElementById('modelBadge').onclick=function(){openOverlay('modelOverlay');renderModelSelector()};
+  document.getElementById('compareModelsBtn').onclick=function(){
+    closeOverlay('modelOverlay');openOverlay('compareOverlay');renderCompare();
+  };
+  document.getElementById('promptBuilderBtn').onclick=function(){openOverlay('promptOverlay');renderPromptTemplates()};
+  document.getElementById('exportBtn').onclick=function(){openOverlay('exportOverlay')};
+  document.getElementById('analyticsBtn').onclick=function(){openOverlay('analyticsOverlay');renderAnalytics()};
+  document.getElementById('teamBtn').onclick=function(){openOverlay('teamOverlay');renderTeam()};
+  document.getElementById('settingsBtn').onclick=function(){openOverlay('settingsOverlay')};
+  document.getElementById('settingsClose').onclick=function(){closeOverlay('settingsOverlay')};
+
+  document.getElementById('promptApplyBtn').onclick=function(){
+    var txt=document.getElementById('promptBuilderText').value.trim();
+    if(txt){state.settings.systemPrompt=txt;var conv=getConv();if(conv)conv.systemPrompt=txt;persist();toast('System prompt applied','success');closeOverlay('promptOverlay')}
+  };
+
+  document.querySelectorAll('.export-card').forEach(function(card){
+    card.addEventListener('click',function(){doExport(card.dataset.format)});
+  });
+
+  document.getElementById('syncBtn').onclick=function(){this.classList.add('syncing');var self=this;setTimeout(function(){self.classList.remove('syncing');toast('Synced','success')},1500)};
+
+  document.getElementById('uploadBtn').onclick=function(){state.editingDocId=null;openDocEditor(null)};
+
+  document.getElementById('addDocClose').onclick=function(){closeOverlay('addDocOverlay')};
+  document.getElementById('addDocCancelBtn').onclick=function(){closeOverlay('addDocOverlay')};
+  document.getElementById('addDocSaveBtn').onclick=function(){
+    var name=document.getElementById('addDocName').value.trim();
+    var type=document.getElementById('addDocType').value;
+    var content=document.getElementById('addDocContent').value.trim();
+    if(!name){toast('Title required','error');return}
+    var chunks=[];if(content){
+      var lines=content.split(/[.\n]/);var chunk=[];
+      for(var i=0;i<lines.length;i++){chunk.push(lines[i]);if(chunk.length>=2){chunks.push({id:genId(),text:chunk.join('. '),score:0.7+Math.random()*0.28});chunk=[]}}
+      if(chunk.length)chunks.push({id:genId(),text:chunk.join('. '),score:0.6+Math.random()*0.3});
+    }
+    if(state.editingDocId){
+      var doc=state.knowledge.find(function(d){return d.id===state.editingDocId});
+      if(doc){doc.title=name;doc.type=type;doc.content=content;doc.chunks=chunks;doc.updatedAt=Date.now()}
+    }else{
+      state.knowledge.push({id:genId(),title:name,type:type,content:content,createdAt:Date.now(),updatedAt:Date.now(),chunks:chunks});
+    }
+    persist();renderKnowledge();closeOverlay('addDocOverlay');toast(state.editingDocId?'Updated':'Uploaded','success');
+  };
+
+  document.getElementById('searchInput').oninput=function(){renderKnowledge()};
+
+  document.getElementById('newChatBtn').onclick=function(){newChat()};
+  document.getElementById('newFolderBtn').onclick=function(){
+    var name=prompt('Folder name:');if(!name)return;
+    name=name.trim();if(!name){toast('Folder name cannot be empty','error');return}
+    if(state.folders.some(function(f){return f.name.toLowerCase()===name.toLowerCase()})){toast('A folder with this name already exists','error');return}
+    state.folders.push({id:genId(),name:name,createdAt:Date.now()});
+    persist();renderFolders();toast('Folder created','success');
+  };
+  document.getElementById('sidebarClose').onclick=function(){document.getElementById('sidebar').classList.remove('open')};
+  document.getElementById('menuBtn').onclick=function(){document.getElementById('sidebar').classList.add('open')};
+
+  document.querySelectorAll('.theme-btn').forEach(function(btn){
+    btn.onclick=function(){state.settings.theme=btn.dataset.themeVal;applySettings();persist();toast('Theme: '+btn.dataset.themeVal,'success')};
+  });
+  document.getElementById('tempSlider').oninput=function(){state.settings.temperature=this.value/100;document.getElementById('tempVal').textContent=state.settings.temperature.toFixed(1);persist()};
+  document.getElementById('maxTokensSlider').oninput=function(){state.settings.maxTokens=parseInt(this.value);document.getElementById('maxTokensVal').textContent=this.value;persist()};
+  document.getElementById('streamSpeed').onchange=function(){state.settings.streamSpeed=this.value;persist()};
+
+  document.getElementById('sendBtn').onclick=sendMessage;
+  document.getElementById('chatInput').addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
+  });
+  document.getElementById('chatInput').addEventListener('input',function(){
+    this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';
+    var val=this.value;var atIdx=val.lastIndexOf('@');
+    if(atIdx!==-1&&(atIdx===0||val[atIdx-1]===' ')){
+      var afterAt=val.substring(atIdx+1);
+      if(afterAt.length>0&&afterAt.indexOf(' ')===-1){
+        var matches=TEAM_MEMBERS.filter(function(m){return m.name.toLowerCase().indexOf(afterAt.toLowerCase())===0});
+        if(matches.length){toast('Members: '+matches.map(function(m){return '@'+m.name}).join(', '),'info')}
+      }
+    }
+  });
+  document.getElementById('voiceBtn').onclick=function(){toast('Voice input not available in simulation','info')};
+  document.getElementById('attachBtn').onclick=function(){toast('Attachments simulated — use document upload','info')};
+}
+
+function renderModelSelector(){
+  var el=document.getElementById('modelList');
+  el.innerHTML=MODELS.map(function(m){
+    var sel=m.id===state.settings.model;
+    return '<div class="form-group" style="margin:0"><div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid '+(sel?'var(--accent)':'var(--border-color)')+';border-radius:var(--radius-md);cursor:pointer;transition:all .15s;background:'+(sel?'rgba(139,92,246,.08)':'transparent')+'" data-model="'+m.id+'"><div style="width:36px;height:36px;border-radius:50%;background:'+m.color+'22;display:flex;align-items:center;justify-content:center;font-size:16px">'+m.icon+'</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text-primary)">'+m.name+'</div><div style="font-size:11px;color:var(--text-muted)">'+m.provider+' · $'+m.costIn.toFixed(4)+'/'+m.costOut.toFixed(4)+' per 1K tokens</div></div>'+(sel?'<span style="color:var(--accent);font-size:18px">✓</span>':'')+'</div></div>';
+  }).join('');
+  el.querySelectorAll('[data-model]').forEach(function(item){
+    item.onclick=function(){
+      state.settings.model=item.dataset.model;var conv=getConv();if(conv)conv.model=item.dataset.model;
+      persist();applySettings();renderModelSelector();renderMessages();toast('Model: '+getModel(item.dataset.model).name,'success');
+    };
+    item.onmouseenter=function(){item.style.borderColor='var(--accent)'};
+    item.onmouseleave=function(){if(item.dataset.model!==state.settings.model)item.style.borderColor='var(--border-color)'};
+  });
+}
+
+function renderCompare(){
+  var grid=document.getElementById('compareGrid');
+  var testPrompt='How do I process a payment?';
+  grid.innerHTML=MODELS.map(function(m){
+    var resp=m.style('To process a payment, you need to create a payment intent first, then confirm it with a payment method.');
+    var tokens=countTokens(resp);var cost=calcCost(tokens,m,true);
+    return '<div class="compare-card"><div class="compare-card-header"><span>'+m.icon+'</span><span>'+m.name+'</span></div><div class="compare-card-body">'+esc(resp.substring(0,200))+'...</div><div class="compare-card-meta"><span>'+tokens+' tokens</span><span>$'+cost.toFixed(4)+'</span><span>'+m.speed+'ms/char</span></div></div>';
+  }).join('');
+}
+
+function renderPromptTemplates(){
+  var el=document.getElementById('promptTemplates');
+  el.innerHTML=PROMPT_TEMPLATES.map(function(t){
+    return '<div class="prompt-template-card" data-tpl="'+t.id+'"><div class="tpl-icon">'+t.icon+'</div><div class="tpl-name">'+t.name+'</div><div class="tpl-desc">'+t.desc+'</div></div>';
+  }).join('');
+  el.querySelectorAll('.prompt-template-card').forEach(function(card){
+    card.onclick=function(){
+      el.querySelectorAll('.prompt-template-card').forEach(function(c){c.classList.remove('selected')});
+      card.classList.add('selected');
+      var tpl=PROMPT_TEMPLATES.find(function(t){return t.id===card.dataset.tpl});
+      if(tpl)document.getElementById('promptBuilderText').value=tpl.prompt;
+    };
+  });
+  document.getElementById('promptBuilderText').value=state.settings.systemPrompt;
+}
+
+function doExport(fmt){
+  var conv=getConv();if(!conv){toast('No conversation to export','error');return}
+  var content,name;
+  if(fmt==='markdown'){
+    content='# '+conv.title+'\n\nExported: '+new Date().toLocaleString()+'\n\n---\n\n';
+    conv.messages.forEach(function(m){
+      content+=(m.role==='user'?'**You**':'**AI**')+' ('+fmtTime(m.timestamp)+'):\n\n'+m.content+'\n\n---\n\n';
+    });
+    name=conv.title.replace(/[^a-z0-9]/gi,'_')+'.md';
+  }else if(fmt==='json'){
+    content=JSON.stringify({title:conv.title,model:conv.model,messages:conv.messages.map(function(m){return{role:m.role,content:m.content,timestamp:m.timestamp,model:m.model,tokens:m.tokens}}),exportedAt:new Date().toISOString()},null,2);
+    name=conv.title.replace(/[^a-z0-9]/gi,'_')+'.json';
+  }else{
+    content='<html><head><title>'+esc(conv.title)+'</title><style>body{font-family:system-ui;max-width:700px;margin:40px auto;padding:20px;line-height:1.7;color:#333}.msg{margin:16px 0;padding:12px 16px;border-radius:8px}.user{background:#f0e6ff;border-left:3px solid #8b5cf6}.ai{background:#f5f5f5;border-left:3px solid #ccc}.time{font-size:11px;color:#999}pre{background:#1a1a2e;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto}code{background:#f0f0f0;padding:2px 4px;border-radius:3px;font-size:13px}</style></head><body><h1>'+esc(conv.title)+'</h1><p>Exported: '+new Date().toLocaleString()+'</p><hr>';
+    conv.messages.forEach(function(m){
+      content+='<div class="msg '+(m.role==='user'?'user':'ai')+'"><div class="time">'+(m.role==='user'?'You':'AI')+' · '+fmtTime(m.timestamp)+'</div><p>'+esc(m.content).replace(/\n/g,'<br>')+'</p></div>';
+    });
+    content+='</body></html>';
+    name=conv.title.replace(/[^a-z0-9]/gi,'_')+'.html';
+  }
+  var blob=new Blob([content],{type:'text/plain'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  URL.revokeObjectURL(a.href);closeOverlay('exportOverlay');toast('Exported as '+fmt.toUpperCase(),'success');
+}
+
+function renderAnalytics(){
+  var a=state.analytics;var body=document.getElementById('analyticsBody');
+  var totalMsgs=a.dailyMessages.reduce(function(s,d){return s+d.count},0);
+  var totalToks=a.tokenHistory.reduce(function(s,t){return s+t.tokens},0);
+  var totalCost=a.costHistory.reduce(function(s,c){return s+c.cost},0);
+
+  body.innerHTML='<div class="analytics-grid"><div class="analytics-card"><h4>Total Messages</h4><div class="stat-value">'+totalMsgs+'</div></div><div class="analytics-card"><h4>Total Tokens</h4><div class="stat-value">'+totalToks.toLocaleString()+'</div></div><div class="analytics-card"><h4>Total Cost</h4><div class="stat-value">$'+totalCost.toFixed(4)+'</div></div><div class="analytics-card"><h4>Documents</h4><div class="stat-value">'+state.knowledge.length+'</div></div></div><div class="analytics-full" style="margin-bottom:16px"><h4>Daily Messages</h4><canvas id="chartDaily" width="750" height="200"></canvas></div><div class="analytics-grid"><div class="analytics-full"><h4>Model Usage</h4><canvas id="chartModels" width="360" height="200"></canvas></div><div class="analytics-full"><h4>Token Distribution</h4><canvas id="chartTokens" width="360" height="200"></canvas></div></div>';
+
+  setTimeout(function(){
+    drawDailyChart();drawModelChart();drawTokenChart();
+  },50);
+}
+
+function drawDailyChart(){
+  var c=document.getElementById('chartDaily');if(!c)return;
+  var ctx=c.getContext('2d');var w=c.width=750;var h=c.height=180;
+  var data=state.analytics.dailyMessages.slice(-14);
+  if(!data.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText('No data yet',w/2-30,h/2);return}
+  var max=Math.max.apply(null,data.map(function(d){return d.count}))||1;
+  var padL=40,padR=20,padT=20,padB=30;
+  var cw=w-padL-padR,ch=h-padT-padB;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='#252548';ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){
+    var y=padT+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+    ctx.fillStyle='#5e5e90';ctx.font='10px Inter';ctx.fillText(Math.round(max*i/4),5,y+3);
+  }
+  var grad=ctx.createLinearGradient(0,padT,0,h-padB);
+  grad.addColorStop(0,'rgba(139,92,246,0.3)');grad.addColorStop(1,'rgba(139,92,246,0.02)');
+  ctx.beginPath();
+  data.forEach(function(d,i){
+    var x=padL+cw*i/(data.length-1||1);
+    var y=padT+ch*(1-d.count/max);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#8b5cf6';ctx.lineWidth=2;ctx.stroke();
+  ctx.lineTo(padL+cw,h-padB);ctx.lineTo(padL,h-padB);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  data.forEach(function(d,i){
+    var x=padL+cw*i/(data.length-1||1);
+    var y=padT+ch*(1-d.count/max);
+    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle='#8b5cf6';ctx.fill();
+    ctx.fillStyle='#5e5e90';ctx.font='9px Inter';ctx.textAlign='center';
+    var lbl=d.date.substring(5);
+    ctx.fillText(lbl,x,h-padB+15);
+  });
+  ctx.textAlign='start';
+}
+
+function drawModelChart(){
+  var c=document.getElementById('chartModels');if(!c)return;
+  var ctx=c.getContext('2d');var w=c.width=360;var h=c.height=180;
+  var usage=state.analytics.modelUsage;var entries=Object.keys(usage);
+  if(!entries.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText('No data yet',w/2-30,h/2);return}
+  var total=entries.reduce(function(s,k){return s+usage[k]},0)||1;
+  var colors=['#8b5cf6','#3b82f6','#22c55e','#f59e0b','#ef4444','#ec4899'];
+  var cx=w/2,cy=h/2,r=60;
+  var startAngle=-Math.PI/2;
+  entries.forEach(function(k,i){
+    var angle=(usage[k]/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,startAngle,startAngle+angle);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();
+    var midAngle=startAngle+angle/2;
+    var lx=cx+Math.cos(midAngle)*(r+20);var ly=cy+Math.sin(midAngle)*(r+20);
+    ctx.fillStyle='#eaeaf4';ctx.font='10px Inter';ctx.textAlign='center';
+    var m=getModel(k);ctx.fillText(m.name.substring(0,10),lx,ly);
+    startAngle+=angle;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,30,0,Math.PI*2);ctx.fillStyle='#111122';ctx.fill();
+  ctx.fillStyle='#eaeaf4';ctx.font='bold 14px Inter';ctx.textAlign='center';ctx.fillText(total,cx,cy+5);
+  ctx.textAlign='start';
+}
+
+function drawTokenChart(){
+  var c=document.getElementById('chartTokens');if(!c)return;
+  var ctx=c.getContext('2d');var w=c.width=360;var h=c.height=180;
+  var tokByModel={};state.analytics.tokenHistory.forEach(function(t){
+    var k=t.model||'unknown';tokByModel[k]=(tokByModel[k]||0)+t.tokens;
+  });
+  var entries=Object.keys(tokByModel);
+  if(!entries.length){ctx.fillStyle='#5e5e90';ctx.font='12px Inter';ctx.fillText('No data yet',w/2-30,h/2);return}
+  var max=Math.max.apply(null,entries.map(function(k){return tokByModel[k]}))||1;
+  var colors=['#8b5cf6','#3b82f6','#22c55e','#f59e0b'];
+  var barH=24,gap=8,padL=100,padR=40;
+  entries.forEach(function(k,i){
+    var y=20+i*(barH+gap);var bw=(w-padL-padR)*(tokByModel[k]/max);
+    ctx.fillStyle=colors[i%colors.length]+'33';
+    ctx.fillRect(padL,y,bw,barH);
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.fillRect(padL,y,Math.min(bw,6),barH);
+    var m=getModel(k);ctx.fillStyle='#9898c0';ctx.font='11px Inter';ctx.textAlign='right';
+    ctx.fillText(m.name.substring(0,14),padL-8,y+barH-6);
+    ctx.fillStyle='#eaeaf4';ctx.font='10px JetBrains Mono';ctx.textAlign='left';
+    ctx.fillText(tokByModel[k].toLocaleString(),padL+bw+6,y+barH-6);
+  });
+  ctx.textAlign='start';
+}
+
+function renderTeam(){
+  var body=document.getElementById('teamBody');
+  body.innerHTML='<div style="margin-bottom:16px"><h4 style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Team Members</h4>'+
+    TEAM_MEMBERS.map(function(m){return '<div class="team-member"><div class="team-member-avatar" style="background:'+m.color+'">'+m.avatar+'</div><div class="team-member-info"><div class="team-member-name">'+m.name+' <span style="font-size:10px;color:var(--text-muted);font-weight:400">'+m.role+'</span></div></div><div class="team-member-status '+(m.online?'online':'offline')+'"></div></div>'}).join('')+
+    '</div><div><h4 style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Shared Rooms</h4>'+
+    SHARED_ROOMS.map(function(r){
+      var members=r.members.map(function(mid){var tm=TEAM_MEMBERS.find(function(t){return t.id===mid});return tm?'<div style="background:'+tm.color+'">'+tm.avatar+'</div>':''}).join('');
+      return '<div class="shared-room"><div class="shared-room-header"><span class="shared-room-name">'+r.name+'</span><span style="font-size:10px;color:var(--text-muted)">'+timeAgo(r.lastActivity)+'</span></div><div class="shared-room-members"><div class="avatar-stack">'+members+'</div></div></div>';
+    }).join('')+
+    '</div>';
+}
+
+if(!state.analytics.dailyMessages.length){
+  var now=new Date();
+  for(var i=13;i>=0;i--){
+    var d=new Date(now-i*86400000);
+    state.analytics.dailyMessages.push({date:d.toISOString().split('T')[0],count:Math.floor(Math.random()*15)+1});
+  }
+  state.analytics.modelUsage={gpt4:12,claude:8,gemini:5,gpt4o:3};
+  state.analytics.tokenHistory=[];state.analytics.costHistory=[];
+  for(var j=0;j<50;j++){
+    var models=['gpt4','claude','gemini','gpt4o'];
+    var rModel=models[Math.floor(Math.random()*models.length)];
+    var rTokens=Math.floor(Math.random()*200)+20;
+    var rCost=calcCost(rTokens,getModel(rModel),Math.random()>0.5);
+    state.analytics.tokenHistory.push({date:state.analytics.dailyMessages[Math.floor(Math.random()*14)].date,tokens:rTokens,role:Math.random()>0.5?'user':'assistant',model:rModel});
+    state.analytics.costHistory.push({date:state.analytics.dailyMessages[Math.floor(Math.random()*14)].date,cost:rCost});
+  }
+  persist();
+}
+
+state.currentConvId=state.conversations[0].id;
+renderConvList();renderFolders();renderMessages();renderSuggestions();renderKnowledge();initModals();
+
+window.addEventListener('resize',function(){applySettings()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){
+    var editArea=document.querySelector('.msg-edit-area');
+    if(editArea){renderMessages();return}
+    document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open')})
+  }});
+function afterLangChange(){
+  var et=document.getElementById('appTitle');if(et)et.textContent=T('app.title');
+  var et2=document.getElementById('chatTitle');if(et2)et2.textContent=T('app.title');
+  var navSections=document.querySelectorAll('.sidebar-section-title');
+  if(navSections.length>=2){navSections[0].childNodes[0].textContent=T('sidebar.pinned');}
+  if(navSections.length>=3){navSections[1].textContent=T('sidebar.folders');}
+  if(navSections.length>=4){navSections[2].textContent=T('sidebar.recent');}
+  var s=document.getElementById('searchInput');if(s)s.placeholder=T('sidebar.search');
+  var up=document.getElementById('uploadBtn');if(up)up.innerHTML='📤 '+T('sidebar.upload');
+  ['newFolderBtn','newChatBtn'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b){var m={newFolderBtn:T('sidebar.newFolder'),newChatBtn:T('sidebar.newChat')};b.title=m[id];}
+  });
+  var si=document.getElementById('sidebarClose');if(si)si.title=T('sidebar.close');
+  var ci=document.getElementById('chatInput');if(ci)ci.placeholder=T('chat.inputPlaceholder');
+  var hi=document.querySelector('.input-hint');if(hi)hi.textContent=T('chat.inputHint');
+}
+renderLangSwitcher();
+afterLangChange();
+})();
+</script>
+</body>
+</html>

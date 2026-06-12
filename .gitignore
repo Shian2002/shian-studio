@@ -45,3 +45,29 @@ hermes-agent/
 hermes-agent-main/
 start-hermes.ps1
 .superpowers/
+
+# workbuddy
+.workbuddy/
+
+# logs
+dev-server*.log
+*.out.log
+*.err.log
+
+# qa / screenshots
+qa-screenshots/
+screenshots/
+dogfood-output/
+
+# misc
+test_write.txt
+skills-lock.json
+fix_i18n.ps1
+
+# agent skills (dev only, not for production)
+.agents/
+
+# dev-only files
+demos/
+docs/
+HANDBOOK.md

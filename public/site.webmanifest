@@ -1,17 +1,18 @@
 {
   "name": "SHIAN Studio",
   "short_name": "SHIAN",
-  "description": "AI-powered full-stack development studio",
+  "description": "AI-Powered Full-Stack Development Studio",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a1a",
+  "background_color": "#0a0a0a",
   "theme_color": "#0a0a1a",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     }
-  ]
+  ],
+  "categories": ["business", "technology"]
 }

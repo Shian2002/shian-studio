@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrossForge Studio - Cross-Platform Dev Tool</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a12;--bg2:#10101c;--bg3:#181830;--bg4:#20203e;
+  --border:#2a2a50;--text:#e4e4f0;--text2:#9898b8;--text3:#6060a0;
+  --accent:#6366f1;--accent2:#8b5cf6;--ag:linear-gradient(135deg,#6366f1,#8b5cf6);
+  --green:#22c55e;--orange:#f59e0b;--red:#ef4444;--blue:#3b82f6;--cyan:#06b6d4;
+  --r:8px;--r2:12px;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'Consolas','Monaco','Courier New',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+.app{display:flex;height:100vh}
+
+.sidebar{width:240px;min-width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar-hdr{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-hdr .logo{width:34px;height:34px;border-radius:8px;background:var(--ag);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:800}
+.sidebar-hdr .info{flex:1}.sidebar-hdr h2{font-size:14px;font-weight:700}.sidebar-hdr .sub{font-size:10px;color:var(--text3)}
+.sidebar-nav{padding:10px;flex:1;overflow-y:auto}
+.nav-sec{margin-bottom:12px}
+.nav-sec-title{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);padding:4px 10px;margin-bottom:2px;font-weight:700}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r);cursor:pointer;transition:background .15s;font-size:13px;color:var(--text2)}
+.nav-item:hover{background:var(--bg3)}
+.nav-item.active{background:rgba(99,102,241,.15);color:var(--accent)}
+.nav-item .icon{width:18px;text-align:center;font-size:14px;opacity:.7}
+.nav-item.active .icon{opacity:1}
+.nav-item .badge{margin-left:auto;font-size:10px;background:var(--bg4);padding:1px 7px;border-radius:10px;color:var(--text3);font-weight:600}
+.nav-item.active .badge{background:rgba(99,102,241,.2);color:var(--accent)}
+.sidebar-ft{padding:10px;border-top:1px solid var(--border)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.main-hdr{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--bg2)}
+.main-hdr h1{font-size:17px;font-weight:700;flex:1}
+.main-hdr .actions{display:flex;gap:8px;align-items:center}
+.btn{padding:6px 16px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--ag);color:#fff}.btn-primary:hover{opacity:.85}
+.btn-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{opacity:.85}
+.btn-sm{padding:4px 10px;font-size:11px}
+.main-body{flex:1;overflow-y:auto;padding:20px 24px}
+
+.page{display:none}.page.active{display:block}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;transition:border-color .2s}
+.stat-card:hover{border-color:var(--accent)}
+.stat-card .label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-card .value{font-size:26px;font-weight:800;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-card .change{font-size:11px;color:var(--green);margin-top:4px}
+.stat-card .change.down{color:var(--red)}
+
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:14px 16px}
+.activity-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(42,42,80,.4)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.activity-text{flex:1;font-size:12px;color:var(--text2)}.activity-text strong{color:var(--text)}
+.activity-time{font-size:10px;color:var(--text3);flex-shrink:0}
+
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.proj-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;transition:all .2s;cursor:pointer}
+.proj-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.proj-card .top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.proj-card .name{font-size:15px;font-weight:700}
+.proj-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.status-active{background:rgba(34,197,94,.15);color:#4ade80}
+.status-dev{background:rgba(99,102,241,.15);color:#818cf8}
+.status-testing{background:rgba(245,158,11,.15);color:#fbbf24}
+.status-deployed{background:rgba(6,182,212,.15);color:#22d3ee}
+.proj-card .desc{font-size:12px;color:var(--text3);line-height:1.4;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.proj-platforms{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.platform-tag{font-size:10px;padding:2px 8px;border-radius:4px;background:var(--bg4);color:var(--text3);font-weight:600}
+.proj-progress{margin-bottom:8px}
+.proj-progress .bar-bg{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.proj-progress .bar-fill{height:100%;border-radius:3px;background:var(--ag);transition:width .5s}
+.proj-progress .labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px}
+.proj-card .meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3)}
+.proj-card .meta .avatars{display:flex;flex-shrink:0}
+.proj-card .meta .avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;border:2px solid var(--bg2);margin-left:-6px}
+.proj-card .meta .avatar:first-child{margin-left:0}
+.proj-card .actions{display:flex;gap:4px;margin-left:auto;opacity:0;transition:opacity .2s}
+.proj-card:hover .actions{opacity:1}
+
+.editor-wrap{display:flex;flex-direction:column;height:calc(100vh - 130px)}
+.editor-tabs{display:flex;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);border-radius:var(--r2) var(--r2) 0 0;overflow:hidden}
+.editor-tab{padding:8px 18px;font-size:12px;font-family:var(--mono);cursor:pointer;color:var(--text3);border-right:1px solid var(--border);transition:all .15s;display:flex;align-items:center;gap:6px}
+.editor-tab:hover{background:var(--bg3);color:var(--text2)}
+.editor-tab.active{background:var(--bg3);color:var(--accent);border-bottom:2px solid var(--accent)}
+.editor-tab .dot{width:6px;height:6px;border-radius:50%}
+.editor-content{flex:1;display:flex;background:var(--bg3);border-radius:0 0 var(--r2) var(--r2);overflow:hidden;border:1px solid var(--border);border-top:none}
+.line-nums{padding:12px 0;min-width:48px;background:rgba(0,0,0,.2);text-align:right;font-family:var(--mono);font-size:12px;color:var(--text3);line-height:1.65;user-select:none;overflow:hidden}
+.line-nums span{display:block;padding:0 10px}
+.code-area{flex:1;padding:12px 16px;font-family:var(--mono);font-size:12px;line-height:1.65;color:var(--text);overflow:auto;white-space:pre;outline:none;tab-size:2}
+.code-area .kw{color:#c084fc}.code-area .str{color:#34d399}.code-area .cm{color:#505080;font-style:italic}
+.code-area .fn{color:#60a5fa}.code-area .num{color:#fbbf24}.code-area .tag{color:#f472b6}.code-area .attr{color:#fb923c}
+
+.build-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.build-platforms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.build-plat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer;transition:all .2s}
+.build-plat-card:hover{border-color:var(--accent)}
+.build-plat-card.building{border-color:var(--orange)}
+.build-plat-card.done{border-color:var(--green)}
+.build-plat-card .plat-icon{font-size:24px;margin-bottom:4px}
+.build-plat-card .plat-name{font-size:12px;font-weight:600}
+.build-plat-card .plat-status{font-size:10px;color:var(--text3);margin-top:2px}
+.build-queue{margin-bottom:16px}
+.queue-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.queue-item .q-bar{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.queue-item .q-bar .q-fill{height:100%;background:var(--ag);border-radius:2px;transition:width .3s}
+.build-log-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-family:var(--mono);font-size:11px;line-height:1.6;max-height:200px;overflow-y:auto;white-space:pre-wrap;color:var(--text2);margin-bottom:16px}
+.log-s{color:var(--green)}.log-w{color:var(--orange)}.log-e{color:var(--red)}.log-i{color:var(--blue)}
+.build-history-table{width:100%;border-collapse:collapse}
+.build-history-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border)}
+.build-history-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid rgba(42,42,80,.3);color:var(--text2)}
+.build-history-table tr:hover td{background:var(--bg3)}
+.filter-tabs{display:flex;gap:6px;margin-bottom:14px}
+.filter-tab{padding:4px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--text3);border:1px solid transparent;transition:all .15s}
+.filter-tab:hover{border-color:var(--border);color:var(--text2)}
+.filter-tab.active{background:rgba(99,102,241,.15);border-color:var(--accent);color:var(--accent)}
+
+.device-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.device-frame{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.device-frame .frame-hdr{padding:8px 12px;background:var(--bg3);font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.device-frame .frame-hdr .dots{display:flex;gap:4px;margin-right:6px}
+.device-frame .frame-hdr .dots span{width:8px;height:8px;border-radius:50%}
+.device-frame .frame-screen{display:flex;align-items:center;justify-content:center;background:#111;position:relative;overflow:hidden}
+.device-frame .frame-screen .preview{width:100%;height:100%;display:flex;flex-direction:column;padding:12px;gap:8px}
+.preview-nav{height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700}
+.preview-hero{flex:1;background:linear-gradient(135deg,var(--bg3),var(--bg4));border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.preview-hero .ph-title{font-size:10px;font-weight:700;color:var(--text)}
+.preview-hero .ph-btn{width:40px;height:14px;background:var(--accent);border-radius:4px}
+.preview-cards{display:flex;gap:4px}
+.preview-cards .pc{flex:1;height:24px;background:var(--bg3);border-radius:4px}
+
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.member-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;display:flex;gap:12px;align-items:center;transition:border-color .2s}
+.member-card:hover{border-color:var(--accent)}
+.member-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+.member-info{flex:1;min-width:0}
+.member-info .name{font-size:13px;font-weight:700}
+.member-info .role{font-size:11px;color:var(--text3)}
+.role-admin{color:#f472b6!important}.role-dev{color:#60a5fa!important}.role-designer{color:#c084fc!important}.role-qa{color:#4ade80!important}
+.member-info .activity{font-size:10px;color:var(--text3);margin-top:3px}
+.member-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.member-status.online{background:var(--green)}.member-status.offline{background:var(--text3)}
+
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.chart-card .card-hdr{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.chart-card canvas{display:block;width:100%!important}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;text-align:center}
+.metric-card .m-val{font-size:22px;font-weight:800;color:var(--text)}
+.metric-card .m-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.metric-card .m-change{font-size:10px;margin-top:3px}
+.metric-card .m-change.up{color:var(--green)}.metric-card .m-change.down{color:var(--red)}
+
+.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:16px;overflow:hidden}
+.settings-section .sec-hdr{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.settings-section .sec-hdr:hover{background:var(--bg3)}
+.settings-section .sec-body{padding:16px}
+.form-row{display:flex;gap:12px;margin-bottom:12px}
+.form-group{flex:1;display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:600;color:var(--text3)}
+.form-group input,.form-group select,.form-group textarea{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group textarea{min-height:60px;resize:vertical}
+.env-table{width:100%;border-collapse:collapse}
+.env-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border)}
+.env-table td{padding:6px 10px;font-size:12px;border-bottom:1px solid rgba(42,42,80,.3)}
+.env-table td input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:11px;width:100%;outline:none}
+.env-table td input:focus{border-color:var(--accent)}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--bg4);cursor:pointer;position:relative;transition:background .2s}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle.on::after{left:18px}
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,80,.3)}
+.notif-row:last-child{border-bottom:none}
+.notif-row .n-label{font-size:12px;color:var(--text2)}
+.notif-row .n-desc{font-size:10px;color:var(--text3)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);width:500px;max-width:90vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 30px rgba(0,0,0,.5);transform:scale(.92);transition:transform .3s}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h3{font-size:14px;font-weight:700}
+.modal-close{width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text3);cursor:pointer;font-size:13px;transition:all .15s}
+.modal-close:hover{color:var(--text);border-color:var(--accent)}
+.modal-body{padding:18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px}
+.modal-ft{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{padding:10px 18px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;pointer-events:auto;animation:toastIn .3s ease-out;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast.info{background:var(--accent)}.toast.success{background:var(--green)}.toast.error{background:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+.dash-projects{margin-top:20px}
+.dash-proj-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;transition:border-color .2s}
+.dash-proj-row:hover{border-color:var(--accent)}
+.dash-proj-row .dp-icon{width:36px;height:36px;border-radius:8px;background:var(--ag);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.dash-proj-row .dp-info{flex:1;min-width:0}
+.dash-proj-row .dp-name{font-size:13px;font-weight:700}
+.dash-proj-row .dp-meta{font-size:10px;color:var(--text3)}
+.dash-proj-row .dp-bar{width:80px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.dash-proj-row .dp-bar .dp-fill{height:100%;background:var(--ag);border-radius:2px}
+.dash-proj-row .dp-pct{font-size:11px;font-weight:600;color:var(--accent);width:32px;text-align:right}
+
+.search-bar{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;transition:border-color .2s}
+.search-bar:focus-within{border-color:var(--accent)}
+.search-bar input{border:none;background:none;color:var(--text);font-family:var(--font);font-size:12px;outline:none;width:160px}
+.search-bar input::placeholder{color:var(--text3)}
+
+.device-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.device-ctrl-btn{padding:6px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.device-ctrl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.device-ctrl-btn.active{background:rgba(99,102,241,.15);border-color:var(--accent);color:var(--accent)}
+
+.team-activity{margin-top:20px}
+.team-act-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.team-act-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(42,42,80,.3);font-size:12px;color:var(--text2)}
+.team-act-item:last-child{border-bottom:none}
+.team-act-item .ta-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.team-act-item .ta-text{flex:1}.team-act-item .ta-text strong{color:var(--text)}
+.team-act-item .ta-time{font-size:10px;color:var(--text3);flex-shrink:0}
+.team-act-item .ta-badge{font-size:9px;padding:2px 6px;border-radius:8px;font-weight:600}
+
+.perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.perf-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.perf-item .pi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.perf-item .pi-value{font-size:16px;font-weight:800;color:var(--text)}
+.perf-item .pi-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:6px;overflow:hidden}
+.perf-item .pi-bar .pi-fill{height:100%;border-radius:2px}
+
+.section-divider{height:1px;background:var(--border);margin:20px 0}
+.section-title{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title .st-badge{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(99,102,241,.15);color:var(--accent);font-weight:600}
+
+.kbd{display:inline-block;padding:1px 6px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:10px;color:var(--text3)}
+.shortcuts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}
+.shortcut-item{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;font-size:11px;color:var(--text2)}
+.shortcut-item .sk-label{color:var(--text3)}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
+  .empty-state .es-icon{font-size:32px;margin-bottom:8px}
+  .empty-state .es-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .empty-state .es-desc{font-size:12px;max-width:300px;margin:0 auto}
+
+  .dash-quick-actions{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .quick-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s}
+  .quick-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+  .role-badge{display:inline-block;font-size:9px;padding:1px 6px;border-radius:4px;font-weight:600;margin-left:4px}
+  .role-badge.admin{background:rgba(244,114,182,.15);color:#f472b6}
+  .role-badge.dev{background:rgba(96,165,250,.15);color:#60a5fa}
+  .role-badge.designer{background:rgba(192,132,252,.15);color:#c084fc}
+  .role-badge.qa{background:rgba(74,222,128,.15);color:#4ade80}
+
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-grid,.build-grid,.analytics-grid{grid-template-columns:1fr}
+  .proj-grid{grid-template-columns:1fr}
+  .device-grid{grid-template-columns:1fr}
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .perf-grid{grid-template-columns:repeat(2,1fr)}
+}
+.build-spinner{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,18,.7);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.build-spinner.active{display:flex}
+.build-spinner .spinner-ring{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spinRing .8s linear infinite}
+.build-spinner .spinner-text{font-size:13px;color:var(--text2)}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-state .empty-msg{font-size:14px;margin-bottom:4px;color:var(--text2)}
+.empty-state .empty-hint{font-size:12px;opacity:.7}
+@media print{
+  .sidebar,.main-hdr,.modal-overlay,.toast-container,.build-spinner{display:none!important}
+  .main{width:100%}
+  .stat-grid,.dash-grid,.build-grid,.proj-grid{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="build-spinner" id="buildSpinner"><div class="spinner-ring"></div><div class="spinner-text"></div></div>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-hdr">
+    <div class="logo">CF</div>
+    <div class="info"><h2>CrossForge</h2><div class="sub">Studio v2.4.1</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-sec"><div class="nav-sec-title">'+T("nav.main")+'</div>
+      <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span>"+T("nav.dashboard")+"</div>
+      <div class="nav-item" data-page="projects"><span class="icon">📁</span>"+T("nav.projects")+"<span class="badge" id="projCount">6</span></div>
+      <div class="nav-item" data-page="editor"><span class="icon">💻</span>"+T("nav.editor")+"</div>
+      <div class="nav-item" data-page="build"><span class="icon">🔨</span>"+T("nav.builds")+"<span class="badge" id="buildCount">3</span></div>
+    </div>
+    <div class="nav-sec"><div class="nav-sec-title">'+T("nav.tools")+'</div>
+      <div class="nav-item" data-page="devices"><span class="icon">📱</span>"+T("nav.devices")+"</div>
+      <div class="nav-item" data-page="team"><span class="icon">👥</span>"+T("nav.team")+"<span class="badge" id="teamCount">8</span></div>
+      <div class="nav-item" data-page="analytics"><span class="icon">📈</span>"+T("nav.analytics")+"</div>
+      <div class="nav-item" data-page="settings"><span class="icon">⚙️</span>"+T("nav.settings")+"</div>
+    </div>
+  </nav>
+  <div class="sidebar-ft" style="padding:12px;border-top:1px solid var(--border);font-size:10px;color:var(--text3)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span>CrossForge v2.4.1</span><span style="color:var(--green)">● '+T("sidebar.online")+'</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <span style="opacity:.7">'+T("sidebar.buildsToday")+': 3</span>
+      <span style="opacity:.7">|</span>
+      <span style="opacity:.7">'+T("sidebar.api")+': 45ms</span>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="APP.showNewProject()">'+T("sidebar.newProject")+'</button>
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;opacity:.5;text-align:center">
+      '+T("sidebar.copyright")+'
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="main-hdr">
+    <h1 id="pageTitle">"+T("nav.dashboard")+"</h1>
+    <div class="actions" id="pageActions"></div>
+    <div id="langSwitcher" style="position:relative"></div>
+  </div>
+  <div class="main-body">
+    <div class="page active" id="page-dashboard"></div>
+    <div class="page" id="page-projects"></div>
+    <div class="page" id="page-editor"></div>
+    <div class="page" id="page-build"></div>
+    <div class="page" id="page-devices"></div>
+    <div class="page" id="page-team"></div>
+    <div class="page" id="page-analytics"></div>
+    <div class="page" id="page-settings"></div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-hdr"><h3 id="modalTitle">Modal</h3><button class="modal-close" onclick="APP.closeModal()">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-ft" id="modalFt"></div>
+  </div>
+</div>
+<div class="toast-container" id="toasts"></div>
+
+<script>
+var LANGS=[
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'zh',name:'中文',flag:'🇨🇳'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'},
+  {code:'ko',name:'한국어',flag:'🇰🇷'}
+];
+var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
+function T(key){
+  var keys=key.split('.');var val=I18N[curLang];
+  for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
+  return(val===undefined||val===null)?key:val;
+}
+function setLang(code){
+  curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
+  renderLangSwitcher();
+  afterLangChange();
+}
+function afterLangChange(){
+  var pageEl=document.querySelector('.page.active');
+  var p=pageEl?pageEl.id.replace('page-',''):'dashboard';
+  var titles={dashboard:T('nav.dashboard'),projects:T('nav.projects'),editor:T('nav.editor'),build:T('nav.builds'),devices:T('nav.devices'),team:T('nav.team'),analytics:T('nav.analytics'),settings:T('nav.settings')};
+  document.getElementById('pageTitle').textContent=titles[p]||p;
+  var spinnerText=document.querySelector('#buildSpinner .spinner-text');
+  if(spinnerText)spinnerText.textContent=T('build.preparingBuild');
+  renderPage(p);
+}
+function renderLangSwitcher(){
+  var el=document.getElementById('langSwitcher');if(!el)return;
+  var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:#ccc;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'#6366f1':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+}
+function toggleLangMenu(){
+  var m=document.getElementById('langMenu');
+  if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+var I18N = {
+  en: {
+    nav: {main:'Main',tools:'Tools',dashboard:'Dashboard',projects:'Projects',editor:'Code Editor',builds:'Build System',devices:'Device Preview',team:'Team',analytics:'Analytics',settings:'Settings'},
+    sidebar: {online:'Online',buildsToday:'Builds today',api:'API',newProject:'+ New Project',copyright:'\u00a9 2024 CrossForge Studio \u00b7 MIT License',version:'CrossForge v2.4.1'},
+    dashboard: {totalProjects:'Total Projects',totalBuilds:'Total Builds',teamMembers:'Team Members',deployments:'Deployments',monthUp:'\u2191 +2 this month',weekUp:'\u2191 12% vs last week',onlineNow:'online now',weekUpDown:'\u2191 +3 this week',newProject:'+ New Project',buildNow:'\ud83d\udd28 Build Now',openEditor:'\ud83d\udcbb Open Editor',preview:'\ud83d\udcf1 Preview',recentActivity:'Recent Activity',platformDistribution:'Platform Distribution',systemStatus:'System Status',live:'Live',loading:'Loading...',activeProjects:'Active Projects',active:'active',cpu:'CPU',memory:'Memory',disk:'Disk',network:'Network',members:'members',platforms:'platforms'},
+    projects: {search:'Search projects...',all:'All',dev:'Dev',testing:'Testing',deployed:'Deployed',active:'Active',noProjects:'No projects yet',noProjectsHint:'Click "New Project" to get started',edit:'Edit',delete:'Delete',newProject:'+ New Project',name:'Name',description:'Description',platforms:'Platforms',status:'Status',team:'Team',version:'Version',progress:'Progress',members:'members',cancel:'Cancel',createProject:'Create Project',saveChanges:'Save Changes',deleteProject:'Delete Project',areYouSure:'Are you sure you want to delete',cannotUndo:'This action cannot be undone.'},
+    editor: {autoSaved:'Auto-saved',fileNames:{'main.dart':'main.dart','App.jsx':'App.jsx','styles.css':'styles.css','config.json':'config.json'}},
+    build: {buildPlatforms:'Build Platforms',clickToBuild:'Click to build',lastBuildOK:'\u2713 Last build successful',lastBuildFailed:'\u2715 Last build failed',readyToBuild:'Ready to build',builds:'builds',success:'success',quickStats:'Quick Stats',successful:'Successful',failed:'Failed',successRate:'Success Rate',buildQueue:'Build Queue',noBuildsQueue:'Queue is empty. Click a platform card or use the trigger button to start.',buildLog:'Build Log',realTime:'Real-time output',buildHistory:'Build History',project:'Project',platform:'Platform',status:'Status',duration:'Duration',size:'Size',time:'Time',actions:'Actions',noBuilds:'No builds yet',noBuildsHint:'Click a platform card to start your first build',download:'\u2b07 Download',retry:'\u21bb Retry',all:'All',success:'success',failed:'failed',triggerBuild:'\u25b6 Trigger Build',cancel:'Cancel',startBuild:'Start Build',buildFor:'Build for',queued:'Queued',running:'Running',preparingBuild:'Preparing build...'},
+    device: {portrait:'Portrait',landscape:'Landscape',previewUrl:'Preview URL: localhost:3000',welcomeBack:'Welcome Back'},
+    team: {activityLog:'Activity Log',events:'events',projects:'projects',online:'online',offline:'offline',role:{admin:'Admin',dev:'Dev',designer:'Designer',qa:'QA'}},
+    analytics: {totalDownloads:'Total Downloads',activeUsers:'Active Users',uptime:'Uptime',avgLoadTime:'Avg Load Time',monthUp1:'↑ 18% this month',monthUp2:'↑ 24% this month',up03:'↑ 0.3%',down15:'↓ 15% faster',downloadsByPlatform:'Downloads by Platform',userGrowth:'User Growth',performanceMetrics:'Performance Metrics',live:'Live',fcp:'First Contentful Paint',tti:'Time to Interactive',bundleSize:'Bundle Size',lighthouse:'Lighthouse Score',errorRate:'Error Rate',apiLatency:'API Latency',memoryUsage:'Memory Usage',cacheHitRate:'Cache Hit Rate',frameRate:'Frame Rate',cpuUsage:'CPU Usage',dbQueries:'DB Queries',refresh:'↻ Refresh'},
+    settings: {projectSettings:'Project Settings',ciCdConfig:'CI/CD Configuration',envVariables:'Environment Variables',notifications:'Notifications',dangerZone:'Danger Zone',about:'About',keyboardShortcuts:'Keyboard Shortcuts',projectName:'Project Name',version:'Version',buildCommand:'Build Command',outputDirectory:'Output Directory',saveSettings:'Save Settings',ciProvider:'CI Provider',branch:'Branch',autoDeploy:'Auto-deploy on push',saveCiCd:'Save CI/CD',key:'Key',value:'Value',addVariable:'+ Add Variable',saveVariables:'Save Variables',clearBuildHistory:'Clear Build History',clearBuildHistoryDesc:'Remove all past build records',clearAll:'Clear All',resetEditorFiles:'Reset Editor Files',resetEditorFilesDesc:'Restore default code templates',reset:'Reset',resetAllData:'Reset All Data',resetAllDataDesc:'Clear all localStorage data and start fresh',resetEverything:'Reset Everything',cancel:'Cancel',build:'Build',engine:'Engine',license:'License',repository:'Repository',navigatePages:'Navigate pages',newProject:'New project',triggerBuild:'Trigger build',saveFile:'Save file',deleteProject:'Delete Project',areYouSure:'Are you sure you want to delete',cannotUndo:'This action cannot be undone.',saveChanges:'Save Changes'},
+    modal: {newProject:'New Project',editProject:'Edit Project',deleteProject:'Delete Project',triggerBuild:'Trigger Build',resetAllData:'Reset All Data',cancel:'Cancel',createProject:'Create Project',saveChanges:'Save Changes',delete:'Delete',resetEverything:'Reset Everything'},
+    common: {search:'Search...'}
+  },
+  zh: {
+    nav: {main:'主菜单',tools:'工具',dashboard:'仪表盘',projects:'项目',editor:'代码编辑器',builds:'构建系统',devices:'设备预览',team:'团队',analytics:'分析',settings:'设置'},
+    sidebar: {online:'在线',buildsToday:'今日构建',api:'API',newProject:'+ 新建项目',copyright:'© 2024 CrossForge Studio · MIT 许可证',version:'CrossForge v2.4.1'},
+    dashboard: {totalProjects:'总项目数',totalBuilds:'总构建数',teamMembers:'团队成员',deployments:'部署数',monthUp:'↑ 本月新增 2 个',weekUp:'↑ 较上周增长 12%',onlineNow:'当前在线',weekUpDown:'↑ 本周新增 3 个',newProject:'+ 新建项目',buildNow:'🔨 立即构建',openEditor:'💻 打开编辑器',preview:'📱 预览',recentActivity:'最近动态',platformDistribution:'平台分布',systemStatus:'系统状态',live:'实时',loading:'加载中...',activeProjects:'活跃项目',active:'活跃',cpu:'CPU',memory:'内存',disk:'磁盘',network:'网络',members:'名成员',platforms:'平台'},
+    projects: {search:'搜索项目...',all:'全部',dev:'开发中',testing:'测试中',deployed:'已部署',active:'活跃',noProjects:'暂无项目',noProjectsHint:'点击"新建项目"开始使用',edit:'编辑',delete:'删除',newProject:'+ 新建项目',name:'项目名称',description:'项目描述',platforms:'平台',status:'状态',team:'团队',version:'版本',progress:'进度',members:'名成员',cancel:'取消',createProject:'创建项目',saveChanges:'保存更改',deleteProject:'删除项目',areYouSure:'确定要删除',cannotUndo:'此操作不可撤销。'},
+    editor: {autoSaved:'已自动保存',fileNames:{'main.dart':'main.dart','App.jsx':'App.jsx','styles.css':'styles.css','config.json':'config.json'}},
+    build: {buildPlatforms:'构建平台',clickToBuild:'点击构建',lastBuildOK:'✓ 上次构建成功',lastBuildFailed:'✕ 上次构建失败',readyToBuild:'准备就绪',builds:'次构建',success:'成功',quickStats:'快速统计',successful:'成功',failed:'失败',successRate:'成功率',buildQueue:'构建队列',noBuildsQueue:'队列为空。点击平台卡片或使用触发按钮开始构建。',buildLog:'构建日志',realTime:'实时输出',buildHistory:'构建历史',project:'项目',platform:'平台',status:'状态',duration:'时长',size:'大小',time:'时间',actions:'操作',noBuilds:'暂无构建记录',noBuildsHint:'点击平台卡片开始首次构建',download:'⬇ 下载',retry:'↻ 重试',all:'全部',triggerBuild:'▶ 触发构建',cancel:'取消',startBuild:'开始构建',buildFor:'构建',queued:'队列中',running:'构建中',preparingBuild:'准备构建中...'},
+    device: {portrait:'竖屏',landscape:'横屏',previewUrl:'预览 URL: localhost:3000',welcomeBack:'欢迎回来'},
+    team: {activityLog:'活动日志',events:'条事件',projects:'个项目',online:'在线',offline:'离线',role:{admin:'管理员',dev:'开发者',designer:'设计师',qa:'测试'}},
+    analytics: {totalDownloads:'总下载量',activeUsers:'活跃用户',uptime:'运行时间',avgLoadTime:'平均加载时间',monthUp1:'↑ 本月增长 18%',monthUp2:'↑ 本月增长 24%',up03:'↑ 0.3%',down15:'↓ 快了 15%',downloadsByPlatform:'各平台下载量',userGrowth:'用户增长',performanceMetrics:'性能指标',live:'实时',fcp:'首次内容绘制',tti:'可交互时间',bundleSize:'打包体积',lighthouse:'Lighthouse 评分',errorRate:'错误率',apiLatency:'API 延迟',memoryUsage:'内存使用',cacheHitRate:'缓存命中率',frameRate:'帧率',cpuUsage:'CPU 使用率',dbQueries:'数据库查询',refresh:'↻ 刷新'},
+    settings: {projectSettings:'项目设置',ciCdConfig:'CI/CD 配置',envVariables:'环境变量',notifications:'通知设置',dangerZone:'危险区域',about:'关于',keyboardShortcuts:'快捷键',projectName:'项目名称',version:'版本',buildCommand:'构建命令',outputDirectory:'输出目录',saveSettings:'保存设置',ciProvider:'CI 提供商',branch:'分支',autoDeploy:'推送时自动部署',saveCiCd:'保存 CI/CD',key:'键',value:'值',addVariable:'+ 添加变量',saveVariables:'保存变量',clearBuildHistory:'清除构建历史',clearBuildHistoryDesc:'删除所有历史构建记录',clearAll:'全部清除',resetEditorFiles:'重置编辑器文件',resetEditorFilesDesc:'恢复默认代码模板',reset:'重置',resetAllData:'重置所有数据',resetAllDataDesc:'清除所有本地存储数据，重新开始',resetEverything:'重置全部',cancel:'取消',build:'构建',engine:'引擎',license:'许可证',repository:'仓库',navigatePages:'页面导航',newProject:'新建项目',triggerBuild:'触发构建',saveFile:'保存文件',deleteProject:'删除项目',areYouSure:'确定要删除',cannotUndo:'此操作不可撤销。',saveChanges:'保存更改'},
+    modal: {newProject:'新建项目',editProject:'编辑项目',deleteProject:'删除项目',triggerBuild:'触发构建',resetAllData:'重置所有数据',cancel:'取消',createProject:'创建项目',saveChanges:'保存更改',delete:'删除',resetEverything:'重置全部'},
+    common: {search:'搜索...'}
+  },
+  ja: {
+    nav: {main:'メインメニュー',tools:'ツール',dashboard:'ダッシュボード',projects:'プロジェクト',editor:'コードエディタ',builds:'ビルドシステム',devices:'デバイスプレビュー',team:'チーム',analytics:'分析',settings:'設定'},
+    sidebar: {online:'オンライン',buildsToday:'今日のビルド',api:'API',newProject:'+ 新規プロジェクト',copyright:'© 2024 CrossForge Studio · MIT ライセンス',version:'CrossForge v2.4.1'},
+    dashboard: {totalProjects:'総プロジェクト数',totalBuilds:'総ビルド数',teamMembers:'チームメンバー',deployments:'デプロイ数',monthUp:'↑ 今月 +2',weekUp:'↑ 前週比 12%',onlineNow:'オンライン中',weekUpDown:'↑ 今週 +3',newProject:'+ 新規プロジェクト',buildNow:'🔨 ビルド実行',openEditor:'💻 エディタを開く',preview:'📱 プレビュー',recentActivity:'最近のアクティビティ',platformDistribution:'プラットフォーム分布',systemStatus:'システムステータス',live:'ライブ',loading:'読み込み中...',activeProjects:'アクティブなプロジェクト',active:'アクティブ',cpu:'CPU',memory:'メモリ',disk:'ディスク',network:'ネットワーク',members:'人のメンバー',platforms:'プラットフォーム'},
+    projects: {search:'プロジェクトを検索...',all:'すべて',dev:'開発中',testing:'テスト中',deployed:'デプロイ済み',active:'アクティブ',noProjects:'プロジェクトがありません',noProjectsHint:'「新規プロジェクト」をクリックして開始',edit:'編集',delete:'削除',newProject:'+ 新規プロジェクト',name:'プロジェクト名',description:'説明',platforms:'プラットフォーム',status:'ステータス',team:'チーム',version:'バージョン',progress:'進捗',members:'人のメンバー',cancel:'キャンセル',createProject:'プロジェクトを作成',saveChanges:'変更を保存',deleteProject:'プロジェクトを削除',areYouSure:'本当に削除しますか',cannotUndo:'この操作は元に戻せません。'},
+    editor: {autoSaved:'自動保存済み',fileNames:{'main.dart':'main.dart','App.jsx':'App.jsx','styles.css':'styles.css','config.json':'config.json'}},
+    build: {buildPlatforms:'ビルドプラットフォーム',clickToBuild:'クリックしてビルド',lastBuildOK:'✓ 前回のビルド成功',lastBuildFailed:'✕ 前回のビルド失敗',readyToBuild:'ビルド準備完了',builds:'回のビルド',success:'成功',quickStats:'クイック統計',successful:'成功',failed:'失敗',successRate:'成功率',buildQueue:'ビルドキュー',noBuildsQueue:'キューは空です。プラットフォームカードをクリックするか、トリガーボタンを使用してください。',buildLog:'ビルドログ',realTime:'リアルタイム出力',buildHistory:'ビルド履歴',project:'プロジェクト',platform:'プラットフォーム',status:'ステータス',duration:'所要時間',size:'サイズ',time:'時間',actions:'操作',noBuilds:'ビルド履歴がありません',noBuildsHint:'プラットフォームカードをクリックして最初のビルドを開始',download:'⬇ ダウンロード',retry:'↻ リトライ',all:'すべて',triggerBuild:'▶ ビルドをトリガー',cancel:'キャンセル',startBuild:'ビルド開始',buildFor:'ビルド',queued:'キュー中',running:'ビルド中',preparingBuild:'ビルドを準備中...'},
+    device: {portrait:'縦向き',landscape:'横向き',previewUrl:'プレビューURL: localhost:3000',welcomeBack:'おかえりなさい'},
+    team: {activityLog:'アクティビティログ',events:'件のイベント',projects:'のプロジェクト',online:'オンライン',offline:'オフライン',role:{admin:'管理者',dev:'開発者',designer:'デザイナー',qa:'QA'}},
+    analytics: {totalDownloads:'総ダウンロード数',activeUsers:'アクティブユーザー',uptime:'稼働率',avgLoadTime:'平均読み込み時間',monthUp1:'↑ 今月 18% 増',monthUp2:'↑ 今月 24% 増',up03:'↑ 0.3%',down15:'↓ 15% 高速化',downloadsByPlatform:'プラットフォーム別ダウンロード',userGrowth:'ユーザー成長',performanceMetrics:'パフォーマンス指標',live:'ライブ',fcp:'First Contentful Paint',tti:'Time to Interactive',bundleSize:'バンドルサイズ',lighthouse:'Lighthouse スコア',errorRate:'エラー率',apiLatency:'API レイテンシ',memoryUsage:'メモリ使用量',cacheHitRate:'キャッシュヒット率',frameRate:'フレームレート',cpuUsage:'CPU 使用率',dbQueries:'DB クエリ',refresh:'↻ 更新'},
+    settings: {projectSettings:'プロジェクト設定',ciCdConfig:'CI/CD 設定',envVariables:'環境変数',notifications:'通知設定',dangerZone:'危険ゾーン',about:'について',keyboardShortcuts:'ショートカットキー',projectName:'プロジェクト名',version:'バージョン',buildCommand:'ビルドコマンド',outputDirectory:'出力ディレクトリ',saveSettings:'設定を保存',ciProvider:'CI プロバイダー',branch:'ブランチ',autoDeploy:'プッシュ時に自動デプロイ',saveCiCd:'CI/CD を保存',key:'キー',value:'値',addVariable:'+ 変数を追加',saveVariables:'変数を保存',clearBuildHistory:'ビルド履歴をクリア',clearBuildHistoryDesc:'過去のビルド記録をすべて削除',clearAll:'すべてクリア',resetEditorFiles:'エディタファイルをリセット',resetEditorFilesDesc:'デフォルトのコードテンプレートを復元',reset:'リセット',resetAllData:'すべてのデータをリセット',resetAllDataDesc:'すべてのローカルストレージデータを消去して再開',resetEverything:'すべてリセット',cancel:'キャンセル',build:'ビルド',engine:'エンジン',license:'ライセンス',repository:'リポジトリ',navigatePages:'ページ移動',newProject:'新規プロジェクト',triggerBuild:'ビルドをトリガー',saveFile:'ファイル保存',deleteProject:'プロジェクトを削除',areYouSure:'本当に削除しますか',cannotUndo:'この操作は元に戻せません。',saveChanges:'変更を保存'},
+    modal: {newProject:'新規プロジェクト',editProject:'プロジェクトを編集',deleteProject:'プロジェクトを削除',triggerBuild:'ビルドをトリガー',resetAllData:'すべてのデータをリセット',cancel:'キャンセル',createProject:'プロジェクトを作成',saveChanges:'変更を保存',delete:'削除',resetEverything:'すべてリセット'},
+    common: {search:'検索...'}
+  },
+  ko: {
+    nav: {main:'메인 메뉴',tools:'도구',dashboard:'대시보드',projects:'프로젝트',editor:'코드 에디터',builds:'빌드 시스템',devices:'기기 미리보기',team:'팀',analytics:'분석',settings:'설정'},
+    sidebar: {online:'온라인',buildsToday:'오늘의 빌드',api:'API',newProject:'+ 새 프로젝트',copyright:'© 2024 CrossForge Studio · MIT 라이선스',version:'CrossForge v2.4.1'},
+    dashboard: {totalProjects:'총 프로젝트',totalBuilds:'총 빌드',teamMembers:'팀 멤버',deployments:'배포 수',monthUp:'↑ 이번 달 +2',weekUp:'↑ 전주 대비 12%',onlineNow:'온라인 중',weekUpDown:'↑ 이번 주 +3',newProject:'+ 새 프로젝트',buildNow:'🔨 지금 빌드',openEditor:'💻 에디터 열기',preview:'📱 미리보기',recentActivity:'최근 활동',platformDistribution:'플랫폼 분포',systemStatus:'시스템 상태',live:'실시간',loading:'로딩 중...',activeProjects:'활성 프로젝트',active:'활성',cpu:'CPU',memory:'메모리',disk:'디스크',network:'네트워크',members:'명',platforms:'플랫폼'},
+    projects: {search:'프로젝트 검색...',all:'전체',dev:'개발 중',testing:'테스트 중',deployed:'배포됨',active:'활성',noProjects:'프로젝트가 없습니다',noProjectsHint:'"새 프로젝트"를 클릭하여 시작하세요',edit:'편집',delete:'삭제',newProject:'+ 새 프로젝트',name:'프로젝트명',description:'설명',platforms:'플랫폼',status:'상태',team:'팀',version:'버전',progress:'진행률',members:'명',cancel:'취소',createProject:'프로젝트 생성',saveChanges:'변경사항 저장',deleteProject:'프로젝트 삭제',areYouSure:'정말 삭제하시겠습니까',cannotUndo:'이 작업은 되돌릴 수 없습니다.'},
+    editor: {autoSaved:'자동 저장됨',fileNames:{'main.dart':'main.dart','App.jsx':'App.jsx','styles.css':'styles.css','config.json':'config.json'}},
+    build: {buildPlatforms:'빌드 플랫폼',clickToBuild:'클릭하여 빌드',lastBuildOK:'✓ 마지막 빌드 성공',lastBuildFailed:'✕ 마지막 빌드 실패',readyToBuild:'빌드 준비 완료',builds:'회 빌드',success:'성공',quickStats:'빠른 통계',successful:'성공',failed:'실패',successRate:'성공률',buildQueue:'빌드 대기열',noBuildsQueue:'대기열이 비어 있습니다. 플랫폼 카드를 클릭하거나 트리거 버튼을 사용하세요.',buildLog:'빌드 로그',realTime:'실시간 출력',buildHistory:'빌드 기록',project:'프로젝트',platform:'플랫폼',status:'상태',duration:'시간',size:'크기',time:'시간',actions:'작업',noBuilds:'빌드 기록이 없습니다',noBuildsHint:'플랫폼 카드를 클릭하여 첫 빌드를 시작하세요',download:'⬇ 다운로드',retry:'↻ 재시도',all:'전체',triggerBuild:'▶ 빌드 트리거',cancel:'취소',startBuild:'빌드 시작',buildFor:'빌드:',queued:'대기 중',running:'빌드 중',preparingBuild:'빌드 준비 중...'},
+    device: {portrait:'세로',landscape:'가로',previewUrl:'미리보기 URL: localhost:3000',welcomeBack:'환영합니다'},
+    team: {activityLog:'활동 로그',events:'개 이벤트',projects:'개 프로젝트',online:'온라인',offline:'오프라인',role:{admin:'관리자',dev:'개발자',designer:'디자이너',qa:'QA'}},
+    analytics: {totalDownloads:'총 다운로드',activeUsers:'활성 사용자',uptime:'가동률',avgLoadTime:'평균 로드 시간',monthUp1:'↑ 이번 달 18% 증가',monthUp2:'↑ 이번 달 24% 증가',up03:'↑ 0.3%',down15:'↓ 15% 단축',downloadsByPlatform:'플랫폼별 다운로드',userGrowth:'사용자 성장',performanceMetrics:'성능 지표',live:'실시간',fcp:'최초 콘텐츠 표시',tti:'상호작용 가능 시간',bundleSize:'번들 크기',lighthouse:'Lighthouse 점수',errorRate:'오류율',apiLatency:'API 지연 시간',memoryUsage:'메모리 사용량',cacheHitRate:'캐시 적중률',frameRate:'프레임 속도',cpuUsage:'CPU 사용량',dbQueries:'DB 쿼리',refresh:'↻ 새로고침'},
+    settings: {projectSettings:'프로젝트 설정',ciCdConfig:'CI/CD 설정',envVariables:'환경 변수',notifications:'알림 설정',dangerZone:'위험 구역',about:'정보',keyboardShortcuts:'키보드 단축키',projectName:'프로젝트명',version:'버전',buildCommand:'빌드 명령어',outputDirectory:'출력 디렉토리',saveSettings:'설정 저장',ciProvider:'CI 제공자',branch:'브랜치',autoDeploy:'푸시 시 자동 배포',saveCiCd:'CI/CD 저장',key:'키',value:'값',addVariable:'+ 변수 추가',saveVariables:'변수 저장',clearBuildHistory:'빌드 기록 지우기',clearBuildHistoryDesc:'모든 과거 빌드 기록 제거',clearAll:'전체 지우기',resetEditorFiles:'에디터 파일 초기화',resetEditorFilesDesc:'기본 코드 템플릿 복원',reset:'초기화',resetAllData:'모든 데이터 초기화',resetAllDataDesc:'모든 로컬 저장소 데이터를 지우고 새로 시작',resetEverything:'전체 초기화',cancel:'취소',build:'빌드',engine:'엔진',license:'라이선스',repository:'저장소',navigatePages:'페이지 이동',newProject:'새 프로젝트',triggerBuild:'빌드 트리거',saveFile:'파일 저장',deleteProject:'프로젝트 삭제',areYouSure:'정말 삭제하시겠습니까',cannotUndo:'이 작업은 되돌릴 수 없습니다.',saveChanges:'변경사항 저장'},
+    modal: {newProject:'새 프로젝트',editProject:'프로젝트 편집',deleteProject:'프로젝트 삭제',triggerBuild:'빌드 트리거',resetAllData:'모든 데이터 초기화',cancel:'취소',createProject:'프로젝트 생성',saveChanges:'변경사항 저장',delete:'삭제',resetEverything:'전체 초기화'},
+    common: {search:'검색...'}
+  }
+};
+var APP = (function(){
+  function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+  var projects = load('cf_projects', null);
+  if(!projects){
+    projects = [
+      {id:1,name:'ShopFlow',desc:'Cross-platform e-commerce app with real-time inventory and payment integration',platforms:['iOS','Android','Web'],status:'active',team:['Alice','Bob','Carol'],version:'2.1.0',progress:78,createdAt:Date.now()-864e5*30},
+      {id:2,name:'FitTrack Pro',desc:'Fitness tracking app with health metrics, workout plans, and social features',platforms:['iOS','Android'],status:'dev',team:['Dave','Eve'],version:'1.3.0-beta',progress:45,createdAt:Date.now()-864e5*20},
+      {id:3,name:'CloudNotes',desc:'Collaborative note-taking app with markdown support and real-time sync',platforms:['Web','Desktop'],status:'testing',team:['Frank','Grace'],version:'3.0.0-rc1',progress:92,createdAt:Date.now()-864e5*45},
+      {id:4,name:'GameHub',desc:'Social gaming platform with leaderboards, achievements, and chat',platforms:['iOS','Android','Web','Desktop'],status:'active',team:['Alice','Eve','Hank'],version:'1.8.2',progress:65,createdAt:Date.now()-864e5*60},
+      {id:5,name:'DevDash',desc:'Developer dashboard for monitoring CI/CD pipelines and deployment metrics',platforms:['Web'],status:'deployed',team:['Bob','Ivy'],version:'4.2.0',progress:100,createdAt:Date.now()-864e5*90},
+      {id:6,name:'MealPlan AI',desc:'AI-powered meal planning with nutritional analysis and grocery lists',platforms:['iOS','Android'],status:'dev',team:['Carol','Dave','Grace'],version:'0.9.0-alpha',progress:28,createdAt:Date.now()-864e5*10}
+    ];
+    save('cf_projects', projects);
+  }
+
+  var team = [
+    {name:'Alice Chen',role:'Admin',color:'#6366f1',email:'alice@crossforge.dev',activity:'Deployed ShopFlow v2.1.0',online:true,projects:3},
+    {name:'Bob Martinez',role:'Dev',color:'#8b5cf6',email:'bob@crossforge.dev',activity:'Merged PR #142 in DevDash',online:true,projects:2},
+    {name:'Carol Wang',role:'Designer',color:'#ec4899',email:'carol@crossforge.dev',activity:'Updated design system tokens',online:false,projects:2},
+    {name:'Dave Kim',role:'Dev',color:'#3b82f6',email:'dave@crossforge.dev',activity:'Fixed auth flow on Android',online:true,projects:2},
+    {name:'Eve Johnson',role:'Dev',color:'#06b6d4',email:'eve@crossforge.dev',activity:'Added WebSocket support',online:false,projects:2},
+    {name:'Frank Liu',role:'QA',color:'#22c55e',email:'frank@crossforge.dev',activity:'Passed regression tests',online:true,projects:1},
+    {name:'Grace Park',role:'Designer',color:'#f59e0b',email:'grace@crossforge.dev',activity:'Created onboarding illustrations',online:false,projects:2},
+    {name:'Hank Wilson',role:'Dev',color:'#ef4444',email:'hank@crossforge.dev',activity:'Optimized build pipeline',online:true,projects:1}
+  ];
+
+  var activities = [
+    {text:'<strong>Alice</strong> deployed ShopFlow v2.1.0 to production',time:'5m ago',color:'#22c55e'},
+    {text:'<strong>Bob</strong> merged PR #142 into main branch',time:'18m ago',color:'#6366f1'},
+    {text:'<strong>Frank</strong> completed regression testing for CloudNotes',time:'1h ago',color:'#22c55e'},
+    {text:'<strong>Carol</strong> pushed new design assets to GameHub',time:'2h ago',color:'#ec4899'},
+    {text:'<strong>Dave</strong> fixed critical auth bug on Android',time:'3h ago',color:'#ef4444'},
+    {text:'<strong>Eve</strong> added WebSocket support to Chat module',time:'4h ago',color:'#06b6d4'},
+    {text:'<strong>Hank</strong> optimized CI pipeline, 40% faster builds',time:'5h ago',color:'#8b5cf6'},
+    {text:'<strong>Grace</strong> updated MealPlan AI illustrations',time:'6h ago',color:'#f59e0b'},
+    {text:'<strong>Alice</strong> reviewed PR #139 for api-refactor',time:'7h ago',color:'#6366f1'},
+    {text:'<strong>Bob</strong> released DevDash v4.2.0 to web',time:'1d ago',color:'#22c55e'},
+    {text:'<strong>Dave</strong> created feature branch for push-notifications',time:'1d ago',color:'#3b82f6'},
+    {text:'<strong>Frank</strong> filed bug report #287 on MealPlan AI',time:'1d ago',color:'#ef4444'},
+    {text:'<strong>Eve</strong> updated API documentation for v2 endpoints',time:'2d ago',color:'#06b6d4'},
+    {text:'<strong>Grace</strong> completed icon set for FitTrack Pro',time:'2d ago',color:'#f59e0b'}
+  ];
+
+  var buildHistory = load('cf_builds', null);
+  if(!buildHistory){
+    var now = Date.now();
+    buildHistory = [
+      {id:1,project:'ShopFlow',platform:'iOS',status:'success',time:now-36e5,duration:'3m 22s',size:'14.2 MB'},
+      {id:2,project:'ShopFlow',platform:'Android',status:'success',time:now-72e5,duration:'2m 58s',size:'11.7 MB'},
+      {id:3,project:'CloudNotes',platform:'Web',status:'failed',time:now-108e5,duration:'0m 45s',size:'-'},
+      {id:4,project:'GameHub',platform:'Web',status:'success',time:now-144e5,duration:'4m 12s',size:'18.3 MB'},
+      {id:5,project:'DevDash',platform:'Web',status:'success',time:now-18e6,duration:'1m 55s',size:'8.4 MB'},
+      {id:6,project:'FitTrack Pro',platform:'iOS',status:'success',time:now-864e5,duration:'3m 10s',size:'12.8 MB'},
+      {id:7,project:'MealPlan AI',platform:'Android',status:'failed',time:now-9e6,duration:'1m 02s',size:'-'},
+      {id:8,project:'ShopFlow',platform:'Web',status:'success',time:now-864e5*2,duration:'2m 14s',size:'6.1 MB'},
+      {id:9,project:'GameHub',platform:'iOS',status:'success',time:now-864e5*3,duration:'3m 48s',size:'16.5 MB'},
+      {id:10,project:'GameHub',platform:'Android',status:'success',time:now-864e5*3+36e5,duration:'2m 55s',size:'14.1 MB'},
+      {id:11,project:'CloudNotes',platform:'Desktop',status:'success',time:now-864e5*4,duration:'4m 30s',size:'22.7 MB'},
+      {id:12,project:'DevDash',platform:'Desktop',status:'success',time:now-864e5*5,duration:'3m 15s',size:'19.8 MB'}
+    ];
+    save('cf_builds', buildHistory);
+  }
+
+  var editorFiles = load('cf_editor', null);
+  if(!editorFiles){
+    editorFiles = {
+      'main.dart': 'import \'package:flutter/material.dart\';\nimport \'package:provider/provider.dart\';\nimport \'package:go_router/go_router.dart\';\nimport \'package:dio/dio.dart\';\n\nvoid main() async {\n  WidgetsFlutterBinding.ensureInitialized();\n  await initServices();\n\n  runApp(\n    MultiProvider(\n      providers: [\n        ChangeNotifierProvider(create: (_) => AppStore()),\n        ChangeNotifierProvider(create: (_) => CartStore()),\n        ChangeNotifierProvider(create: (_) => UserStore()),\n        Provider(create: (_) => ApiService(Dio())),\n        Provider(create: (_) => StorageService()),\n      ],\n      child: const MyApp(),\n    ),\n  );\n}\n\nclass MyApp extends StatelessWidget {\n  const MyApp({super.key});\n\n  static final _router = GoRouter(\n    routes: [\n      GoRoute(path: \'/\', builder: (_, __) => const HomePage()),\n      GoRoute(path: \'/product/:id\', builder: (_, state) => ProductPage(id: state.pathParameters[\'id\']!)),\n      GoRoute(path: \'/cart\', builder: (_, __) => const CartPage()),\n      GoRoute(path: \'/profile\', builder: (_, __) => const ProfilePage()),\n    ],\n  );\n\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp.router(\n      title: \'ShopFlow\',\n      debugShowCheckedModeBanner: false,\n      theme: ThemeData(\n        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),\n        useMaterial3: true,\n        typography: Typography.material2021(),\n      ),\n      routerConfig: _router,\n    );\n  }\n}\n\nFuture<void> initServices() async {\n  await StorageService.init();\n  await ApiService.configure();\n}',
+      'App.jsx': 'import React, { useState, useEffect, useCallback } from "react";\nimport { BrowserRouter, Routes, Route } from "react-router-dom";\nimport { Navigation } from "./components/Navigation";\nimport { Dashboard } from "./pages/Dashboard";\nimport { Products } from "./pages/Products";\nimport { Cart } from "./pages/Cart";\nimport { Profile } from "./pages/Profile";\nimport { useAuth } from "../hooks/useAuth";\nimport { ThemeProvider } from "../context/ThemeContext";\nimport { CartProvider } from "../context/CartContext";\n\nexport default function App() {\n  const [theme, setTheme] = useState("dark");\n  const { user, isLoading, error } = useAuth();\n\n  useEffect(() => {\n    const saved = localStorage.getItem("theme") || "dark";\n    setTheme(saved);\n  }, []);\n\n  useEffect(() => {\n    document.documentElement.setAttribute("data-theme", theme);\n    localStorage.setItem("theme", theme);\n  }, [theme]);\n\n  const handleThemeChange = useCallback((newTheme) => {\n    setTheme(newTheme);\n  }, []);\n\n  if (isLoading) {\n    return <LoadingSpinner size="large" />;\n  }\n\n  if (error) {\n    return <ErrorBoundary error={error} />;\n  }\n\n  return (\n    <ThemeProvider theme={theme}>\n      <CartProvider>\n        <BrowserRouter>\n          <div className="app-container">\n            <Navigation\n              user={user}\n              theme={theme}\n              onThemeChange={handleThemeChange}\n            />\n            <main className="content" role="main">\n              <Routes>\n                <Route path="/" element={<Dashboard user={user} />} />\n                <Route path="/products" element={<Products />} />\n                <Route path="/cart" element={<Cart />} />\n                <Route path="/profile" element={<Profile user={user} />} />\n              </Routes>\n            </main>\n          </div>\n        </BrowserRouter>\n      </CartProvider>\n    </ThemeProvider>\n  );\n}',
+      'styles.css': ':root {\n  --primary: #6366f1;\n  --primary-hover: #4f46e5;\n  --bg: #0a0a12;\n  --surface: #181830;\n  --surface-hover: #20203e;\n  --text: #e4e4f0;\n  --text-secondary: #9898b8;\n  --muted: #6060a0;\n  --border: #2a2a50;\n  --radius: 8px;\n  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n  --transition: all 0.2s ease;\n}\n\n[data-theme="light"] {\n  --bg: #f8f9fa;\n  --surface: #ffffff;\n  --text: #1a1a2e;\n  --text-secondary: #6b7280;\n  --border: #e5e7eb;\n}\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nhtml {\n  scroll-behavior: smooth;\n}\n\nbody {\n  font-family: "Inter", system-ui, -apple-system, sans-serif;\n  background: var(--bg);\n  color: var(--text);\n  line-height: 1.6;\n  -webkit-font-smoothing: antialiased;\n}\n\n.container {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 0 24px;\n}\n\n.card {\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: var(--radius);\n  padding: 16px;\n  transition: var(--transition);\n}\n\n.card:hover {\n  box-shadow: var(--shadow);\n  transform: translateY(-2px);\n}\n\n.btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 8px 20px;\n  border-radius: var(--radius);\n  font-weight: 600;\n  font-size: 14px;\n  border: none;\n  cursor: pointer;\n  transition: var(--transition);\n}\n\n.btn-primary {\n  background: var(--primary);\n  color: white;\n}\n\n.btn-primary:hover {\n  background: var(--primary-hover);\n}',
+      'config.json': '{\n  "name": "shopflow",\n  "version": "2.1.0",\n  "private": true,\n  "description": "Cross-platform e-commerce application",\n  "platforms": ["ios", "android", "web", "desktop"],\n  "build": {\n    "ios": {\n      "bundleId": "com.shopflow.app",\n      "minSdk": "14.0",\n      "targetSdk": "17.0",\n      "provisioningProfile": "match AppStore"\n    },\n    "android": {\n      "appId": "com.shopflow.app",\n      "minSdk": 24,\n      "targetSdk": 34,\n      "signingConfig": "release"\n    },\n    "web": {\n      "basePath": "/",\n      "prerender": true,\n      "serviceWorker": true,\n      "compression": "gzip"\n    },\n    "desktop": {\n      "target": "electron",\n      "autoUpdate": true,\n      "codeSign": true\n    }\n  },\n  "environment": "production",\n  "apiEndpoint": "https://api.shopflow.io/v2",\n  "cdnEndpoint": "https://cdn.shopflow.io",\n  "sentry": {\n    "dsn": "https://example@sentry.io/123",\n    "tracesSampleRate": 0.1\n  },\n  "analytics": {\n    "enabled": true,\n    "provider": "mixpanel",\n    "trackPageViews": true\n  }\n}'
+    };
+    save('cf_editor', editorFiles);
+  }
+
+  var settings = load('cf_settings', {
+    projectName:'ShopFlow',buildCmd:'npm run build',outputDir:'./dist',
+    autoDeploy:false,ciProvider:'github',branch:'main',
+    envVars:[{key:'API_KEY',value:'••••••••'},{key:'BASE_URL',value:'https://api.shopflow.io'},{key:'NODE_ENV',value:'production'},{key:'DEBUG',value:'false'},{key:'SENTRY_DSN',value:'https://example@sentry.io/123'},{key:'CDN_URL',value:'https://cdn.shopflow.io'},{key:'MAX_RETRIES',value:'3'},{key:'TIMEOUT_MS',value:'5000'}],
+    notifications:{buildComplete:true,deploySuccess:true,errorAlert:true,teamUpdates:false,weeklyReport:true,pullRequestReviews:true,securityAlerts:true}
+  });
+
+  var currentPage = 'dashboard';
+  var currentEditorFile = 'main.dart';
+  var buildQueue = [];
+  var buildFilter = 'all';
+  var nextProjId = 7;
+
+  function toast(msg, type){
+    var c = document.getElementById('toasts');
+    var t = document.createElement('div');
+    t.className = 'toast ' + (type||'info');
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){ t.remove() },300) },2500);
+  }
+
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+  function timeAgo(ts){ var d=Date.now()-ts,m=Math.floor(d/6e4); if(m<1)return 'just now'; if(m<60)return m+'m ago'; var h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago' }
+
+  function highlightCode(code, ext){
+    if(ext==='json'){
+      return esc(code).replace(/"([^"]+)"(?=\s*:)/g,'<span class="attr">"$1"</span>').replace(/:\s*"([^"]*)"/g,': <span class="str">"$1"</span>').replace(/:\s*(\d+)/g,': <span class="num">$1</span>').replace(/:\s*(true|false|null)/g,': <span class="kw">$1</span>');
+    }
+    var html = esc(code);
+    html = html.replace(/(\/\/[^\n]*)/g,'<span class="cm">$1</span>');
+    html = html.replace(/(\/\*[\s\S]*?\*\/)/g,'<span class="cm">$1</span>');
+    html = html.replace(/('(?:[^'\\]|\\.)*')/g,'<span class="str">$1</span>');
+    html = html.replace(/("(?:[^"\\]|\\.)*")/g,'<span class="str">$1</span>');
+    var kws = ext==='dart'
+      ? '\\b(import|export|library|part|show|hide|as|class|abstract|extends|implements|mixin|with|enum|typedef|extension|on|static|const|final|var|late|required|covariant|dynamic|void|int|double|bool|String|List|Map|Set|Future|Stream|async|await|sync|yield|return|if|else|for|while|do|switch|case|default|break|continue|try|catch|finally|throw|rethrow|new|this|super|is|in|true|false|null|get|set|factory|operator|override)\\b'
+      : '\\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|new|this|super|class|extends|import|export|from|default|async|await|yield|try|catch|finally|throw|typeof|instanceof|in|of|true|false|null|undefined|void|delete|static|get|set)\\b';
+    html = html.replace(new RegExp(kws,'g'),'<span class="kw">$1</span>');
+    html = html.replace(/\b(\d+\.?\d*)\b/g,'<span class="num">$1</span>');
+    if(ext==='jsx'||ext==='tsx'){
+      html = html.replace(/(&lt;\/?)([\w.]+)/g,'$1<span class="tag">$2</span>');
+    }
+    return html;
+  }
+
+  function openModal(title, bodyHtml, ftHtml){
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = bodyHtml;
+    document.getElementById('modalFt').innerHTML = ftHtml||'';
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal(){ document.getElementById('modal').classList.remove('open') }
+  document.getElementById('modal').addEventListener('click',function(e){ if(e.target===this) closeModal() });
+
+  function switchPage(page){
+    currentPage = page;
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active') });
+    document.getElementById('page-'+page).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active') });
+    document.querySelector('.nav-item[data-page="'+page+'"]').classList.add('active');
+    var titles = {dashboard:T('nav.dashboard'),projects:T('nav.projects'),editor:T('nav.editor'),build:T('nav.builds'),devices:T('nav.devices'),team:T('nav.team'),analytics:T('nav.analytics'),settings:T('nav.settings')};
+    document.getElementById('pageTitle').textContent = titles[page]||page;
+    renderPage(page);
+  }
+
+  function renderPage(page){
+    var actionsEl = document.getElementById('pageActions');
+    actionsEl.innerHTML = '';
+    if(page==='projects') actionsEl.innerHTML = '<button class="btn btn-primary" onclick="APP.showNewProject()">'+T("sidebar.newProject")+'</button>';
+    if(page==='editor') actionsEl.innerHTML = '<span style="font-size:11px;color:var(--text3)">Auto-saved</span> <span class="kbd">Ctrl+S</span>';
+    if(page==='build') actionsEl.innerHTML = '<button class="btn btn-primary" onclick="APP.triggerBuild()">▶ Trigger Build</button> <span class="kbd">Ctrl+B</span>';
+    if(page==='analytics') actionsEl.innerHTML = '<button class="btn btn-secondary" onclick="APP.refreshAnalytics()">↻ Refresh</button>';
+    var renderers = {dashboard:renderDashboard,projects:renderProjects,editor:renderEditor,build:renderBuild,devices:renderDevices,team:renderTeam,analytics:renderAnalytics,settings:renderSettings};
+    if(renderers[page]) renderers[page]();
+  }
+
+  function renderDashboard(){
+    var activeP = projects.filter(function(p){return p.status==='active'}).length;
+    var totalBuilds = buildHistory.length;
+    var deployed = projects.filter(function(p){return p.status==='deployed'}).length;
+    var el = document.getElementById('page-dashboard');
+    el.innerHTML = '<div class="stat-grid">'
+      +'<div class="stat-card"><div class="label">'+T("dashboard.totalProjects")+'</div><div class="value">'+projects.length+'</div><div class="change">'+T("dashboard.monthUp")+'</div></div>'
+      +'<div class="stat-card"><div class="label">'+T("dashboard.totalBuilds")+'</div><div class="value">'+totalBuilds+'</div><div class="change">'+T("dashboard.weekUp")+'</div></div>'
+      +'<div class="stat-card"><div class="label">'+T("dashboard.teamMembers")+'</div><div class="value">'+team.length+'</div><div class="change">'+team.filter(function(t){return t.online}).length+' '+T("dashboard.onlineNow")+'</div></div>'
+      +'<div class="stat-card"><div class="label">'+T("dashboard.deployments")+'</div><div class="value">'+deployed+'</div><div class="change down">'+T("dashboard.weekUpDown")+'</div></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:20px">'
+      +'<button class="btn btn-primary" onclick="APP.showNewProject()">'+T("sidebar.newProject")+'</button>'
+      +'<button class="btn btn-secondary" onclick="APP.switchPage(\'build\')">'+T("dashboard.buildNow")+'</button>'
+      +'<button class="btn btn-secondary" onclick="APP.switchPage(\'editor\')">'+T("dashboard.openEditor")+'</button>'
+      +'<button class="btn btn-secondary" onclick="APP.switchPage(\'devices\')">'+T("dashboard.preview")+'</button>'
+      +'</div>'
+      +'<div class="dash-grid">'
+      +'<div class="card"><div class="card-hdr">'+T("dashboard.recentActivity")+'</div><div class="card-body">'
+      + activities.map(function(a){ return '<div class="activity-item"><div class="activity-dot" style="background:'+a.color+'"></div><div class="activity-text">'+a.text+'</div><div class="activity-time">'+a.time+'</div></div>' }).join('')
+      +'</div></div>'
+      +'<div class="card"><div class="card-hdr">'+T("dashboard.platformDistribution")+'</div><div class="card-body"><canvas id="pieChart" width="320" height="240"></canvas></div></div>'
+      +'</div>'
+      +'<div class="section-divider"></div>'
+      +'<div class="section-title">'+T("dashboard.systemStatus")+' <span class="st-badge">Live</span></div>'
+      +'<div id="systemStatus" style="margin-bottom:16px"><div style="color:var(--text3);font-size:11px">'+T("dashboard.loading")+'</div></div>'
+      +'<div class="section-divider"></div>'
+      +'<div class="section-title">'+T("dashboard.activeProjects")+' <span class="st-badge">'+projects.filter(function(p){return p.status!=='deployed'}).length+''+T("dashboard.active")+'</span></div>'
+      +'<div class="dash-projects">'
+      + projects.filter(function(p){return p.status!=='deployed'}).slice(0,5).map(function(p){
+        return '<div class="dash-proj-row">'
+          +'<div class="dp-icon">'+p.name.charAt(0)+'</div>'
+          +'<div class="dp-info"><div class="dp-name">'+esc(p.name)+'</div><div class="dp-meta">v'+p.version+' · '+p.platforms.join(', ')+' · '+p.team.length+''+T("dashboard.members")+'</div></div>'
+          +'<div class="dp-bar"><div class="dp-fill" style="width:'+p.progress+'%"></div></div>'
+          +'<div class="dp-pct">'+p.progress+'%</div>'
+          +'</div>';
+      }).join('')
+      +'</div>';
+    drawPieChart();
+    setTimeout(function(){
+      var statusEl = document.getElementById('systemStatus');
+      if(statusEl){
+        statusEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'
+          +'<div style="text-align:center;padding:8px;background:var(--bg3);border-radius:var(--r)"><div style="font-size:10px;color:var(--text3)">'+T("dashboard.cpu")+'</div><div style="font-size:14px;font-weight:700;color:var(--green)">23%</div></div>'
+          +'<div style="text-align:center;padding:8px;background:var(--bg3);border-radius:var(--r)"><div style="font-size:10px;color:var(--text3)">'+T("dashboard.memory")+'</div><div style="font-size:14px;font-weight:700;color:var(--accent)">4.2 GB</div></div>'
+          +'<div style="text-align:center;padding:8px;background:var(--bg3);border-radius:var(--r)"><div style="font-size:10px;color:var(--text3)">'+T("dashboard.disk")+'</div><div style="font-size:14px;font-weight:700;color:var(--orange)">67%</div></div>'
+          +'<div style="text-align:center;padding:8px;background:var(--bg3);border-radius:var(--r)"><div style="font-size:10px;color:var(--text3)">'+T("dashboard.network")+'</div><div style="font-size:14px;font-weight:700;color:var(--cyan)">12ms</div></div>'
+          +'</div>';
+      }
+    }, 100);
+  }
+
+  function drawPieChart(){
+    var canvas = document.getElementById('pieChart');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var counts = {iOS:0,Android:0,Web:0,Desktop:0};
+    projects.forEach(function(p){ p.platforms.forEach(function(pl){ counts[pl]=(counts[pl]||0)+1 }) });
+    var data = [];
+    var colors = ['#6366f1','#8b5cf6','#3b82f6','#06b6d4'];
+    var labels = [];
+    var i=0;
+    for(var k in counts){ if(counts[k]>0){ data.push(counts[k]); labels.push(k+' ('+counts[k]+')') } }
+    var total = data.reduce(function(a,b){return a+b},0);
+    var cx=140,cy=120,r=80,startAngle=-Math.PI/2;
+    for(var j=0;j<data.length;j++){
+      var slice = (data[j]/total)*Math.PI*2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,startAngle,startAngle+slice);
+      ctx.fillStyle=colors[j%colors.length]; ctx.fill();
+      var mid = startAngle+slice/2;
+      var lx=cx+Math.cos(mid)*(r+20), ly=cy+Math.sin(mid)*(r+20);
+      ctx.fillStyle='#9898b8'; ctx.font='11px system-ui'; ctx.textAlign='center';
+      ctx.fillText(labels[j],lx,ly);
+      startAngle+=slice;
+    }
+    ctx.beginPath(); ctx.arc(cx,cy,40,0,Math.PI*2); ctx.fillStyle='#0a0a12'; ctx.fill();
+    ctx.fillStyle='#e4e4f0'; ctx.font='bold 18px system-ui'; ctx.textAlign='center';
+    ctx.fillText(total,cx,cy+2);
+    ctx.fillStyle='#6060a0'; ctx.font='10px system-ui';
+    ctx.fillText(T("dashboard.platforms"),cx,cy+14);
+  }
+
+  function renderProjects(){
+    document.getElementById('projCount').textContent = projects.length;
+    var el = document.getElementById('page-projects');
+    var statusCounts = {all:projects.length,active:0,dev:0,testing:0,deployed:0};
+    projects.forEach(function(p){ statusCounts[p.status]=(statusCounts[p.status]||0)+1 });
+    el.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+      +'<div class="search-bar"><span style="color:var(--text3);font-size:13px">🔍</span><input type="text" id="projSearch" placeholder="'+T("projects.search")+'" oninput="APP.filterProjects()"></div>'
+      +'<div style="display:flex;gap:6px">'
+      +['all','active','dev','testing','deployed'].map(function(s){return '<div class="device-ctrl-btn'+(s==='all'?' active':'')+'" data-status="'+s+'" onclick="APP.filterByStatus(\''+s+'\')">'+(s==='all'?T('projects.all'):s==='dev'?T('projects.dev'):s==='active'?T('projects.active'):T('projects.'+s))+' <span style="opacity:.6">'+statusCounts[s]+'</span></div>'}).join('')
+      +'</div></div>'
+      +'<div class="proj-grid" id="projGrid">'
+      +(projects.length===0?'<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-msg">No projects yet</div><div class="empty-hint">Click "New Project" to get started</div></div>'
+      : projects.map(function(p){
+        return renderProjectCard(p);
+      }).join(''))
+      +'</div>';
+  }
+
+  function renderProjectCard(p){
+    var sl = {active:T('projects.active'),dev:T('projects.dev'),testing:T('projects.testing'),deployed:T('projects.deployed')};
+    var sc = 'status-'+p.status;
+    return '<div class="proj-card" data-id="'+p.id+'" data-status="'+p.status+'">'
+      +'<div class="top"><div class="name">'+esc(p.name)+'</div><span class="proj-status '+sc+'">'+(sl[p.status]||p.status)+'</span></div>'
+      +'<div class="desc">'+esc(p.desc)+'</div>'
+      +'<div class="proj-platforms">'+p.platforms.map(function(pl){return '<span class="platform-tag">'+pl+'</span>'}).join('')+'</div>'
+      +'<div class="proj-progress"><div class="bar-bg"><div class="bar-fill" style="width:'+p.progress+'%"></div></div><div class="labels"><span>v'+p.version+'</span><span>'+p.progress+'%</span></div></div>'
+      +'<div class="meta"><div class="avatars">'+p.team.map(function(t){var tm=team.find(function(m){return m.name.startsWith(t)});return '<div class="avatar" style="background:'+(tm?tm.color:'#666')+'">'+t.charAt(0)+'</div>'}).join('')+'</div>'
+      +'<span style="margin-left:8px">'+p.team.length+' '+T("projects.members")+'</span>'
+      +'<div class="actions"><button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();APP.editProject('+p.id+')">'+T("projects.edit")+'</button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();APP.deleteProject('+p.id+')">'+T("projects.delete")+'</button></div>'
+      +'</div></div>';
+  }
+
+  var projStatusFilter = 'all';
+  function filterProjects(){
+    var q = (document.getElementById('projSearch').value||'').toLowerCase();
+    document.querySelectorAll('.proj-card').forEach(function(card){
+      var name = card.querySelector('.name').textContent.toLowerCase();
+      var desc = card.querySelector('.desc').textContent.toLowerCase();
+      var status = card.dataset.status;
+      var matchSearch = !q || name.indexOf(q)!==-1 || desc.indexOf(q)!==-1;
+      var matchStatus = projStatusFilter==='all' || status===projStatusFilter;
+      card.style.display = (matchSearch && matchStatus) ? '' : 'none';
+    });
+  }
+  function filterByStatus(status){
+    projStatusFilter = status;
+    document.querySelectorAll('.device-ctrl-btn[data-status]').forEach(function(b){b.classList.remove('active')});
+    var btn = document.querySelector('.device-ctrl-btn[data-status="'+status+'"]');
+    if(btn) btn.classList.add('active');
+    filterProjects();
+  }
+
+  function renderEditor(){
+    var el = document.getElementById('page-editor');
+    var fileNames = Object.keys(editorFiles);
+    var exts = {'dart':'dart','jsx':'jsx','css':'css','json':'json'};
+    var currentCode = editorFiles[currentEditorFile]||'';
+    var lines = currentCode.split('\n');
+    var ext = currentEditorFile.split('.').pop();
+    var highlighted = highlightCode(currentCode, ext);
+    var hLines = highlighted.split('\n');
+
+    el.innerHTML = '<div class="editor-wrap">'
+      +'<div class="editor-tabs">'
+      + fileNames.map(function(f){
+        var dot = {dart:'#60a5fa',jsx:'#fbbf24',css:'#ec4899',json:'#4ade80'}[ext]||'#999';
+        return '<div class="editor-tab'+(f===currentEditorFile?' active':'')+'" data-file="'+f+'"><span class="dot" style="background:'+dot+'"></span>'+f+'</div>';
+      }).join('')
+      +'</div>'
+      +'<div class="editor-content">'
+      +'<div class="line-nums">'+lines.map(function(_,i){return '<span>'+(i+1)+'</span>'}).join('')+'</div>'
+      +'<div class="code-area" contenteditable="true" id="codeEditor" spellcheck="false">'+hLines.join('\n')+'</div>'
+      +'</div></div>';
+
+    el.querySelectorAll('.editor-tab').forEach(function(tab){
+      tab.onclick = function(){
+        currentEditorFile = tab.dataset.file;
+        renderEditor();
+      };
+    });
+
+    var codeEl = document.getElementById('codeEditor');
+    var saveTimer = null;
+    codeEl.addEventListener('input', function(){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function(){
+        var raw = codeEl.innerText||codeEl.textContent;
+        editorFiles[currentEditorFile] = raw;
+        save('cf_editor', editorFiles);
+        var newLines = raw.split('\n');
+        var numsEl = el.querySelector('.line-nums');
+        numsEl.innerHTML = newLines.map(function(_,i){return '<span>'+(i+1)+'</span>'}).join('');
+      }, 500);
+    });
+  }
+
+  function renderBuild(){
+    var el = document.getElementById('page-build');
+    var filtered = buildFilter==='all' ? buildHistory : buildHistory.filter(function(b){return b.status===buildFilter});
+    el.innerHTML = '<div class="build-grid">'
+      +'<div>'
+      +'<div class="card" style="margin-bottom:16px"><div class="card-hdr">'+T("build.buildPlatforms")+' <span style="font-size:10px;color:var(--text3);font-weight:400">'+T("build.clickToBuild")+'</span></div><div class="card-body">'
+      +'<div class="build-platforms-grid">'
+      +['iOS','Android','Web','Desktop'].map(function(pl){
+        var icon = {iOS:'🍎',Android:'🤖',Web:'🌐',Desktop:'🖥️'}[pl];
+        var lastB = buildHistory.filter(function(b){return b.platform===pl});
+        var lastSuccess = buildHistory.filter(function(b){return b.platform===pl&&b.status==='success'});
+        var st = lastB.length>0 ? lastB[0].status : 'idle';
+        var buildCount = lastB.length;
+        var successRate = lastB.length>0 ? Math.round(lastSuccess.length/lastB.length*100) : 0;
+        return '<div class="build-plat-card" onclick="APP.triggerBuildFor(\''+pl+'\')">'
+          +'<div class="plat-icon">'+icon+'</div>'
+          +'<div class="plat-name">'+pl+'</div>'
+          +'<div class="plat-status">'+(st==='success'?T("build.lastBuildOK"):st==='failed'?T("build.lastBuildFailed"):T("build.readyToBuild"))+'</div>'
+          +'<div style="font-size:9px;color:var(--text3);margin-top:4px">'+buildCount+' '+T("build.builds")+' · '+successRate+' '+T("build.success")+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div></div></div>'
+      +'<div class="card" style="margin-bottom:16px"><div class="card-hdr">'+T("build.quickStats")+'</div><div class="card-body">'
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'
+      +'<div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--green)">'+buildHistory.filter(function(b){return b.status==='success'}).length+'</div><div style="font-size:9px;color:var(--text3)">'+T("build.successful")+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--red)">'+buildHistory.filter(function(b){return b.status==='failed'}).length+'</div><div style="font-size:9px;color:var(--text3)">'+T("build.failed")+'</div></div>'
+      +'<div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--accent)">'+(buildHistory.length>0?Math.round(buildHistory.filter(function(b){return b.status==='success'}).length/buildHistory.length*100):0)+'%</div><div style="font-size:9px;color:var(--text3)">'+T("build.successRate")+'</div></div>'
+      +'</div></div></div>'
+      +'<div class="card"><div class="card-hdr">'+T("build.buildQueue")+''+(buildQueue.length>0?' ('+buildQueue.length+')':'')+'</div><div class="card-body">'
+      +(buildQueue.length===0?'<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">'+T("build.noBuildsQueue")+'</div>'
+        :buildQueue.map(function(b){return '<div class="queue-item"><span style="font-size:12px">'+b.project+'</span><span style="font-size:11px;color:var(--text3)">'+b.platform+'</span><div class="q-bar"><div class="q-fill" style="width:'+b.progress+'%"></div></div><span style="font-size:11px;color:var(--accent)">'+b.progress+'%</span></div>'}).join(''))
+      +'</div></div>'
+      +'</div>'
+      +'<div>'
+      +'<div class="card" style="margin-bottom:16px"><div class="card-hdr">'+T("build.buildLog")+' <span style="font-size:10px;color:var(--text3);font-weight:400">'+T("build.realTime")+'</span></div><div class="card-body"><div class="build-log-box" id="buildLog">'
+      +'[INFO] CrossForge Build System v2.4.1\n[INFO] Node.js v20.11.0 | npm v10.2.4\n[INFO] Flutter 3.22.0 | Dart 3.4.0\n[INFO] ──────────────────────────────\n[INFO] Ready to build\n[INFO] Select a platform or trigger a new build to start.\n[INFO] Build artifacts will appear in the history table below.\n[INFO] ──────────────────────────────\n[WARN] No recent builds found in cache\n[INFO] Tip: Use Ctrl+B to quick-build the last configuration'
+      +'</div></div></div>'
+      +'<div class="card"><div class="card-hdr">'+T("build.buildHistory")+'</div><div class="card-body">'
+      +'<div class="filter-tabs">'
+      +['all','success','failed'].map(function(f){return '<div class="filter-tab'+(buildFilter===f?' active':'')+'" onclick="APP.setBuildFilter(\''+f+'\')">'+f==='all'?T('build.all'):f==='success'?T('build.success'):T('build.failed')+'</div>'}).join('')
+      +'</div>'
+      +'<table class="build-history-table"><thead><tr><th>'+T("build.project")+'</th><th>'+T("build.platform")+'</th><th>'+T("build.status")+'</th><th>'+T("build.duration")+'</th><th>'+T("build.size")+'</th><th>'+T("build.time")+'</th><th>'+T("build.actions")+'</th></tr></thead><tbody>'
+      +(filtered.length===0?'<tr><td colspan="7"><div class="empty-state" style="padding:24px"><div class="empty-icon">🔨</div><div class="empty-msg">No builds yet</div><div class="empty-hint">Click a platform card to start your first build</div></div></td></tr>'
+      : filtered.map(function(b){
+        return '<tr><td><strong>'+esc(b.project)+'</strong></td><td>'+b.platform+'</td><td><span style="color:'+(b.status==='success'?'var(--green)':'var(--red)')+';font-weight:600">'+(b.status==='success'?T("build.success"):T("build.failed"))+'</span></td><td>'+b.duration+'</td><td>'+b.size+'</td><td>'+timeAgo(b.time)+'</td><td>'+(b.status==='success'?'<button class="btn btn-sm btn-secondary" onclick="APP.simulateDownload(\''+b.project+'\',\''+b.platform+'\')">'+T("build.download")+'</button>':'<button class="btn btn-sm btn-secondary" onclick="APP.retryBuild(\''+b.project+'\',\''+b.platform+'\')">'+T("build.retry")+'</button>')+'</td></tr>';
+      }).join(''))
+      +'</tbody></table></div></div>'
+      +'</div></div>';
+    document.getElementById('buildCount').textContent = buildHistory.length;
+  }
+
+  var deviceOrientation = 'portrait';
+  function renderDevices(){
+    var el = document.getElementById('page-devices');
+    var devices = [
+      {name:'iPhone 15 Pro',w:375,h:667,icon:'📱',color:'#6366f1',type:'iOS'},
+      {name:'Pixel 8',w:360,h:640,icon:'🤖',color:'#4ade80',type:'Android'},
+      {name:'iPad Air',w:768,h:1024,icon:'📟',color:'#8b5cf6',type:'iPad'},
+      {name:'Desktop',w:1024,h:768,icon:'🖥️',color:'#3b82f6',type:'Desktop'}
+    ];
+    el.innerHTML = '<div class="device-controls">'
+      +'<div class="device-ctrl-btn active" onclick="APP.setOrientation(\'portrait\',this)">Portrait</div>'
+      +'<div class="device-ctrl-btn" onclick="APP.setOrientation(\'landscape\',this)">Landscape</div>'
+      +'<div style="flex:1"></div>'
+      +'<div class="search-bar"><span style="color:var(--text3);font-size:12px">🔍</span><input type="text" placeholder="Preview URL: localhost:3000" style="width:220px"></div>'
+      +'</div>'
+      +'<div class="device-grid">'
+      + devices.map(function(d){
+        var dw = deviceOrientation==='landscape'&&d.type!=='Desktop' ? d.h : d.w;
+        var dh = deviceOrientation==='landscape'&&d.type!=='Desktop' ? d.w : d.h;
+        var scale = Math.min(280/dw, 340/dh, 0.45);
+        return '<div class="device-frame">'
+          +'<div class="frame-hdr"><div class="dots"><span style="background:#ef4444"></span><span style="background:#f59e0b"></span><span style="background:#22c55e"></span></div>'+d.name+' <span style="color:var(--text3);font-weight:400">('+dw+'×'+dh+')</span></div>'
+          +'<div class="frame-screen" style="height:'+Math.round(dh*scale+40)+'px">'
+          +'<div class="preview" style="width:'+dw+'px;height:'+dh+'px;transform:scale('+scale+');transform-origin:top left">'
+          +'<div class="preview-nav">'+esc(projects[0].name)+'</div>'
+          +'<div class="preview-hero"><div class="ph-title">Welcome Back</div><div class="ph-btn"></div></div>'
+          +'<div class="preview-cards"><div class="pc"></div><div class="pc"></div><div class="pc"></div></div>'
+          +'</div></div></div>';
+      }).join('')
+      +'</div>';
+  }
+
+  function setOrientation(orient, btn){
+    deviceOrientation = orient;
+    document.querySelectorAll('.device-controls .device-ctrl-btn').forEach(function(b){b.classList.remove('active')});
+    if(btn) btn.classList.add('active');
+    renderDevices();
+  }
+
+  function renderTeam(){
+    document.getElementById('teamCount').textContent = team.length;
+    var el = document.getElementById('page-team');
+    var teamActivities = [
+      {who:'Alice Chen',action:'deployed',target:'ShopFlow v2.1.0',badge:'deploy',badgeColor:'rgba(6,182,212,.15)',badgeText:'#22d3ee',time:'5m ago'},
+      {who:'Bob Martinez',action:'merged PR',target:'#142 fix-auth-flow',badge:'code',badgeColor:'rgba(99,102,241,.15)',badgeText:'#818cf8',time:'18m ago'},
+      {who:'Frank Liu',action:'passed tests for',target:'CloudNotes v3.0.0-rc1',badge:'test',badgeColor:'rgba(34,197,94,.15)',badgeText:'#4ade80',time:'1h ago'},
+      {who:'Carol Wang',action:'pushed designs to',target:'GameHub assets',badge:'design',badgeColor:'rgba(236,72,153,.15)',badgeText:'#f472b6',time:'2h ago'},
+      {who:'Dave Kim',action:'fixed bug in',target:'Android auth module',badge:'fix',badgeColor:'rgba(239,68,68,.15)',badgeText:'#f87171',time:'3h ago'},
+      {who:'Eve Johnson',action:'implemented',target:'WebSocket support',badge:'feature',badgeColor:'rgba(6,182,212,.15)',badgeText:'#22d3ee',time:'4h ago'},
+      {who:'Hank Wilson',action:'optimized',target:'CI pipeline (40% faster)',badge:'perf',badgeColor:'rgba(139,92,246,.15)',badgeText:'#a78bfa',time:'5h ago'},
+      {who:'Grace Park',action:'created illustrations for',target:'MealPlan AI onboarding',badge:'design',badgeColor:'rgba(236,72,153,.15)',badgeText:'#f472b6',time:'6h ago'},
+      {who:'Alice Chen',action:'reviewed PR',target:'#139 api-refactor',badge:'review',badgeColor:'rgba(245,158,11,.15)',badgeText:'#fbbf24',time:'7h ago'},
+      {who:'Bob Martinez',action:'released',target:'DevDash v4.2.0',badge:'release',badgeColor:'rgba(34,197,94,.15)',badgeText:'#4ade80',time:'1d ago'}
+    ];
+    el.innerHTML = '<div class="team-grid">'
+      + team.map(function(m){
+        var roleClass = 'role-'+m.role.toLowerCase();
+        return '<div class="member-card">'
+          +'<div class="member-avatar" style="background:'+m.color+'">'+m.name.charAt(0)+'</div>'
+          +'<div class="member-info"><div class="name">'+esc(m.name)+'</div><div class="role '+roleClass+'">'+m.role+'</div><div class="activity">'+esc(m.activity)+'</div>'
+          +'<div style="font-size:9px;color:var(--text3);margin-top:2px">'+m.email+' · '+m.projects+' projects</div></div>'
+          +'<div class="member-status '+(m.online?'online':'offline')+'"></div>'
+          +'</div>';
+      }).join('')
+      +'</div>'
+      +'<div class="team-activity">'
+      +'<div class="section-title">Activity Log <span class="st-badge">'+teamActivities.length+' events</span></div>'
+      +'<div class="team-act-card">'
+      + teamActivities.map(function(a){
+        var member = team.find(function(m){return m.name===a.who});
+        return '<div class="team-act-item">'
+          +'<div class="ta-avatar" style="background:'+(member?member.color:'#666')+'">'+a.who.charAt(0)+'</div>'
+          +'<div class="ta-text"><strong>'+a.who+'</strong> '+a.action+' '+a.target+'</div>'
+          +'<div class="ta-badge" style="background:'+a.badgeColor+';color:'+a.badgeText+'">'+a.badge+'</div>'
+          +'<div class="ta-time">'+a.time+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div></div>';
+  }
+
+  function renderAnalytics(){
+    var el = document.getElementById('page-analytics');
+    el.innerHTML = '<div class="metrics-grid" style="margin-bottom:20px">'
+      +'<div class="metric-card"><div class="m-val">24.8K</div><div class="m-label">Total Downloads</div><div class="m-change up">↑ 18% this month</div></div>'
+      +'<div class="metric-card"><div class="m-val">12.3K</div><div class="m-label">Active Users</div><div class="m-change up">↑ 24% this month</div></div>'
+      +'<div class="metric-card"><div class="m-val">98.7%</div><div class="m-label">Uptime</div><div class="m-change up">↑ 0.3%</div></div>'
+      +'<div class="metric-card"><div class="m-val">1.2s</div><div class="m-label">Avg Load Time</div><div class="m-change up">↓ 15% faster</div></div>'
+      +'</div>'
+      +'<div class="analytics-grid">'
+      +'<div class="chart-card"><div class="card-hdr">Downloads by Platform</div><div style="padding:14px"><canvas id="barChart" width="480" height="260"></canvas></div></div>'
+      +'<div class="chart-card"><div class="card-hdr">User Growth</div><div style="padding:14px"><canvas id="lineChart" width="480" height="260"></canvas></div></div>'
+      +'</div>'
+      +'<div class="section-title" style="margin-top:20px">Performance Metrics <span class="st-badge">Live</span></div>'
+      +'<div class="perf-grid">'
+      +'<div class="perf-item"><div class="pi-label">First Contentful Paint</div><div class="pi-value">0.8s</div><div class="pi-bar"><div class="pi-fill" style="width:80%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Time to Interactive</div><div class="pi-value">1.2s</div><div class="pi-bar"><div class="pi-fill" style="width:72%;background:var(--accent)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Bundle Size</div><div class="pi-value">248 KB</div><div class="pi-bar"><div class="pi-fill" style="width:62%;background:var(--cyan)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Lighthouse Score</div><div class="pi-value">94/100</div><div class="pi-bar"><div class="pi-fill" style="width:94%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Error Rate</div><div class="pi-value">0.12%</div><div class="pi-bar"><div class="pi-fill" style="width:8%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">API Latency</div><div class="pi-value">45ms</div><div class="pi-bar"><div class="pi-fill" style="width:55%;background:var(--blue)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Memory Usage</div><div class="pi-value">128 MB</div><div class="pi-bar"><div class="pi-fill" style="width:45%;background:var(--orange)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Cache Hit Rate</div><div class="pi-value">92%</div><div class="pi-bar"><div class="pi-fill" style="width:92%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">Frame Rate</div><div class="pi-value">60 FPS</div><div class="pi-bar"><div class="pi-fill" style="width:100%;background:var(--green)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">CPU Usage</div><div class="pi-value">23%</div><div class="pi-bar"><div class="pi-fill" style="width:23%;background:var(--cyan)"></div></div></div>'
+      +'<div class="perf-item"><div class="pi-label">DB Queries</div><div class="pi-value">12ms avg</div><div class="pi-bar"><div class="pi-fill" style="width:35%;background:var(--accent)"></div></div></div>'
+      +'</div>';
+    setTimeout(function(){ drawBarChart(); drawLineChart(); }, 50);
+  }
+
+  function refreshAnalytics(){
+    toast('Refreshing analytics data...','info');
+    setTimeout(function(){
+      renderAnalytics();
+      toast('Analytics data refreshed','success');
+    }, 800);
+  }
+
+  function drawBarChart(){
+    var canvas = document.getElementById('barChart');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var data = [{label:'iOS',value:8200,color:'#6366f1'},{label:'Android',value:9400,color:'#22c55e'},{label:'Web',value:5200,color:'#3b82f6'},{label:'Desktop',value:2000,color:'#f59e0b'}];
+    var max = Math.max.apply(null,data.map(function(d){return d.value}));
+    var w=480,h=260,pad={t:20,r:20,b:40,l:60};
+    var chartW=w-pad.l-pad.r, chartH=h-pad.t-pad.b;
+    ctx.fillStyle='#6060a0'; ctx.font='10px system-ui';
+    for(var i=0;i<=4;i++){
+      var y=pad.t+chartH-(chartH/4)*i;
+      ctx.fillText(Math.round(max/4*i).toLocaleString(),0,y+4);
+      ctx.strokeStyle='rgba(42,42,80,.4)'; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke();
+    }
+    var barW=chartW/data.length*0.6, gap=chartW/data.length;
+    data.forEach(function(d,i){
+      var x=pad.l+gap*i+gap*0.2;
+      var barH=(d.value/max)*chartH;
+      var y=pad.t+chartH-barH;
+      ctx.fillStyle=d.color;
+      ctx.beginPath();
+      ctx.roundRect(x,y,barW,barH,4);
+      ctx.fill();
+      ctx.fillStyle='#9898b8'; ctx.font='11px system-ui'; ctx.textAlign='center';
+      ctx.fillText(d.label,x+barW/2,h-pad.b+16);
+      ctx.fillStyle='#e4e4f0'; ctx.font='bold 10px system-ui';
+      ctx.fillText(d.value.toLocaleString(),x+barW/2,y-6);
+    });
+  }
+
+  function drawLineChart(){
+    var canvas = document.getElementById('lineChart');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var data = [1200,1800,2400,2800,3500,4200,5100,5800,6700,7800,9200,12300];
+    var labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var w=480,h=260,pad={t:20,r:20,b:40,l:60};
+    var chartW=w-pad.l-pad.r, chartH=h-pad.t-pad.b;
+    var max = Math.max.apply(null,data);
+    ctx.fillStyle='#6060a0'; ctx.font='10px system-ui';
+    for(var i=0;i<=4;i++){
+      var y=pad.t+chartH-(chartH/4)*i;
+      ctx.fillText(Math.round(max/4*i).toLocaleString(),0,y+4);
+      ctx.strokeStyle='rgba(42,42,80,.4)'; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke();
+    }
+    var pts = data.map(function(v,i){
+      return {x:pad.l+(chartW/(data.length-1))*i, y:pad.t+chartH-(v/max)*chartH};
+    });
+    ctx.beginPath(); ctx.moveTo(pts[0].x,pad.t+chartH); ctx.lineTo(pts[0].x,pts[0].y);
+    for(var j=1;j<pts.length;j++){
+      var xc=(pts[j-1].x+pts[j].x)/2;
+      ctx.bezierCurveTo(xc,pts[j-1].y,xc,pts[j].y,pts[j].x,pts[j].y);
+    }
+    ctx.lineTo(pts[pts.length-1].x,pad.t+chartH); ctx.closePath();
+    var grad=ctx.createLinearGradient(0,pad.t,0,pad.t+chartH);
+    grad.addColorStop(0,'rgba(99,102,241,0.3)'); grad.addColorStop(1,'rgba(99,102,241,0)');
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x,pts[0].y);
+    for(var k=1;k<pts.length;k++){
+      var xc2=(pts[k-1].x+pts[k].x)/2;
+      ctx.bezierCurveTo(xc2,pts[k-1].y,xc2,pts[k].y,pts[k].x,pts[k].y);
+    }
+    ctx.strokeStyle='#6366f1'; ctx.lineWidth=2.5; ctx.stroke();
+    pts.forEach(function(p,i){
+      ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fillStyle='#6366f1'; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.5,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    });
+    labels.forEach(function(l,i){
+      var x=pad.l+(chartW/(labels.length-1))*i;
+      ctx.fillStyle='#6060a0'; ctx.font='10px system-ui'; ctx.textAlign='center';
+      ctx.fillText(l,x,h-pad.b+16);
+    });
+  }
+
+  function renderSettings(){
+    var el = document.getElementById('page-settings');
+    var s = settings;
+    el.innerHTML = ''
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Project Settings <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="form-row"><div class="form-group"><label>Project Name</label><input type="text" id="s_projName" value="'+esc(s.projectName)+'"></div><div class="form-group"><label>Version</label><input type="text" value="2.1.0" disabled></div></div>'
+      +'<div class="form-row"><div class="form-group"><label>Build Command</label><input type="text" id="s_buildCmd" value="'+esc(s.buildCmd)+'"></div><div class="form-group"><label>Output Directory</label><input type="text" id="s_outputDir" value="'+esc(s.outputDir)+'"></div></div>'
+      +'<button class="btn btn-primary" onclick="APP.saveProjectSettings()">Save Settings</button>'
+      +'</div></div>'
+
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">CI/CD Configuration <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="form-row"><div class="form-group"><label>CI Provider</label><select id="s_ciProvider"><option value="github"'+(s.ciProvider==='github'?' selected':'')+'>GitHub Actions</option><option value="gitlab"'+(s.ciProvider==='gitlab'?' selected':'')+'>GitLab CI</option><option value="jenkins"'+(s.ciProvider==='jenkins'?' selected':'')+'>Jenkins</option><option value="circle"'+(s.ciProvider==='circle'?' selected':'')+'>CircleCI</option></select></div>'
+      +'<div class="form-group"><label>Branch</label><input type="text" id="s_branch" value="'+esc(s.branch)+'"></div></div>'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="font-size:12px;color:var(--text2)">Auto-deploy on push</span><div class="toggle'+(s.autoDeploy?' on':'')+'" id="s_autoDeploy" onclick="this.classList.toggle(\'on\')"></div></div>'
+      +'<button class="btn btn-primary" onclick="APP.saveCIConfig()">Save CI/CD</button>'
+      +'</div></div>'
+
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Environment Variables <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<table class="env-table"><thead><tr><th>Key</th><th>Value</th><th></th></tr></thead><tbody id="envBody">'
+      + s.envVars.map(function(ev,i){return '<tr><td><input value="'+esc(ev.key)+'" data-idx="'+i+'" data-field="key"></td><td><input value="'+esc(ev.value)+'" data-idx="'+i+'" data-field="value"></td><td><button class="btn btn-sm btn-danger" onclick="APP.removeEnv('+i+')">✕</button></td></tr>'}).join('')
+      +'</tbody></table>'
+      +'<button class="btn btn-secondary" style="margin-top:10px" onclick="APP.addEnv()">+ Add Variable</button>'
+      +'<button class="btn btn-primary" style="margin-top:10px;margin-left:8px" onclick="APP.saveEnvVars()">Save Variables</button>'
+      +'</div></div>'
+
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Notifications <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      + Object.keys(s.notifications).map(function(k){
+        var label = k.replace(/([A-Z])/g,' $1').replace(/^./,function(c){return c.toUpperCase()});
+        var descs = {
+          buildComplete:'Get notified when a build finishes',
+          deploySuccess:'Alert on successful deployments',
+          errorAlert:'Immediate notification for errors and crashes',
+          teamUpdates:'Team member activity updates',
+          weeklyReport:'Weekly project summary via email',
+          pullRequestReviews:'PR review requests and approvals',
+          securityAlerts:'Security vulnerability notifications'
+        };
+        return '<div class="notif-row"><div><div class="n-label">'+label+'</div><div class="n-desc">'+(descs[k]||'')+'</div></div><div class="toggle'+(s.notifications[k]?' on':'')+'" data-notif="'+k+'" onclick="APP.toggleNotif(this,\''+k+'\')"></div></div>';
+      }).join('')
+      +'</div></div>'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Danger Zone <span style="color:var(--red)">⚠</span></div><div class="sec-body">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,80,.3)">'
+      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">Clear Build History</div><div style="font-size:10px;color:var(--text3)">Remove all past build records</div></div>'
+      +'<button class="btn btn-sm btn-danger" onclick="APP.clearBuildHistory()">Clear All</button></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,80,.3)">'
+      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">Reset Editor Files</div><div style="font-size:10px;color:var(--text3)">Restore default code templates</div></div>'
+      +'<button class="btn btn-sm btn-danger" onclick="APP.resetEditor()">Reset</button></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">'
+      +'<div><div style="font-size:12px;color:var(--text);font-weight:600">Reset All Data</div><div style="font-size:10px;color:var(--text3)">Clear all localStorage data and start fresh</div></div>'
+      +'<button class="btn btn-sm btn-danger" onclick="APP.resetAllData()">Reset Everything</button></div>'
+      +'</div></div>'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">About <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div style="display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:12px">'
+      +'<span style="color:var(--text3)">Version</span><span>CrossForge Studio v2.4.1</span>'
+      +'<span style="color:var(--text3)">Build</span><span>2024.06.15-stable</span>'
+      +'<span style="color:var(--text3)">Engine</span><span>Chromium v126 / Flutter 3.22</span>'
+      +'<span style="color:var(--text3)">License</span><span>MIT License</span>'
+      +'<span style="color:var(--text3)">Repository</span><span style="color:var(--accent)">github.com/crossforge/studio</span>'
+      +'</div></div></div>'
+      +'<div class="settings-section"><div class="sec-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Keyboard Shortcuts <span style="color:var(--text3)">▾</span></div><div class="sec-body">'
+      +'<div class="shortcuts-grid">'
+      +'<div class="shortcut-item"><span>Navigate pages</span><span><span class="kbd">Ctrl</span>+<span class="kbd">1-8</span></span></div>'
+      +'<div class="shortcut-item"><span>New project</span><span><span class="kbd">Ctrl</span>+<span class="kbd">N</span></span></div>'
+      +'<div class="shortcut-item"><span>Trigger build</span><span><span class="kbd">Ctrl</span>+<span class="kbd">B</span></span></div>'
+      +'<div class="shortcut-item"><span>Save file</span><span><span class="kbd">Ctrl</span>+<span class="kbd">S</span></span></div>'
+      +'</div></div></div>';
+  }
+
+  function showNewProject(){
+    var body = '<div class="form-group"><label>Project Name</label><input type="text" id="np_name" placeholder="My Project"></div>'
+      +'<div class="form-group"><label>Description</label><textarea id="np_desc" placeholder="Describe your project..."></textarea></div>'
+      +'<div class="form-row"><div class="form-group"><label>Platforms</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+      +['iOS','Android','Web','Desktop'].map(function(p){return '<label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" value="'+p+'" class="np-platform"> '+p+'</label>'}).join('')
+      +'</div></div><div class="form-group"><label>Status</label><select id="np_status"><option value="dev">Development</option><option value="active">Active</option><option value="testing">Testing</option><option value="deployed">Deployed</option></select></div></div>'
+      +'<div class="form-row"><div class="form-group"><label>Version</label><input type="text" id="np_version" placeholder="1.0.0"></div><div class="form-group"><label>Team (comma separated)</label><input type="text" id="np_team" placeholder="Alice, Bob"></div></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.saveNewProject()">Create Project</button>';
+    openModal('New Project', body, ft);
+  }
+
+  function saveNewProject(){
+    var name = document.getElementById('np_name').value.trim();
+    var desc = document.getElementById('np_desc').value.trim();
+    var status = document.getElementById('np_status').value;
+    var version = document.getElementById('np_version').value.trim()||'1.0.0';
+    var teamInput = document.getElementById('np_team').value.trim();
+    var platforms = [];
+    document.querySelectorAll('.np-platform:checked').forEach(function(cb){ platforms.push(cb.value) });
+    if(!name){ toast('Project name is required','error'); return }
+    if(platforms.length===0){ toast('Select at least one platform','error'); return }
+    var teamList = teamInput ? teamInput.split(',').map(function(s){return s.trim()}).filter(Boolean) : ['Alice'];
+    projects.push({
+      id: nextProjId++, name:name, desc:desc, platforms:platforms, status:status,
+      team:teamList, version:version, progress:0, createdAt:Date.now()
+    });
+    save('cf_projects', projects);
+    closeModal();
+    if(currentPage==='projects') renderProjects();
+    toast('Project "'+name+'" created','success');
+  }
+
+  function editProject(id){
+    var p = projects.find(function(x){return x.id===id});
+    if(!p) return;
+    var body = '<div class="form-group"><label>Project Name</label><input type="text" id="ep_name" value="'+esc(p.name)+'"></div>'
+      +'<div class="form-group"><label>Description</label><textarea id="ep_desc">'+esc(p.desc)+'</textarea></div>'
+      +'<div class="form-row"><div class="form-group"><label>Platforms</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+      +['iOS','Android','Web','Desktop'].map(function(pl){return '<label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" value="'+pl+'" class="ep-platform"'+(p.platforms.indexOf(pl)!==-1?' checked':'')+'> '+pl+'</label>'}).join('')
+      +'</div></div><div class="form-group"><label>Status</label><select id="ep_status"><option value="dev"'+(p.status==='dev'?' selected':'')+'>Development</option><option value="active"'+(p.status==='active'?' selected':'')+'>Active</option><option value="testing"'+(p.status==='testing'?' selected':'')+'>Testing</option><option value="deployed"'+(p.status==='deployed'?' selected':'')+'>Deployed</option></select></div></div>'
+      +'<div class="form-row"><div class="form-group"><label>Version</label><input type="text" id="ep_version" value="'+esc(p.version)+'"></div><div class="form-group"><label>Progress (%)</label><input type="number" id="ep_progress" value="'+p.progress+'" min="0" max="100"></div></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.saveEditProject('+id+')">Save Changes</button>';
+    openModal('Edit Project', body, ft);
+  }
+
+  function saveEditProject(id){
+    var p = projects.find(function(x){return x.id===id});
+    if(!p) return;
+    p.name = document.getElementById('ep_name').value.trim();
+    p.desc = document.getElementById('ep_desc').value.trim();
+    p.status = document.getElementById('ep_status').value;
+    p.version = document.getElementById('ep_version').value.trim();
+    p.progress = Math.min(100, Math.max(0, parseInt(document.getElementById('ep_progress').value)||0));
+    p.platforms = [];
+    document.querySelectorAll('.ep-platform:checked').forEach(function(cb){ p.platforms.push(cb.value) });
+    save('cf_projects', projects);
+    closeModal();
+    renderProjects();
+    toast('Project updated','success');
+  }
+
+  function deleteProject(id){
+    var p = projects.find(function(x){return x.id===id});
+    if(!p) return;
+    var body = '<p style="font-size:13px;color:var(--text2)">Are you sure you want to delete <strong>'+esc(p.name)+'</strong>? This action cannot be undone.</p>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-danger" onclick="APP.confirmDeleteProject('+id+')">Delete</button>';
+    openModal('Delete Project', body, ft);
+  }
+
+  function confirmDeleteProject(id){
+    projects = projects.filter(function(x){return x.id!==id});
+    save('cf_projects', projects);
+    closeModal();
+    renderProjects();
+    toast('Project deleted','success');
+  }
+
+  function triggerBuild(){
+    var body = '<div class="form-row"><div class="form-group"><label>Project</label><select id="tb_project">'
+      + projects.map(function(p){return '<option value="'+esc(p.name)+'">'+esc(p.name)+'</option>'}).join('')
+      +'</select></div><div class="form-group"><label>Platform</label><select id="tb_platform"><option value="iOS">iOS</option><option value="Android">Android</option><option value="Web">Web</option><option value="Desktop">Desktop</option></select></div></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.startBuild()">Start Build</button>';
+    openModal('Trigger Build', body, ft);
+  }
+
+  function triggerBuildFor(platform){
+    var body = '<div class="form-group"><label>Project</label><select id="tb_project">'
+      + projects.map(function(p){return '<option value="'+esc(p.name)+'">'+esc(p.name)+'</option>'}).join('')
+      +'</select></div>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-primary" onclick="APP.startBuild(\''+platform+'\')">Build for '+platform+'</button>';
+    openModal('Build for '+platform, body, ft);
+  }
+
+  function startBuild(platformOverride){
+    var project = document.getElementById('tb_project').value;
+    var platform = platformOverride || document.getElementById('tb_platform').value;
+    closeModal();
+    var spinner = document.getElementById('buildSpinner');
+    if(spinner) spinner.classList.add('active');
+    setTimeout(function(){
+      if(spinner) spinner.classList.remove('active');
+      var build = {id:Date.now(),project:project,platform:platform,progress:0,status:'running',time:Date.now()};
+    buildQueue.push(build);
+    toast('Build started for '+project+' ('+platform+')','info');
+    if(currentPage==='build') renderBuild();
+
+    var logEl = document.getElementById('buildLog');
+    var logs = '[INFO] CrossForge Build System v2.4.1\n'
+      +'[INFO] Node.js v20.11.0 | npm v10.2.4\n'
+      +'[INFO] Flutter 3.22.0 | Dart 3.4.0\n'
+      +'[INFO] ──────────────────────────────\n'
+      +'[INFO] Starting build for '+project+'...\n'
+      +'[INFO] Target: '+platform+'\n'
+      +'[INFO] Branch: '+settings.branch+'\n'
+      +'[INFO] CI Provider: '+settings.ciProvider+'\n'
+      +'[INFO] ──────────────────────────────\n'
+      +'[INFO] Resolving dependencies...\n';
+    if(logEl) logEl.textContent = logs;
+    if(logEl) logEl.scrollTop = logEl.scrollHeight;
+
+    var progress = 0;
+    var interval = setInterval(function(){
+      progress += Math.floor(Math.random()*15)+5;
+      if(progress>100) progress=100;
+      build.progress = progress;
+      var phase = progress<30?'Installing dependencies':progress<50?'Compiling source files':progress<70?'Bundling assets':progress<90?'Optimizing output':'Generating artifacts';
+      logs += '[INFO] '+phase+'... ('+progress+'%)\n';
+      if(progress>40 && Math.random()>0.7) logs += '[WARN] Minor deprecation warning in module/utils\n';
+      if(logEl) logEl.textContent = logs;
+      if(logEl) logEl.scrollTop = logEl.scrollHeight;
+      if(currentPage==='build') renderBuild();
+      if(progress>=100){
+        clearInterval(interval);
+        var success = Math.random()>0.15;
+        var duration = Math.floor(Math.random()*180+60);
+        var min = Math.floor(duration/60), sec=duration%60;
+        logs += success
+          ? '[INFO] ──────────────────────────────\n[SUCCESS] Build completed successfully!\n[INFO] Duration: '+min+'m '+sec+'s\n[INFO] Artifacts ready for download.\n[INFO] Output: ./dist/'+project.toLowerCase()+'-'+platform.toLowerCase()+'\n'
+          : '[INFO] ──────────────────────────────\n[ERROR] Build failed after '+min+'m '+sec+'s\n[ERROR] compilation error in module/core/services.dart:42\n[ERROR] Type mismatch: expected String, got dynamic\n[ERROR] Run with --verbose for more details\n';
+        if(logEl){ logEl.textContent = logs; logEl.scrollTop = logEl.scrollHeight; }
+        buildHistory.unshift({
+          id:build.id, project:project, platform:platform,
+          status:success?'success':'failed', time:Date.now(),
+          duration:min+'m '+sec+'s', size:success?(Math.random()*15+5).toFixed(1)+' MB':'-'
+        });
+        save('cf_builds', buildHistory);
+        buildQueue = buildQueue.filter(function(b){return b.id!==build.id});
+        if(currentPage==='build') renderBuild();
+        toast(success?'Build completed!':'Build failed', success?'success':'error');
+      }
+    }, 600);
+    }, 1500);
+  }
+
+  function setBuildFilter(f){
+    buildFilter = f;
+    renderBuild();
+  }
+
+  function simulateDownload(project, platform){
+    toast('Preparing download for '+project+' ('+platform+')...','info');
+    setTimeout(function(){
+      toast(project+'-'+platform.toLowerCase()+'.zip download started','success');
+    }, 1200);
+  }
+
+  function retryBuild(project, platform){
+    toast('Retrying build for '+project+' ('+platform+')...','info');
+    var build = {id:Date.now(),project:project,platform:platform,progress:0,status:'running',time:Date.now()};
+    buildQueue.push(build);
+    if(currentPage==='build') renderBuild();
+    var logEl = document.getElementById('buildLog');
+    var logs = '[INFO] Retrying build for '+project+'...\n[INFO] Target: '+platform+'\n[INFO] Cleaning previous artifacts...\n';
+    if(logEl) logEl.textContent = logs;
+    if(logEl) logEl.scrollTop = logEl.scrollHeight;
+    var progress = 0;
+    var interval = setInterval(function(){
+      progress += Math.floor(Math.random()*12)+8;
+      if(progress>100) progress=100;
+      build.progress = progress;
+      logs += '[INFO] Compiling... ('+progress+'%)\n';
+      if(logEl){ logEl.textContent = logs; logEl.scrollTop = logEl.scrollHeight; }
+      if(currentPage==='build') renderBuild();
+      if(progress>=100){
+        clearInterval(interval);
+        buildHistory.unshift({id:build.id,project:project,platform:platform,status:'success',time:Date.now(),duration:Math.floor(Math.random()*2+1)+'m '+Math.floor(Math.random()*59)+'s',size:(Math.random()*15+5).toFixed(1)+' MB'});
+        save('cf_builds', buildHistory);
+        buildQueue = buildQueue.filter(function(b){return b.id!==build.id});
+        if(currentPage==='build') renderBuild();
+        toast('Retry build completed successfully!','success');
+      }
+    }, 700);
+  }
+
+  function saveProjectSettings(){
+    settings.projectName = document.getElementById('s_projName').value;
+    settings.buildCmd = document.getElementById('s_buildCmd').value;
+    settings.outputDir = document.getElementById('s_outputDir').value;
+    save('cf_settings', settings);
+    toast('Project settings saved','success');
+  }
+
+  function saveCIConfig(){
+    settings.ciProvider = document.getElementById('s_ciProvider').value;
+    settings.branch = document.getElementById('s_branch').value;
+    settings.autoDeploy = document.getElementById('s_autoDeploy').classList.contains('on');
+    save('cf_settings', settings);
+    toast('CI/CD configuration saved','success');
+  }
+
+  function addEnv(){
+    settings.envVars.push({key:'NEW_KEY',value:'value'});
+    save('cf_settings', settings);
+    renderSettings();
+  }
+
+  function removeEnv(idx){
+    settings.envVars.splice(idx,1);
+    save('cf_settings', settings);
+    renderSettings();
+    toast('Variable removed','success');
+  }
+
+  function saveEnvVars(){
+    var rows = document.querySelectorAll('#envBody tr');
+    settings.envVars = [];
+    rows.forEach(function(row){
+      var inputs = row.querySelectorAll('input');
+      if(inputs.length>=2){
+        settings.envVars.push({key:inputs[0].value, value:inputs[1].value});
+      }
+    });
+    save('cf_settings', settings);
+    toast('Environment variables saved','success');
+  }
+
+  function toggleNotif(el, key){
+    el.classList.toggle('on');
+    settings.notifications[key] = el.classList.contains('on');
+    save('cf_settings', settings);
+  }
+
+  function clearBuildHistory(){
+    buildHistory = [];
+    save('cf_builds', buildHistory);
+    if(currentPage==='build') renderBuild();
+    toast('Build history cleared','success');
+  }
+
+  function resetEditor(){
+    localStorage.removeItem('cf_editor');
+    editorFiles = null;
+    toast('Editor files reset to defaults. Refresh to see changes.','info');
+  }
+
+  function resetAllData(){
+    var body = '<p style="font-size:13px;color:var(--text2)">This will permanently delete all saved data including projects, builds, editor files, and settings. Are you absolutely sure?</p>';
+    var ft = '<button class="btn btn-secondary" onclick="APP.closeModal()">Cancel</button><button class="btn btn-danger" onclick="APP.confirmResetAll()">Reset Everything</button>';
+    openModal('Reset All Data', body, ft);
+  }
+
+  function confirmResetAll(){
+    localStorage.removeItem('cf_projects');
+    localStorage.removeItem('cf_builds');
+    localStorage.removeItem('cf_editor');
+    localStorage.removeItem('cf_settings');
+    closeModal();
+    toast('All data has been reset. Reloading...','success');
+    setTimeout(function(){ location.reload() }, 1500);
+  }
+
+  document.querySelectorAll('.nav-item').forEach(function(item){
+    item.onclick = function(){ switchPage(item.dataset.page) };
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.ctrlKey || e.metaKey){
+      var key = e.key.toLowerCase();
+      if(key==='1'){ e.preventDefault(); switchPage('dashboard') }
+      if(key==='2'){ e.preventDefault(); switchPage('projects') }
+      if(key==='3'){ e.preventDefault(); switchPage('editor') }
+      if(key==='4'){ e.preventDefault(); switchPage('build') }
+      if(key==='5'){ e.preventDefault(); switchPage('devices') }
+      if(key==='6'){ e.preventDefault(); switchPage('team') }
+      if(key==='7'){ e.preventDefault(); switchPage('analytics') }
+      if(key==='8'){ e.preventDefault(); switchPage('settings') }
+      if(key==='b' && !e.shiftKey){ e.preventDefault(); triggerBuild() }
+      if(key==='n'){ e.preventDefault(); showNewProject() }
+      if(key==='s'){ e.preventDefault(); if(currentPage==='editor'){ toast('File saved','success') } }
+    }
+  });
+
+  var _spinnerText=document.querySelector('#buildSpinner .spinner-text');
+  if(_spinnerText)_spinnerText.textContent=T('build.preparingBuild');
+  renderDashboard();
+
+  return {
+    showNewProject:showNewProject, saveNewProject:saveNewProject,
+    editProject:editProject, saveEditProject:saveEditProject,
+    deleteProject:deleteProject, confirmDeleteProject:confirmDeleteProject,
+    triggerBuild:triggerBuild, triggerBuildFor:triggerBuildFor, startBuild:startBuild,
+    setBuildFilter:setBuildFilter,
+    saveProjectSettings:saveProjectSettings, saveCIConfig:saveCIConfig,
+    addEnv:addEnv, removeEnv:removeEnv, saveEnvVars:saveEnvVars,
+    toggleNotif:toggleNotif, closeModal:closeModal,
+    filterProjects:filterProjects, filterByStatus:filterByStatus,
+    setOrientation:setOrientation,
+    simulateDownload:simulateDownload, retryBuild:retryBuild,
+    clearBuildHistory:clearBuildHistory, resetEditor:resetEditor,
+    resetAllData:resetAllData, confirmResetAll:confirmResetAll,
+    refreshAnalytics:refreshAnalytics,
+    switchPage:switchPage
+  };
+})();
+// CrossForge Studio v2.4.1 - Cross-Platform App Development Tool
+</script>
+</body>
+</html>

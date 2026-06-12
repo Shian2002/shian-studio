@@ -2,28 +2,26 @@
 
 import { motion } from "framer-motion";
 
-interface TrustCardProps {
+interface Props {
   value: string;
   label: string;
-  index?: number;
+  index: number;
 }
 
-export default function TrustCard({ value, label, index = 0 }: TrustCardProps) {
+export default function TrustCard({ value, label, index }: Props) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.08, duration: 0.3 }}
-      whileHover={{ scale: 1.03, y: -2 }}
-      className="bg-surface p-5 rounded-xl text-center border border-white/5 hover:border-white/15 transition-all duration-300"
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      whileHover={{ y: -2 }}
+      className="bg-th-card border border-th-border rounded-xl p-4 text-center hover:border-th-border-m transition-colors"
     >
-      <div className="text-2xl md:text-3xl font-bold bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent tabular-nums">
+      <div className="text-2xl font-bold bg-gradient-to-r from-accent to-mint bg-clip-text text-transparent mb-1">
         {value}
       </div>
-      <div className="text-xs text-gray-500 mt-2 uppercase tracking-widest leading-tight">
-        {label}
-      </div>
+      <div className="text-xs text-th-subtle">{label}</div>
     </motion.div>
   );
 }

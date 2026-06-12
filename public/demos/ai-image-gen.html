@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArtifAI — AI Image Generation Studio Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#111118;--surface2:#18181f;--surface3:#1f1f28;--surface4:#25252f;--border:#2a2a38;--border2:#35354a;--text:#e8e8ed;--text2:#8888a0;--text3:#55556a;--accent:#8b5cf6;--accent2:#7c3aed;--accent3:#6d28d9;--pink:#ec4899;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;--yellow:#eab308;--radius:10px;--radius-sm:6px;--radius-lg:14px;--radius-xl:20px;--shadow:0 4px 24px rgba(0,0,0,.4);--shadow-lg:0 12px 48px rgba(0,0,0,.6);--transition:all .2s ease;--transition-fast:all .15s ease}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;overflow:hidden}
+#app{display:flex;height:100vh}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
+
+/* ===== NAV TABS ===== */
+.nav-tabs{display:flex;gap:2px;padding:0 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.nav-tab{padding:10px 16px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:var(--transition);text-transform:uppercase;letter-spacing:.5px;user-select:none;white-space:nowrap}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ===== LEFT PANEL ===== */
+#left-panel{width:380px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden}
+.panel-header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--surface);z-index:20}
+.panel-header .logo{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--pink));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.panel-header h1{font-size:17px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.panel-header .version{font-size:10px;color:var(--text3);font-weight:500;background:var(--surface2);padding:2px 8px;border-radius:10px;margin-left:4px}
+.credits-badge{margin-left:auto;display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(236,72,153,.1));border:1px solid rgba(139,92,246,.25);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;transition:var(--transition)}
+.credits-badge:hover{background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(236,72,153,.15));border-color:var(--accent)}
+.plan-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
+.plan-badge.free{background:rgba(139,92,246,.15);color:var(--accent);border:1px solid rgba(139,92,246,.3)}
+.plan-badge.pro{background:rgba(236,72,153,.15);color:var(--pink);border:1px solid rgba(236,72,153,.3)}
+.plan-badge.enterprise{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+
+.section{padding:14px 18px;border-bottom:1px solid var(--border)}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-title .count{background:var(--accent);color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:auto}
+.section-title .section-action{margin-left:auto;font-size:10px;color:var(--accent);cursor:pointer;font-weight:600;text-transform:none;letter-spacing:0}
+
+/* Prompt */
+.prompt-area textarea{width:100%;height:90px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none;resize:vertical;transition:border-color .2s;line-height:1.5}
+.prompt-area textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+.prompt-area textarea::placeholder{color:var(--text3)}
+.prompt-stats{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text3)}
+.prompt-toolbar{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.prompt-toolbar .pt-btn{height:26px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:var(--transition);white-space:nowrap}
+.prompt-toolbar .pt-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+.neg-prompt-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--text2);padding:6px 0;user-select:none;transition:var(--transition)}
+.neg-prompt-toggle:hover{color:var(--text)}
+.neg-prompt-toggle .arrow{transition:transform .2s;font-size:9px}
+.neg-prompt-toggle.open .arrow{transform:rotate(90deg)}
+.neg-prompt-content{display:none;padding-top:6px}
+.neg-prompt-content.open{display:block}
+.neg-prompt-content textarea{width:100%;height:55px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12px;font-family:inherit;color:var(--text);outline:none;resize:vertical;transition:border-color .2s}
+.neg-prompt-content textarea:focus{border-color:var(--accent)}
+.neg-prompt-content textarea::placeholder{color:var(--text3)}
+
+/* Model Cards */
+.model-cards{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.model-card{min-width:100px;padding:10px 8px;border-radius:10px;background:var(--surface2);border:2px solid transparent;cursor:pointer;text-align:center;transition:var(--transition);flex-shrink:0}
+.model-card:hover{border-color:rgba(139,92,246,.3);background:var(--surface3)}
+.model-card.active{border-color:var(--accent);box-shadow:0 0 16px rgba(139,92,246,.25);background:rgba(139,92,246,.08)}
+.model-card .mc-icon{font-size:22px;margin-bottom:4px}
+.model-card .mc-name{font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px}
+.model-card .mc-speed{font-size:8px;color:var(--text3)}
+.model-card .mc-tag{font-size:8px;font-weight:600;padding:1px 6px;border-radius:6px;margin-top:4px;display:inline-block}
+.mc-tag.fast{background:rgba(16,185,129,.15);color:var(--green)}
+.mc-tag.med{background:rgba(245,158,11,.15);color:var(--orange)}
+.mc-tag.slow{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* Style Presets */
+.style-presets{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.style-thumb{min-width:62px;height:62px;border-radius:8px;background:var(--surface2);border:2px solid transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:var(--transition);flex-shrink:0;position:relative}
+.style-thumb:hover{border-color:rgba(139,92,246,.3);background:var(--surface3)}
+.style-thumb.active{border-color:var(--accent);box-shadow:0 0 16px rgba(139,92,246,.25);background:rgba(139,92,246,.08)}
+.style-thumb .style-icon{font-size:18px}
+.style-thumb .style-name{font-size:7px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+.style-thumb.active .style-name{color:var(--accent)}
+.style-thumb .preset-badge{position:absolute;top:2px;right:2px;width:12px;height:12px;background:var(--green);border-radius:50%;font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+
+/* Settings */
+.setting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.setting-label{font-size:12px;color:var(--text2);white-space:nowrap}
+.setting-value{font-size:11px;font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:28px;text-align:right}
+.setting-row input[type="range"]{width:100px;-webkit-appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none;cursor:pointer}
+.setting-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px rgba(139,92,246,.4);transition:var(--transition)}
+.setting-row input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.setting-row input[type="text"],.setting-row select{width:110px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;transition:border-color .2s}
+.setting-row input[type="text"]:focus,.setting-row select:focus{border-color:var(--accent)}
+.setting-row select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23888' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;padding-right:22px}
+.seed-row{display:flex;gap:4px;align-items:center}
+.seed-row input{flex:1}
+.seed-btn{width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);flex-shrink:0}
+.seed-btn:hover{border-color:var(--accent);color:var(--accent)}
+.seed-btn.active{background:rgba(139,92,246,.15);border-color:var(--accent);color:var(--accent)}
+
+.advanced-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--text2);padding:6px 0;user-select:none;transition:var(--transition)}
+.advanced-toggle:hover{color:var(--text)}
+.advanced-toggle .arrow{transition:transform .2s;font-size:9px}
+.advanced-toggle.open .arrow{transform:rotate(90deg)}
+.advanced-content{display:none;padding-top:6px}
+.advanced-content.open{display:block}
+
+/* Dimension presets */
+.dim-presets{display:flex;gap:4px;flex-wrap:wrap}
+.dim-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.dim-btn:hover{border-color:var(--accent);color:var(--text)}
+.dim-btn.active{background:rgba(139,92,246,.12);border-color:var(--accent);color:var(--accent)}
+
+/* Mode toggles */
+.mode-row{display:flex;gap:5px;margin-bottom:10px}
+.mode-btn{flex:1;padding:7px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:11px;font-weight:600;text-align:center;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.mode-btn:hover{border-color:rgba(139,92,246,.4);color:var(--text)}
+.mode-btn.active{background:rgba(139,92,246,.12);border-color:var(--accent);color:var(--accent)}
+
+/* Generate button */
+.generate-section{padding:14px 18px}
+.gen-btn{width:100%;height:46px;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--accent),var(--pink));box-shadow:0 4px 20px rgba(139,92,246,.3);transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(139,92,246,.4)}
+.gen-btn:active{transform:translateY(0)}
+.gen-btn.generating{background:linear-gradient(135deg,#4c1d95,#6d28d9);pointer-events:none}
+.gen-btn .gen-shimmer{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{to{left:100%}}
+.cancel-btn{width:100%;height:36px;border:1px solid var(--red);border-radius:var(--radius-sm);background:rgba(239,68,68,.1);color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;display:none;transition:var(--transition)}
+.cancel-btn:hover{background:rgba(239,68,68,.2)}
+.cancel-btn.visible{display:flex;align-items:center;justify-content:center;gap:6px}
+
+.batch-row{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.batch-btn{flex:1;min-width:50px;height:30px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition);text-align:center}
+.batch-btn:hover{border-color:rgba(139,92,246,.4);color:var(--text)}
+.batch-btn.active{background:rgba(139,92,246,.12);border-color:var(--accent);color:var(--accent)}
+
+/* ===== MAIN AREA ===== */
+#main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.canvas-toolbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:6px;flex-shrink:0}
+.toolbar-btn{padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:var(--transition);white-space:nowrap}
+.toolbar-btn:hover{border-color:var(--accent);color:var(--text)}
+.toolbar-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.toolbar-btn.primary:hover{background:var(--accent2)}
+.toolbar-btn.danger{border-color:rgba(239,68,68,.3);color:var(--red)}
+.toolbar-btn.danger:hover{background:rgba(239,68,68,.1);border-color:var(--red)}
+.toolbar-spacer{flex:1}
+.size-display{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.gen-time{font-size:11px;color:var(--green);font-family:'JetBrains Mono',monospace;display:none}
+.gen-time.visible{display:inline}
+
+/* Canvas */
+.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#13131a 0%,var(--bg) 70%)}
+.canvas-placeholder{width:520px;height:520px;border:2px dashed var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text3);transition:var(--transition)}
+.canvas-placeholder .icon{font-size:56px;opacity:.3}
+.canvas-placeholder .text{font-size:14px;font-weight:500}
+.canvas-placeholder .subtext{font-size:11px;color:var(--text3)}
+
+.generated-image{border-radius:14px;overflow:hidden;position:relative;display:none;box-shadow:var(--shadow)}
+.generated-image.visible{display:block}
+.generated-image .img-canvas{display:block;border-radius:14px}
+
+.image-actions{position:absolute;bottom:14px;right:14px;display:none;gap:7px;z-index:5}
+.generated-image:hover .image-actions{display:flex}
+.image-action-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);backdrop-filter:blur(8px)}
+.image-action-btn:hover{background:var(--accent);border-color:var(--accent);transform:scale(1.1)}
+.image-action-btn.favorited{color:#ef4444;background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4)}
+
+.image-info-overlay{position:absolute;top:14px;left:14px;right:14px;display:none;z-index:5}
+.generated-image:hover .image-info-overlay{display:block}
+.image-info-card{background:rgba(0,0,0,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--text2);line-height:1.6;max-height:120px;overflow-y:auto}
+.image-info-card .info-prompt{color:var(--text);font-weight:500;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.image-info-card .info-meta{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px}
+
+.image-tags{position:absolute;top:14px;right:14px;display:none;flex-wrap:wrap;gap:4px;z-index:5;max-width:200px;justify-content:flex-end}
+.generated-image:hover .image-tags{display:flex}
+.tag{padding:2px 8px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:12px;font-size:9px;font-weight:600;color:var(--text2);cursor:default;display:flex;align-items:center;gap:3px}
+.tag .tag-remove{cursor:pointer;color:var(--red);font-size:10px;margin-left:2px}
+.tag-add{padding:2px 8px;background:rgba(139,92,246,.2);border:1px dashed rgba(139,92,246,.4);border-radius:12px;font-size:9px;font-weight:600;color:var(--accent);cursor:pointer;transition:var(--transition)}
+.tag-add:hover{background:rgba(139,92,246,.3)}
+
+/* Progress overlay */
+.progress-overlay{position:absolute;inset:0;background:rgba(10,10,15,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:10;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+.progress-overlay.active{opacity:1;pointer-events:auto}
+.progress-stages{display:flex;flex-direction:column;gap:6px;width:280px}
+.progress-stage{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text3);transition:color .3s}
+.progress-stage.active{color:var(--accent)}
+.progress-stage.done{color:var(--green)}
+.progress-stage .stage-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:var(--transition)}
+.progress-stage.active .stage-dot{background:var(--accent);box-shadow:0 0 10px rgba(139,92,246,.5);animation:pulse 1.5s infinite}
+.progress-stage.done .stage-dot{background:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.progress-bar{width:280px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:2px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:2px;width:0;transition:width .4s ease}
+.progress-percent{font-size:28px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace}
+.progress-stage-label{font-size:11px;color:var(--text2);margin-top:-8px}
+
+/* Comparison slider */
+.comparison-container{position:relative;border-radius:14px;overflow:hidden;display:none;box-shadow:var(--shadow)}
+.comparison-container.visible{display:block}
+.comparison-before,.comparison-after{position:absolute;inset:0}
+.comparison-before{clip-path:inset(0 50% 0 0)}
+.comparison-after{clip-path:inset(0 0 0 50%)}
+.comparison-before canvas,.comparison-after canvas{display:block}
+.comparison-slider{position:absolute;top:0;bottom:0;width:3px;background:#fff;left:50%;transform:translateX(-50%);z-index:5;cursor:ew-resize;box-shadow:0 0 12px rgba(0,0,0,.6)}
+.comparison-slider::before{content:'\21d4';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30px;height:30px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#000;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.comparison-label{position:absolute;bottom:14px;padding:4px 10px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:6px;font-size:10px;font-weight:600;color:#fff;z-index:4}
+.comparison-label.before{left:14px}.comparison-label.after{right:14px}
+
+/* Batch grid */
+.batch-grid{display:none;gap:8px;padding:20px}
+.batch-grid.visible{display:grid}
+.batch-grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.batch-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.batch-item{aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .2s;position:relative}
+.batch-item:hover{transform:scale(1.03);z-index:1}
+.batch-item canvas{display:block;width:100%;height:100%}
+.batch-item .batch-actions{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;gap:6px;backdrop-filter:blur(2px)}
+.batch-item:hover .batch-actions{display:flex}
+.batch-action-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);backdrop-filter:blur(4px)}
+.batch-action-btn:hover{background:var(--accent);border-color:var(--accent)}
+.batch-action-btn.fav-active{color:#ef4444;background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4)}
+.batch-item .batch-select{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:6px;border:2px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:var(--transition);z-index:3}
+.batch-select-mode .batch-select{display:flex}
+.batch-select.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ===== IMAGE EDITING PANEL ===== */
+.edit-tab{display:none;padding:14px 18px;overflow-y:auto;flex:1}
+.edit-tab.visible{display:block}
+.edit-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.edit-tool{padding:14px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;text-align:center;transition:var(--transition)}
+.edit-tool:hover{border-color:var(--accent);background:var(--surface3)}
+.edit-tool.active{border-color:var(--accent);background:rgba(139,92,246,.1);box-shadow:0 0 12px rgba(139,92,246,.15)}
+.edit-tool .et-icon{font-size:24px;margin-bottom:4px}
+.edit-tool .et-name{font-size:11px;font-weight:700;color:var(--text)}
+.edit-tool .et-desc{font-size:9px;color:var(--text3);margin-top:2px}
+
+.inpaint-canvas-wrap{position:relative;border:2px dashed var(--border);border-radius:12px;overflow:hidden;margin:10px 0;background:var(--surface2);display:flex;align-items:center;justify-content:center;min-height:200px}
+.inpaint-canvas-wrap canvas{display:block;cursor:crosshair}
+.inpaint-hint{text-align:center;font-size:11px;color:var(--text3);padding:40px}
+
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:var(--transition);margin:10px 0}
+.upload-zone:hover{border-color:var(--accent);background:rgba(139,92,246,.05)}
+.upload-zone .uz-icon{font-size:32px;margin-bottom:8px;opacity:.5}
+.upload-zone .uz-text{font-size:12px;color:var(--text2)}
+.upload-zone .uz-sub{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* Style Transfer */
+.st-style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.st-style-card{padding:10px;border-radius:8px;background:var(--surface2);border:2px solid transparent;cursor:pointer;text-align:center;transition:var(--transition)}
+.st-style-card:hover{border-color:rgba(139,92,246,.3)}
+.st-style-card.active{border-color:var(--accent);background:rgba(139,92,246,.08)}
+.st-style-card .ss-icon{font-size:22px}
+.st-style-card .ss-name{font-size:9px;font-weight:700;color:var(--text2);margin-top:2px}
+.st-style-card.active .ss-name{color:var(--accent)}
+
+/* ===== RIGHT PANEL ===== */
+#right-panel{width:290px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.right-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.right-header h2{font-size:13px;font-weight:700;flex:1}
+.right-header .clear-btn{font-size:10px;color:var(--red);cursor:pointer;padding:3px 8px;border:1px solid rgba(239,68,68,.3);border-radius:4px;background:transparent;font-family:inherit;transition:var(--transition)}
+.right-header .clear-btn:hover{background:rgba(239,68,68,.1);border-color:var(--red)}
+
+.right-tabs{display:flex;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--border);flex-shrink:0}
+.right-tab{flex:1;padding:6px;font-size:10px;font-weight:600;color:var(--text3);text-align:center;cursor:pointer;border-bottom:2px solid transparent;transition:var(--transition)}
+.right-tab:hover{color:var(--text2)}
+.right-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.history-search{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;position:relative}
+.history-search input{width:100%;height:30px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 10px 0 30px;font-size:11px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s}
+.history-search input:focus{border-color:var(--accent)}
+.history-search .search-icon{position:absolute;left:26px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3)}
+
+.history-filters{padding:6px 16px;border-bottom:1px solid var(--border);display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
+.hf-btn{padding:3px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text3);font-size:9px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.hf-btn:hover{border-color:var(--accent);color:var(--text)}
+.hf-btn.active{background:rgba(139,92,246,.12);border-color:var(--accent);color:var(--accent)}
+
+.history-list{flex:1;overflow-y:auto;padding:8px}
+.history-empty{text-align:center;padding:30px 16px;color:var(--text3);font-size:12px}
+.history-card{padding:10px 12px;border-radius:8px;background:var(--surface2);border:1px solid transparent;margin-bottom:6px;cursor:pointer;transition:var(--transition)}
+.history-card:hover{border-color:rgba(139,92,246,.3);background:var(--surface3)}
+.history-card.active{border-color:var(--accent);background:rgba(139,92,246,.08)}
+.history-card .hc-prompt{font-size:11px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.history-card .hc-meta{display:flex;align-items:center;gap:8px;font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.history-card .hc-meta .hc-fav{color:var(--red);font-size:10px}
+.history-card .hc-delete{margin-left:auto;font-size:10px;color:var(--text3);cursor:pointer;padding:2px;transition:var(--transition)}
+.history-card .hc-delete:hover{color:var(--red)}
+.history-card .hc-thumbs{display:flex;gap:3px;margin-top:6px}
+.history-card .hc-thumb{width:28px;height:28px;border-radius:4px;overflow:hidden}
+.history-card .hc-actions{display:flex;gap:4px;margin-top:6px}
+.hc-action{padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text3);font-size:9px;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.hc-action:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Gallery V2 */
+.gallery-section{border-top:1px solid var(--border);padding:12px 16px;flex-shrink:0;background:var(--surface)}
+.gallery-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.gallery-title{font-size:13px;font-weight:700;color:var(--text)}
+.gallery-filters{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.gf-btn{padding:3px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text3);font-size:9px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.gf-btn:hover{border-color:var(--accent);color:var(--text)}
+.gf-btn.active{background:rgba(139,92,246,.12);border-color:var(--accent);color:var(--accent)}
+.gallery-sort{font-size:10px;color:var(--text3);cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);font-family:inherit;outline:none;appearance:none}
+.gallery-sort option{background:var(--surface2);color:var(--text)}
+.masonry-grid{column-count:3;column-gap:6px}
+.masonry-item{break-inside:avoid;margin-bottom:6px;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .2s;position:relative}
+.masonry-item:hover{transform:scale(1.03);z-index:1}
+.masonry-item canvas{display:block;width:100%;height:auto}
+.masonry-item .mi-meta{position:absolute;bottom:0;left:0;right:0;padding:20px 8px 6px;background:linear-gradient(transparent,rgba(0,0,0,.75));font-size:9px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.masonry-item .mi-actions{position:absolute;top:6px;right:6px;display:none;gap:4px}
+.masonry-item:hover .mi-actions{display:flex}
+.mi-btn{width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.mi-btn:hover{background:var(--accent)}
+.mi-btn.liked{background:rgba(239,68,68,.7)}
+.load-more-btn{width:100%;padding:8px;border:1px dashed var(--border);border-radius:8px;background:transparent;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;margin-top:8px;transition:var(--transition)}
+.load-more-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ===== API TAB ===== */
+.api-tab{display:none;padding:20px;overflow-y:auto;flex:1}
+.api-tab.visible{display:block}
+.api-hero{text-align:center;padding:30px 20px;margin-bottom:20px}
+.api-hero h2{font-size:22px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.api-hero p{font-size:13px;color:var(--text2);max-width:500px;margin:0 auto;line-height:1.6}
+.api-keys{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+.api-keys h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.api-key-row{display:flex;gap:6px;margin-bottom:8px}
+.api-key-row input{flex:1;height:36px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none}
+.api-key-row input:focus{border-color:var(--accent)}
+.api-key-row button{height:36px;padding:0 16px;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.api-key-create{background:var(--accent);color:#fff}
+.api-key-create:hover{background:var(--accent2)}
+.api-key-copy{background:var(--surface3);color:var(--text2);border:1px solid var(--border)}
+.api-key-copy:hover{border-color:var(--accent);color:var(--accent)}
+.api-key-delete{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.api-key-delete:hover{background:rgba(239,68,68,.2)}
+.api-usage{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.usage-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.usage-card .uc-value{font-size:22px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.usage-card .uc-label{font-size:10px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.usage-bar{width:100%;height:6px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden}
+.usage-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:3px;transition:width .5s ease}
+.api-code-tabs{display:flex;gap:2px;margin-bottom:0;border-bottom:1px solid var(--border);padding:0 12px;background:var(--surface2);border-radius:10px 10px 0 0}
+.api-code-tab{padding:8px 14px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:var(--transition)}
+.api-code-tab:hover{color:var(--text2)}
+.api-code-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.api-code-block{background:#0d1117;border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:#c9d1d9;position:relative}
+.api-code-block .copy-api-btn{position:absolute;top:10px;right:10px;padding:4px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:var(--text2);font-size:10px;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.api-code-block .copy-api-btn:hover{background:rgba(255,255,255,.2);color:var(--text)}
+.api-code-block .kw{color:#ff7b72}.api-code-block .str{color:#a5d6ff}.api-code-block .cm{color:#8b949e}.api-code-block .fn{color:#d2a8ff}.api-code-block .num{color:#79c0ff}
+.api-section{margin-bottom:20px}
+.api-section h3{font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.api-endpoint{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px}
+.api-method{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.api-method.get{background:rgba(16,185,129,.15);color:var(--green)}
+.api-method.post{background:rgba(59,130,246,.15);color:var(--blue)}
+.api-method.delete{background:rgba(239,68,68,.15);color:var(--red)}
+.api-path{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);flex:1}
+.api-desc{font-size:10px;color:var(--text3)}
+
+/* ===== MODALS ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .25s ease;position:relative}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:6px}
+.modal .modal-sub{font-size:12px;color:var(--text2);margin-bottom:20px}
+.modal label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.modal input[type="text"],.modal input[type="email"],.modal input[type="password"]{width:100%;height:38px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:14px}
+.modal input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+.modal-btn{width:100%;height:42px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--accent),var(--pink));transition:var(--transition);margin-top:4px}
+.modal-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(139,92,246,.3)}
+.modal-switch{text-align:center;margin-top:14px;font-size:12px;color:var(--text2)}
+.modal-switch a{color:var(--accent);cursor:pointer;text-decoration:none;font-weight:600}
+.modal-switch a:hover{text-decoration:underline}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:none;background:var(--surface2);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.modal-close:hover{background:var(--surface3);color:var(--text)}
+
+.tag-input-row{display:flex;gap:4px;margin-top:6px}
+.tag-input-row input{flex:1;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:11px;font-family:inherit;color:var(--text);outline:none}
+.tag-input-row input:focus{border-color:var(--accent)}
+.tag-input-row button{height:28px;padding:0 12px;border:1px solid var(--accent);border-radius:6px;background:rgba(139,92,246,.15);color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.tag-input-row button:hover{background:rgba(139,92,246,.25)}
+
+.preset-save-row{display:flex;gap:6px;margin-top:8px}
+.preset-save-row input{flex:1}
+.preset-save-row button{height:38px;padding:0 16px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.preset-save-row button:hover{background:var(--accent2)}
+
+.user-profile{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:16px}
+.user-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{flex:1}
+.user-info .user-name{font-size:14px;font-weight:700}
+.user-info .user-email{font-size:11px;color:var(--text2)}
+.user-credits{font-size:12px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.logout-btn{width:100%;height:36px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;transition:var(--transition)}
+.logout-btn:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.05)}
+
+.confirm-text{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6}
+.confirm-btns{display:flex;gap:8px}
+.confirm-btns button{flex:1;height:38px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.confirm-cancel{border:1px solid var(--border);background:var(--surface2);color:var(--text2)}
+.confirm-cancel:hover{border-color:var(--text2);color:var(--text)}
+.confirm-ok{border:none;background:var(--red);color:#fff}
+.confirm-ok:hover{background:#dc2626}
+
+/* Pricing Modal */
+.pricing-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.pricing-card{background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:18px 14px;text-align:center;transition:var(--transition);cursor:pointer;position:relative}
+.pricing-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.pricing-card.popular{border-color:var(--pink)}
+.pricing-card.popular::before{content:'POPULAR';position:absolute;top:-10px;left:50%;transform:translateX(-50%);padding:2px 10px;background:var(--pink);color:#fff;font-size:9px;font-weight:700;border-radius:8px;letter-spacing:.5px}
+.pricing-card .pc-name{font-size:14px;font-weight:800;margin-bottom:4px}
+.pricing-card .pc-price{font-size:24px;font-weight:800;color:var(--accent);margin-bottom:2px}
+.pricing-card .pc-price span{font-size:12px;color:var(--text3);font-weight:400}
+.pricing-card .pc-features{font-size:10px;color:var(--text2);line-height:1.8;margin-top:8px;text-align:left}
+.pricing-card .pc-features div{display:flex;align-items:center;gap:4px}
+.pricing-card .pc-features div::before{content:'✓';color:var(--green);font-weight:700;font-size:10px}
+.pricing-card .pc-btn{width:100%;height:34px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;transition:var(--transition)}
+.pricing-card .pc-btn.primary{background:linear-gradient(135deg,var(--accent),var(--pink));color:#fff}
+.pricing-card .pc-btn.secondary{background:var(--surface3);color:var(--text);border:1px solid var(--border)}
+
+/* Prompt Templates */
+.prompt-templates{max-height:250px;overflow-y:auto}
+.pt-category{margin-bottom:10px}
+.pt-category-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.pt-item{padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid transparent;margin-bottom:4px;cursor:pointer;transition:var(--transition)}
+.pt-item:hover{border-color:var(--accent);background:var(--surface3)}
+.pt-item .pti-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
+.pt-item .pti-preview{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Side by side compare */
+.compare-view{display:none;gap:12px;padding:20px;width:100%;justify-content:center;align-items:flex-start}
+.compare-view.visible{display:flex}
+.compare-panel{border-radius:14px;overflow:hidden;position:relative;box-shadow:var(--shadow);flex:1;max-width:400px}
+.compare-panel canvas{display:block;width:100%;border-radius:14px}
+.compare-panel .cp-label{position:absolute;top:10px;left:10px;padding:4px 10px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:6px;font-size:10px;font-weight:600;color:#fff}
+.compare-panel .cp-info{position:absolute;bottom:10px;left:10px;right:10px;padding:8px 10px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:8px;font-size:10px;color:var(--text2)}
+.compare-panel .cp-info .cp-prompt{color:var(--text);font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Toast */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 18px;border-radius:10px;font-size:12px;font-family:'Inter',sans-serif;color:#fff;pointer-events:auto;animation:toastIn .3s ease;max-width:380px;box-shadow:0 4px 20px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px;backdrop-filter:blur(8px)}
+.toast.info{background:rgba(59,130,246,.9)}.toast.success{background:rgba(16,185,129,.9)}.toast.warning{background:rgba(245,158,11,.9);color:#000}.toast.error{background:rgba(239,68,68,.9)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:1200px){#right-panel{width:240px}#left-panel{width:340px}}
+@media(max-width:900px){#right-panel{display:none}#left-panel{width:300px}}
+
+@media print{
+  #left-panel,#right-panel,.canvas-toolbar,.toast-container,.modal-overlay{display:none!important}
+  #main-area{flex:1;width:100%}
+  .gallery-section{padding:10px 0}
+  .masonry-grid{column-count:4}
+  .canvas-area{overflow:visible}
+  .batch-item,.masonry-item,.generated-image{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div class="panel-header">
+      <div class="logo">A</div>
+      <h1>ArtifAI</h1>
+      <span class="version">v4.0 Pro</span>
+      <div id="langSwitcher" style="position:relative;display:inline-block;margin-left:auto;margin-right:6px"></div>
+      <span class="plan-badge free" id="planBadge">FREE</span>
+      <div class="credits-badge" id="creditsBadge" title="Click to view profile">
+        <span class="credit-icon">✦</span>
+        <span id="creditsCount">100</span>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <div class="nav-tab active" data-tab="generate" data-i18n="nav.generate">Generate</div>
+      <div class="nav-tab" data-tab="edit" data-i18n="nav.edit">Edit</div>
+      <div class="nav-tab" data-tab="style-transfer" data-i18n="nav.style">Style</div>
+      <div class="nav-tab" data-tab="api" data-i18n="nav.api">API</div>
+    </div>
+
+    <!-- GENERATE TAB -->
+    <div id="tab-generate">
+      <div class="section prompt-area">
+        <div class="section-title" data-i18n="prompt.title">Prompt <span class="section-action" id="promptHelperBtn" data-i18n="prompt.enhance">✦ Enhance</span></div>
+        <textarea id="promptInput" data-i18n-placeholder="prompt.placeholder" placeholder="Describe the image you want to generate...&#10;&#10;e.g. A majestic dragon soaring through a nebula, digital art, cinematic lighting, 8K"></textarea>
+        <div class="prompt-stats">
+          <span id="promptCharCount">0 chars</span>
+          <span id="promptWordCount">0 words</span>
+        </div>
+        <div class="prompt-toolbar">
+          <button class="pt-btn" id="templatesBtn" data-i18n="prompt.templates">📋 Templates</button>
+          <button class="pt-btn" id="enhanceBtn">✨ <span data-i18n="prompt.enhance">Enhance</span></button>
+          <button class="pt-btn" id="randomBtn" data-i18n="prompt.randomizer">🎲 Random</button>
+        </div>
+        <div style="margin-top:8px">
+          <div class="neg-prompt-toggle" id="negPromptToggle"><span class="arrow">▸</span> <span data-i18n="prompt.negToggle">Negative Prompt</span></div>
+          <div class="neg-prompt-content" id="negPromptContent">
+            <textarea id="negPromptInput" data-i18n-placeholder="prompt.negPlaceholder" placeholder="e.g. blurry, low quality, distorted, watermark..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title" data-i18n="model.title">Model</div>
+        <div class="model-cards" id="modelCards"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span data-i18n="style.title">Style Presets</span> <span class="count" id="presetCount">8</span></div>
+        <div class="style-presets" id="stylePresets"></div>
+        <div class="preset-save-row" style="margin-top:8px">
+          <input type="text" id="presetNameInput" data-i18n-placeholder="prompt.presetSave" placeholder="Save current as preset..." style="width:100%;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:11px;font-family:inherit;color:var(--text);outline:none">
+          <button id="savePresetBtn" data-i18n="btn.save">Save</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title" data-i18n="dim.title">Dimensions</div>
+        <div class="dim-presets" id="dimPresets"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title" data-i18n="settings.title">Settings</div>
+        <div class="setting-row"><span class="setting-label" data-i18n="settings.steps">Steps</span><input type="range" min="10" max="150" value="30" id="stepsSlider"><span class="setting-value" id="stepsVal">30</span></div>
+        <div class="setting-row"><span class="setting-label" data-i18n="settings.cfg">CFG Scale</span><input type="range" min="1" max="30" value="7" step="0.5" id="cfgSlider"><span class="setting-value" id="cfgVal">7</span></div>
+        <div class="setting-row"><span class="setting-label" data-i18n="settings.sampler">Sampler</span>
+          <select id="samplerSelect"><option>Euler a</option><option>DPM++ 2M</option><option>DPM++ SDE</option><option>DDIM</option><option>UniPC</option><option>DPM++ 2M Karras</option><option>LCM</option></select>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="advanced-toggle" id="advancedToggle"><span class="arrow">▸</span> <span data-i18n="settings.advanced">Advanced</span></div>
+        <div class="advanced-content" id="advancedContent">
+          <div class="setting-row"><span class="setting-label" data-i18n="settings.seed">Seed</span>
+            <div class="seed-row">
+              <input type="text" id="seedInput" data-i18n-placeholder="settings.random" placeholder="Random">
+              <button class="seed-btn" id="randomSeedBtn" data-i18n-title="settings.random" title="Random seed">🎲</button>
+              <button class="seed-btn" id="lockSeedBtn" data-i18n-title="settings.lock" title="Lock seed">🔒</button>
+            </div>
+          </div>
+          <div class="setting-row"><span class="setting-label" data-i18n="settings.clip">Clip Skip</span><input type="range" min="1" max="12" value="1" id="clipSlider"><span class="setting-value" id="clipVal">1</span></div>
+          <div class="setting-row"><span class="setting-label" data-i18n="settings.denoise">Denoise</span><input type="range" min="0" max="100" value="75" id="denoiseSlider"><span class="setting-value" id="denoiseVal">0.75</span></div>
+          <div class="setting-row"><span class="setting-label" data-i18n="settings.batch">Batch Size</span>
+            <select id="batchSizeSelect"><option value="1">1</option><option value="4">4</option><option value="8">8</option><option value="16">16</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title" data-i18n="mode.title">Mode</div>
+        <div class="mode-row">
+          <div class="mode-btn active" data-mode="generate" data-i18n="mode.generate">Generate</div>
+          <div class="mode-btn" data-mode="compare" data-i18n="mode.compare">Compare</div>
+        </div>
+      </div>
+
+      <div class="generate-section">
+        <button class="gen-btn" id="generateBtn"><span class="gen-shimmer"></span><span data-i18n="btn.generate">✦ Generate</span></button>
+        <button class="cancel-btn" id="cancelBtn"><span data-i18n="btn.cancel">✕ Cancel Generation</span></button>
+      </div>
+    </div>
+
+    <!-- EDIT TAB -->
+    <div id="tab-edit" class="edit-tab">
+      <div class="section-title" data-i18n="edit.title">Image Editing Tools</div>
+      <div class="edit-tools" id="editTools">
+        <div class="edit-tool active" data-tool="inpaint"><div class="et-icon">🖌</div><div class="et-name" data-i18n="edit.inpaint">Inpaint</div><div class="et-desc" data-i18n="edit.inpaintDesc">Paint area + prompt</div></div>
+        <div class="edit-tool" data-tool="upscale"><div class="et-icon">🔍</div><div class="et-name" data-i18n="edit.upscale">Upscale</div><div class="et-desc" data-i18n="edit.upscaleDesc">2x / 4x resolution</div></div>
+        <div class="edit-tool" data-tool="variation"><div class="et-icon">🔄</div><div class="et-name" data-i18n="edit.variation">Variation</div><div class="et-desc" data-i18n="edit.variationDesc">Generate variants</div></div>
+        <div class="edit-tool" data-tool="blend"><div class="et-icon">🎭</div><div class="et-name" data-i18n="edit.blend">Blend</div><div class="et-desc" data-i18n="edit.blendDesc">Merge two images</div></div>
+      </div>
+
+      <div id="editToolContent">
+        <div id="tool-inpaint">
+          <div class="section-title" data-i18n="edit.inpaintTitle">Inpainting</div>
+          <div class="inpaint-canvas-wrap" id="inpaintWrap">
+            <div class="inpaint-hint" id="inpaintHint" data-i18n="edit.inpaintHint">Generate an image first, then paint over areas to modify</div>
+            <canvas id="inpaintCanvas" width="400" height="400" style="display:none"></canvas>
+          </div>
+          <textarea id="inpaintPrompt" data-i18n-placeholder="edit.inpaintPlaceholder" placeholder="Describe what should replace the masked area..." style="width:100%;height:50px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;font-family:inherit;color:var(--text);outline:none;resize:vertical;margin-top:8px"></textarea>
+          <div style="display:flex;gap:4px;margin-top:8px">
+            <button class="toolbar-btn" id="inpaintBrushBtn" style="flex:1" data-i18n="edit.brush">🖌 Brush</button>
+            <button class="toolbar-btn" id="inpaintEraseBtn" style="flex:1" data-i18n="edit.erase">◻ Erase</button>
+            <button class="toolbar-btn" id="inpaintClearBtn" style="flex:1" data-i18n="edit.clear">✕ Clear</button>
+          </div>
+          <button class="gen-btn" id="inpaintGenBtn" style="margin-top:10px;height:38px;font-size:12px"><span class="gen-shimmer"></span><span data-i18n="edit.inpaintBtn">✦ Inpaint</span></button>
+        </div>
+
+        <div id="tool-upscale" style="display:none">
+          <div class="section-title" data-i18n="edit.upscaleTitle">Upscale Image</div>
+          <p style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="edit.upscaleDesc">Increase resolution of your generated images using AI upscaling simulation.</p>
+          <div style="display:flex;gap:6px;margin-bottom:12px">
+            <div class="dim-btn active" data-scale="2">2x</div>
+            <div class="dim-btn" data-scale="4">4x</div>
+          </div>
+          <div id="upscalePreview" style="font-size:11px;color:var(--text3);margin-bottom:12px" data-i18n="edit.selectImg">Select an image to upscale</div>
+          <button class="gen-btn" id="upscaleBtn" style="height:38px;font-size:12px"><span class="gen-shimmer"></span><span data-i18n="edit.upscaleBtn">✦ Upscale</span></button>
+        </div>
+
+        <div id="tool-variation" style="display:none">
+          <div class="section-title" data-i18n="edit.variationTitle">Generate Variations</div>
+          <p style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="edit.variationDesc">Create variations of your current image with slight changes.</p>
+          <div class="setting-row"><span class="setting-label" data-i18n="edit.strength">Strength</span><input type="range" min="10" max="90" value="30" id="variationStrength"><span class="setting-value" id="variationVal">0.3</span></div>
+          <div class="setting-row"><span class="setting-label" data-i18n="edit.count">Count</span>
+            <select id="variationCount"><option value="2">2</option><option value="4" selected>4</option><option value="8">8</option></select>
+          </div>
+          <button class="gen-btn" id="variationBtn" style="margin-top:10px;height:38px;font-size:12px"><span class="gen-shimmer"></span><span data-i18n="edit.varBtn">✦ Generate Variations</span></button>
+        </div>
+
+        <div id="tool-blend" style="display:none">
+          <div class="section-title" data-i18n="edit.blendTitle">Blend Images</div>
+          <p style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="edit.blendDesc">Combine two images into one. Select images from history.</p>
+          <div class="upload-zone" id="blendImage1"><div class="uz-icon">🖼</div><div class="uz-text" data-i18n="edit.imgA">Image A (click to select)</div><div class="uz-sub" data-i18n="edit.blendSub">Select from history or upload</div></div>
+          <div class="upload-zone" id="blendImage2"><div class="uz-icon">🖼</div><div class="uz-text" data-i18n="edit.imgB">Image B (click to select)</div><div class="uz-sub" data-i18n="edit.blendSub">Select from history or upload</div></div>
+          <div class="setting-row"><span class="setting-label" data-i18n="edit.blendRatio">Blend Ratio</span><input type="range" min="0" max="100" value="50" id="blendRatio"><span class="setting-value" id="blendVal">50%</span></div>
+          <button class="gen-btn" id="blendBtn" style="margin-top:10px;height:38px;font-size:12px"><span class="gen-shimmer"></span><span data-i18n="edit.blendBtn">✦ Blend</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STYLE TRANSFER TAB -->
+    <div id="tab-style-transfer" class="edit-tab">
+      <div class="section-title" data-i18n="styleTransfer.title">Style Transfer</div>
+      <p style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="styleTransfer.desc">Apply artistic styles to your images. Generate an image first.</p>
+      <div id="stSourcePreview" style="background:var(--surface2);border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;font-size:11px;color:var(--text3)" data-i18n="styleTransfer.noImage">Generate an image first to apply style transfer</div>
+      <div class="section-title" data-i18n="styleTransfer.selectStyle">Select Style</div>
+      <div class="st-style-grid" id="stStyleGrid"></div>
+      <div class="setting-row"><span class="setting-label" data-i18n="styleTransfer.strength">Strength</span><input type="range" min="10" max="100" value="75" id="stStrength"><span class="setting-value" id="stVal">75%</span></div>
+      <button class="gen-btn" id="stApplyBtn" style="margin-top:10px;height:38px;font-size:12px"><span class="gen-shimmer"></span><span data-i18n="styleTransfer.apply">✦ Apply Style</span></button>
+    </div>
+
+    <!-- API TAB -->
+    <div id="tab-api" class="api-tab">
+      <div class="api-hero">
+        <h2 data-i18n="apiSection.title">ArtifAI API</h2>
+        <p data-i18n="apiSection.hero">Integrate AI image generation into your applications. RESTful API with SDK support.</p>
+      </div>
+
+      <div class="api-keys">
+        <h3>🔑 <span data-i18n="apiSection.keys">API Keys</span></h3>
+        <div id="apiKeyList"></div>
+        <div class="api-key-row">
+          <input type="text" id="newKeyName" data-i18n-placeholder="apiSection.keyName" placeholder="Key name (e.g. My App)">
+          <button class="api-key-create" id="createKeyBtn" data-i18n="btn.create">+ Create</button>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="apiSection.usage">Usage This Month</div>
+      <div class="api-usage">
+        <div class="usage-card"><div class="uc-value" id="apiCallsUsed">0</div><div class="uc-label" data-i18n="apiSection.apiCalls">API Calls</div><div class="usage-bar"><div class="usage-bar-fill" id="apiCallsBar" style="width:0"></div></div></div>
+        <div class="usage-card"><div class="uc-value" id="apiImagesUsed">0</div><div class="uc-label" data-i18n="apiSection.images">Images</div><div class="usage-bar"><div class="usage-bar-fill" id="apiImagesBar" style="width:0"></div></div></div>
+        <div class="usage-card"><div class="uc-value" id="apiCreditsUsed">0</div><div class="uc-label" data-i18n="apiSection.credits">Credits</div><div class="usage-bar"><div class="usage-bar-fill" id="apiCreditsBar" style="width:0"></div></div></div>
+      </div>
+
+      <div class="api-section">
+        <h3>📡 <span data-i18n="apiSection.endpoints">Endpoints</span></h3>
+        <div class="api-endpoint"><span class="api-method post">POST</span><span class="api-path">/v1/images/generate</span><span class="api-desc">Generate image</span></div>
+        <div class="api-endpoint"><span class="api-method post">POST</span><span class="api-path">/v1/images/upscale</span><span class="api-desc">Upscale image</span></div>
+        <div class="api-endpoint"><span class="api-method post">POST</span><span class="api-path">/v1/images/inpaint</span><span class="api-desc">Inpaint image</span></div>
+        <div class="api-endpoint"><span class="api-method post">POST</span><span class="api-path">/v1/images/variations</span><span class="api-desc">Create variations</span></div>
+        <div class="api-endpoint"><span class="api-method get">GET</span><span class="api-path">/v1/images/{id}</span><span class="api-desc">Get image</span></div>
+        <div class="api-endpoint"><span class="api-method delete">DELETE</span><span class="api-path">/v1/images/{id}</span><span class="api-desc">Delete image</span></div>
+      </div>
+
+      <div class="api-section">
+        <h3>💻 <span data-i18n="apiSection.codeExamples">Code Examples</span></h3>
+        <div class="api-code-tabs">
+          <div class="api-code-tab active" data-lang="python">Python</div>
+          <div class="api-code-tab" data-lang="javascript">JavaScript</div>
+          <div class="api-code-tab" data-lang="curl">cURL</div>
+        </div>
+        <div class="api-code-block" id="apiCodeBlock">
+          <button class="copy-api-btn" id="copyApiCode" data-i18n="apiSection.copy">Copy</button>
+          <pre id="apiCodeContent"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div id="main-area">
+    <div class="canvas-toolbar">
+      <button class="toolbar-btn" id="downloadBtn" data-i18n="btn.download">⬇ PNG</button>
+      <button class="toolbar-btn" id="downloadAllBtn" style="display:none" data-i18n="btn.downloadAll">⬇ Download ZIP</button>
+      <button class="toolbar-btn" id="copyPromptBtn" data-i18n="btn.copyPrompt">📋 Prompt</button>
+      <button class="toolbar-btn primary" id="shareBtn" data-i18n="btn.share">↗ Share</button>
+      <button class="toolbar-btn" id="pricingBtn" data-i18n="btn.plans">💎 Plans</button>
+      <div class="toolbar-spacer"></div>
+      <span class="gen-time" id="genTime"></span>
+      <span class="size-display" id="sizeDisplay">512 × 512</span>
+    </div>
+
+    <div class="canvas-area" id="canvasArea">
+      <div class="canvas-placeholder" id="placeholder">
+        <div class="icon">✦</div>
+        <div class="text" data-i18n="canvas.placeholder">Enter a prompt and click Generate</div>
+        <div class="subtext" data-i18n="canvas.placeholderSub">Sign in to get started with free credits</div>
+      </div>
+
+      <div class="generated-image" id="generatedImage">
+        <canvas id="imgCanvas" width="512" height="512"></canvas>
+        <div class="image-info-overlay"><div class="image-info-card"><div class="info-prompt" id="infoPrompt"></div><div class="info-meta" id="infoMeta"></div></div></div>
+        <div class="image-tags" id="imageTags"></div>
+        <div class="image-actions">
+          <button class="image-action-btn" id="imgDownload" title="Download">⬇</button>
+          <button class="image-action-btn" id="imgFavorite" title="Favorite">♥</button>
+          <button class="image-action-btn" id="imgAddTag" title="Add Tag">🏷</button>
+        </div>
+        <div class="progress-overlay" id="progressOverlay">
+          <div class="progress-percent" id="progressPercent">0%</div>
+          <div class="progress-stage-label" id="progressStageLabel" data-i18n="progress.initializing">Initializing...</div>
+          <div class="progress-stages" id="progressStages">
+            <div class="progress-stage" id="ps0"><div class="stage-dot"></div><span data-i18n="progress.analyzing">Analyzing Prompt</span></div>
+            <div class="progress-stage" id="ps1"><div class="stage-dot"></div><span data-i18n="progress.generating">Generating Layout</span></div>
+            <div class="progress-stage" id="ps2"><div class="stage-dot"></div><span data-i18n="progress.rendering">Rendering Details</span></div>
+            <div class="progress-stage" id="ps3"><div class="stage-dot"></div><span data-i18n="progress.upscaling">Upscaling</span></div>
+            <div class="progress-stage" id="ps4"><div class="stage-dot"></div><span data-i18n="progress.finalizing">Finalizing</span></div>
+          </div>
+          <div class="progress-bar"><div class="progress-bar-fill" id="progressBarFill"></div></div>
+        </div>
+      </div>
+
+      <div class="comparison-container" id="comparisonContainer">
+        <div class="comparison-before" id="compBefore"><canvas width="512" height="512"></canvas></div>
+        <div class="comparison-after" id="compAfter"><canvas width="512" height="512"></canvas></div>
+        <div class="comparison-slider" id="comparisonSlider"></div>
+        <div class="comparison-label before" data-i18n="canvas.before">Before</div>
+        <div class="comparison-label after" data-i18n="canvas.after">After</div>
+      </div>
+
+      <div class="batch-grid" id="batchGrid"></div>
+      <div class="compare-view" id="compareView"></div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-header">
+        <span class="gallery-title" data-i18n="gallery.title">🔥 Community Gallery</span>
+        <select class="gallery-sort" id="gallerySort">
+          <option value="trending" data-i18n-text="gallery.trending">Trending</option>
+          <option value="newest" data-i18n-text="gallery.newest">Newest</option>
+          <option value="liked" data-i18n-text="gallery.mostLiked">Most Liked</option>
+        </select>
+      </div>
+      <div class="gallery-filters" id="galleryFilters"></div>
+      <div class="masonry-grid" id="galleryGrid"></div>
+      <button class="load-more-btn" id="galleryLoadMore" data-i18n="gallery.loadMore">Load More</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="right-header">
+      <h2 data-i18n="history.title">📜 History</h2>
+      <button class="clear-btn" id="clearHistoryBtn" data-i18n="history.clear">Clear</button>
+    </div>
+    <div class="right-tabs">
+      <div class="right-tab active" data-rtab="all" data-i18n="history.all">All</div>
+      <div class="right-tab" data-rtab="favorites" data-i18n="history.favs">♥ Favs</div>
+      <div class="right-tab" data-rtab="today" data-i18n="history.today">Today</div>
+    </div>
+    <div class="history-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="historySearchInput" data-i18n-placeholder="history.search" placeholder="Search by prompt...">
+    </div>
+    <div class="history-filters" id="historyFilters"></div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty"><span data-i18n="history.empty">No generations yet.</span><br><span data-i18n="history.emptySub">Start creating!</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" id="authClose">✕</button>
+    <h2 id="authTitle" data-i18n-default="auth.signIn">Sign In</h2>
+    <div class="modal-sub" id="authSub" data-i18n-default="auth.signInSub">Sign in to start generating images</div>
+    <label data-i18n="auth.username">Username</label><input type="text" id="authUsername" data-i18n-placeholder="auth.username" placeholder="Enter username" value="demo">
+    <label data-i18n="auth.email">Email</label><input type="email" id="authEmail" data-i18n-placeholder="auth.email" placeholder="Enter email" value="demo@example.com">
+    <label id="authPassLabel" data-i18n="auth.password">Password</label><input type="password" id="authPassword" data-i18n-placeholder="auth.password" placeholder="Enter password" value="demo123">
+    <button class="modal-btn" id="authSubmit" data-i18n-default="auth.signIn">Sign In</button>
+    <div style="text-align:center;margin-top:10px;font-size:.78rem;color:#888">Demo: demo / demo@example.com / demo123</div>
+    <div class="modal-switch" id="authSwitch"><span data-i18n="auth.noAccount">Don't have an account?</span> <a id="authToggle" data-i18n="auth.signUp">Sign Up</a></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="tagModal">
+  <div class="modal">
+    <button class="modal-close" id="tagClose">✕</button>
+    <h2 data-i18n="tags.title">Image Tags</h2>
+    <div class="modal-sub" data-i18n="tags.sub">Add tags to organize your images</div>
+    <div id="tagList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+    <div class="tag-input-row"><input type="text" id="tagInput" data-i18n-placeholder="tags.addTag" placeholder="Add a tag..."><button id="tagAddBtn" data-i18n="tags.add">Add</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h2 id="confirmTitle" data-i18n-default="confirm.title">Confirm</h2>
+    <div class="confirm-text" id="confirmText"></div>
+    <div class="confirm-btns"><button class="confirm-cancel" id="confirmCancel" data-i18n="confirm.cancel">Cancel</button><button class="confirm-ok" id="confirmOk" data-i18n="confirm.confirm">Confirm</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pricingModal">
+  <div class="modal" style="width:680px">
+    <button class="modal-close" id="pricingClose">✕</button>
+    <h2 style="text-align:center" data-i18n="pricing.title">Choose Your Plan</h2>
+    <div class="modal-sub" style="text-align:center" data-i18n="pricing.sub">Unlock the full power of AI image generation</div>
+    <div class="pricing-cards">
+      <div class="pricing-card" data-plan="free"><div class="pc-name" data-i18n="pricing.free">Free</div><div class="pc-price">$0<span data-i18n="pricing.perMonth">/mo</span></div><div class="pc-features"><div data-i18n="pricing.freeFeat1">50 credits/day</div><div data-i18n="pricing.freeFeat2">512×512 max</div><div data-i18n="pricing.freeFeat3">Basic models</div><div data-i18n="pricing.freeFeat4">Community gallery</div></div><button class="pc-btn secondary" data-i18n="pricing.current">Current Plan</button></div>
+      <div class="pricing-card popular" data-plan="pro"><div class="pc-name" data-i18n="pricing.pro">Pro</div><div class="pc-price">$10<span data-i18n="pricing.perMonth">/mo</span></div><div class="pc-features"><div data-i18n="pricing.proFeat1">1000 credits/mo</div><div data-i18n="pricing.proFeat2">1024×1024 max</div><div data-i18n="pricing.proFeat3">All models</div><div data-i18n="pricing.proFeat4">API access</div><div data-i18n="pricing.proFeat5">Priority queue</div><div data-i18n="pricing.proFeat6">No watermark</div></div><button class="pc-btn primary" data-i18n="pricing.upgrade">Upgrade to Pro</button></div>
+      <div class="pricing-card" data-plan="enterprise"><div class="pc-name" data-i18n="pricing.enterprise">Enterprise</div><div class="pc-price">$49<span data-i18n="pricing.perMonth">/mo</span></div><div class="pc-features"><div data-i18n="pricing.entFeat1">Unlimited credits</div><div data-i18n="pricing.entFeat2">2048×2048 max</div><div data-i18n="pricing.entFeat3">All models + early access</div><div data-i18n="pricing.entFeat4">Full API access</div><div data-i18n="pricing.entFeat5">Dedicated support</div><div data-i18n="pricing.entFeat6">Custom models</div><div data-i18n="pricing.entFeat7">Team collaboration</div></div><button class="pc-btn primary" data-i18n="pricing.contact">Contact Sales</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="templateModal">
+  <div class="modal" style="width:500px">
+    <button class="modal-close" id="templateClose">✕</button>
+    <h2 data-i18n="templates.title">Prompt Templates</h2>
+    <div class="modal-sub" data-i18n="templates.sub">Choose a template to get started</div>
+    <div class="prompt-templates" id="promptTemplates"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <button class="modal-close" id="profileClose">✕</button>
+    <h2 data-i18n="profile.title">Profile</h2>
+    <div class="user-profile">
+      <div class="user-avatar" id="profileAvatar">U</div>
+      <div class="user-info"><div class="user-name" id="profileName">User</div><div class="user-email" id="profileEmail">user@email.com</div></div>
+      <div class="user-credits" id="profileCredits">100 ✦</div>
+    </div>
+    <label data-i18n="profile.plan">Current Plan</label>
+    <div id="profilePlan" style="padding:10px;background:var(--surface2);border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600" data-i18n="profile.freePlan">Free Plan — 50 credits/day</div>
+    <button class="modal-btn" id="profileUpgradeBtn" style="margin-bottom:8px" data-i18n="profile.upgrade">💎 Upgrade Plan</button>
+    <button class="logout-btn" id="logoutBtn" data-i18n="profile.signOut">Sign Out</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="creditPurchaseModal">
+  <div class="modal" style="width:400px">
+    <button class="modal-close" id="creditPurchaseClose">✕</button>
+    <h2 data-i18n="profile.buyCredits">Buy Credits</h2>
+    <div class="modal-sub" data-i18n="profile.buyCreditsSub">Purchase additional credits</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <div class="pricing-card" data-credits="100" style="cursor:pointer"><div class="pc-price" style="font-size:18px">100<span> <span data-i18n="profile.credits">credits</span></span></div><div class="pc-name" style="font-size:16px;color:var(--green)">$2</div></div>
+      <div class="pricing-card" data-credits="500" style="cursor:pointer"><div class="pc-price" style="font-size:18px">500<span> <span data-i18n="profile.credits">credits</span></span></div><div class="pc-name" style="font-size:16px;color:var(--green)">$8</div></div>
+      <div class="pricing-card" data-credits="2000" style="cursor:pointer;border-color:var(--pink)"><div class="pc-price" style="font-size:18px">2000<span> <span data-i18n="profile.credits">credits</span></span></div><div class="pc-name" style="font-size:16px;color:var(--green)">$25</div><div style="font-size:9px;color:var(--pink);font-weight:700" data-i18n="profile.bestValue">BEST VALUE</div></div>
+      <div class="pricing-card" data-credits="5000" style="cursor:pointer"><div class="pc-price" style="font-size:18px">5000<span> <span data-i18n="profile.credits">credits</span></span></div><div class="pc-name" style="font-size:16px;color:var(--green)">$50</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ===== I18N ===== */
+var LANGS=[
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'zh',name:'中文',flag:'🇨🇳'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'},
+  {code:'ko',name:'한국어',flag:'🇰🇷'}
+];
+var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
+function T(key){
+  var keys=key.split('.');var val=I18N[curLang];
+  for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
+  return(val===undefined||val===null)?key:val;
+}
+function setLang(code){
+  curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
+  renderLangSwitcher();
+  afterLangChange();
+}
+function renderLangSwitcher(){
+  var el=document.getElementById('langSwitcher');if(!el)return;
+  var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#8b5cf6)':'none')+';color:'+(l.code===curLang?'#fff':'#8888a0')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+}
+function toggleLangMenu(){
+  var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+var I18N={
+  en:{
+    nav:{generate:'Generate',edit:'Edit',style:'Style',api:'API'},
+    btn:{generate:'✦ Generate',cancel:'✕ Cancel Generation',download:'⬇ PNG',downloadAll:'⬇ Download ZIP',copyPrompt:'📋 Prompt',share:'↗ Share',plans:'💎 Plans',save:'Save',clear:'Clear',copy:'Copy',create:'+ Create',add:'Add',upload:'Upload',like:'Like',favorite:'♥',unfavorite:'♡'},
+    model:{title:'Model',sdxl:'SDXL',dalle:'DALL·E 3',mj:'MJ v6',fast:'⚡ Fast',med:'⏱ Med',slow:'🐢 Slow'},
+    style:{title:'Style Presets',none:'None',photo:'Photo',anime:'Anime',digital:'Digital',oil:'Oil',water:'Water',cyber:'Cyber',fantasy:'Fantasy',mini:'Mini',pixel:'Pixel',d3:'3D',film:'Film'},
+    dim:{title:'Dimensions'},
+    settings:{title:'Settings',steps:'Steps',cfg:'CFG Scale',sampler:'Sampler',advanced:'Advanced',seed:'Seed',clip:'Clip Skip',denoise:'Denoise',batch:'Batch Size',random:'Random',lock:'Lock seed'},
+    mode:{title:'Mode',generate:'Generate',compare:'Compare'},
+    prompt:{title:'Prompt',placeholder:'Describe the image you want to generate...',negPlaceholder:'e.g. blurry, low quality, distorted, watermark...',enhance:'✦ Enhance',templates:'📋 Templates',randomizer:'🎲 Random',negToggle:'Negative Prompt',char:'chars',words:'words',presetSave:'Save current as preset...'},
+    edit:{title:'Image Editing Tools',inpaint:'Inpaint',upscale:'Upscale',variation:'Variation',blend:'Blend',inpaintDesc:'Paint area + prompt',upscaleDesc:'2x / 4x resolution',variationDesc:'Generate variants',blendDesc:'Merge two images',inpaintTitle:'Inpainting',inpaintHint:'Generate an image first, then paint over areas to modify',inpaintPlaceholder:'Describe what should replace the masked area...',brush:'🖌 Brush',erase:'◻ Erase',clear:'✕ Clear',inpaintBtn:'✦ Inpaint',upscaleTitle:'Upscale Image',upscaleDesc:'Increase resolution of your generated images using AI upscaling simulation.',upscaleBtn:'✦ Upscale',selectImg:'Select an image to upscale',variationTitle:'Generate Variations',variationDesc:'Create variations of your current image with slight changes.',strength:'Strength',count:'Count',varBtn:'✦ Generate Variations',blendTitle:'Blend Images',blendDesc:'Combine two images into one. Select images from history.',imgA:'Image A (click to select)',imgB:'Image B (click to select)',blendSub:'Select from history or upload',blendRatio:'Blend Ratio',blendBtn:'✦ Blend'},
+    styleTransfer:{title:'Style Transfer',desc:'Apply artistic styles to your images. Generate an image first.',selectStyle:'Select Style',strength:'Strength',apply:'✦ Apply Style',noImage:'Generate an image first to apply style transfer'},
+    apiSection:{title:'API',hero:'Integrate AI image generation into your applications. RESTful API with SDK support.',keys:'API Keys',keyName:'Key name (e.g. My App)',usage:'Usage This Month',apiCalls:'API Calls',images:'Images',credits:'Credits',endpoints:'Endpoints',codeExamples:'Code Examples',copy:'Copy'},
+    canvas:{placeholder:'Enter a prompt and click Generate',placeholderSub:'Sign in to get started with free credits',before:'Before',after:'After'},
+    gallery:{title:'🔥 Community Gallery',trending:'Trending',newest:'Newest',mostLiked:'Most Liked',loadMore:'Load More'},
+    history:{title:'📜 History',all:'All',favs:'♥ Favs',today:'Today',search:'Search by prompt...',empty:'No generations yet.',emptySub:'Start creating!',clear:'Clear',regen:'🔄 Regen',use:'📋 Use',compare:'⚖ Compare',deleted:'Deleted'},
+    progress:{analyzing:'Analyzing Prompt',generating:'Generating Layout',rendering:'Rendering Details',upscaling:'Upscaling',finalizing:'Finalizing',initializing:'Initializing...'},
+    auth:{signIn:'Sign In',signUp:'Sign Up',signInSub:'Sign in to start generating images',signUpSub:'Create an account to get started',username:'Username',email:'Email',password:'Password',noAccount:"Don't have an account?",hasAccount:'Already have an account?',welcome:'Welcome,',freeCredits:'You have 100 free credits.'},
+    pricing:{title:'Choose Your Plan',sub:'Unlock the full power of AI image generation',free:'Free',pro:'Pro',enterprise:'Enterprise',current:'Current Plan',upgrade:'Upgrade to Pro',contact:'Contact Sales',perMonth:'/mo',freeFeat1:'50 credits/day',freeFeat2:'512×512 max',freeFeat3:'Basic models',freeFeat4:'Community gallery',proFeat1:'1000 credits/mo',proFeat2:'1024×1024 max',proFeat3:'All models',proFeat4:'API access',proFeat5:'Priority queue',proFeat6:'No watermark',entFeat1:'Unlimited credits',entFeat2:'2048×2048 max',entFeat3:'All models + early access',entFeat4:'Full API access',entFeat5:'Dedicated support',entFeat6:'Custom models',entFeat7:'Team collaboration'},
+    profile:{title:'Profile',plan:'Current Plan',upgrade:'💎 Upgrade Plan',signOut:'Sign Out',freePlan:'Free Plan — 50 credits/day',buyCredits:'Buy Credits',buyCreditsSub:'Purchase additional credits',credits:'credits',bestValue:'BEST VALUE'},
+    tags:{title:'Image Tags',sub:'Add tags to organize your images',addTag:'Add a tag...',add:'Add'},
+    templates:{title:'Prompt Templates',sub:'Choose a template to get started'},
+    confirm:{title:'Confirm',clearHistory:'Are you sure you want to delete all generation history?',cancel:'Cancel',confirm:'Confirm'},
+    toast:{generated:'generated!',downloaded:'Downloaded!',copied:'Copied!',enhanced:'Prompt enhanced!',saved:'Image saved!',tagAdded:'Tag added',upgraded:'Upgraded to',deleted:'Deleted',cancelled:'Generation cancelled',cleared:'History cleared',promptFirst:'Enter a prompt first',noCredits:'Not enough credits! Upgrade your plan.',pleasePrompt:'Please enter a prompt',promptCopied:'Prompt copied!',shareCopied:'Share link copied to clipboard!',comparing:'Comparing: drag the slider',cfgError:'CFG Scale must be between 1 and 30',selectDimensions:'Please select valid dimensions',upgradeRes:'Upgrade to Pro for higher resolutions',selectMoreCompare:'Select one more image to compare',enterPresetName:'Enter a preset name',freePlanMsg:'You are on the Free plan',contactSales:'Contact sales@artifai.com for Enterprise',inpaintFirst:'Generate an image first, then paint areas',describeMask:'Describe what should replace the masked area',inpainting:'Inpainting...',inpaintComplete:'Inpainting complete!',genFirst:'Generate an image first',needTwoImages:'Need at least 2 images in history',blending:'Blending images...',blended:'Images blended!',applyingStyle:'Applying style transfer...',styleApplied:'Style applied!',imgSelected:'Image selected from history',genFirstPlural:'Generate images first',welcomeMsg:'Welcome! Sign in to get 100 free credits',apiKeyCreated:'API key created!',codeCopied:'Code copied!',presetSaved:'Preset saved',templateLoaded:'Template loaded',variationsCount:'variations generated!',upscaling:'Upscaling',upscaledTo:'Upscaled to',imgSelectedCheck:'\u2713 Image selected',allDownloaded:'All images downloaded!',addedToFav:'Added to favorites',removedFromFav:'Removed from favorites',enterKeyName:'Enter a key name',creditsAdded:'credits added!',enterPromptOrPreset:'Enter a prompt first',pleaseLogin:'Please sign in first'}
+  },
+  zh:{
+    nav:{generate:'生成',edit:'编辑',style:'风格',api:'API'},
+    btn:{generate:'✦ 生成',cancel:'✕ 取消生成',download:'⬇ 下载 PNG',downloadAll:'⬇ 下载 ZIP',copyPrompt:'📋 复制提示词',share:'↗ 分享',plans:'💎 套餐',save:'保存',clear:'清空',copy:'复制',create:'+ 创建',add:'添加',upload:'上传',like:'喜欢',favorite:'♥',unfavorite:'♡'},
+    model:{title:'模型',sdxl:'SDXL',dalle:'DALL·E 3',mj:'MJ v6',fast:'⚡ 快速',med:'⏱ 中等',slow:'🐢 慢速'},
+    style:{title:'风格预设',none:'无',photo:'照片',anime:'动漫',digital:'数字',oil:'油画',water:'水彩',cyber:'赛博',fantasy:'奇幻',mini:'极简',pixel:'像素',d3:'3D',film:'电影'},
+    dim:{title:'尺寸'},
+    settings:{title:'设置',steps:'步数',cfg:'CFG 强度',sampler:'采样器',advanced:'高级',seed:'种子',clip:'跳跃裁剪',denoise:'降噪',batch:'批量',random:'随机',lock:'锁定种子'},
+    mode:{title:'模式',generate:'生成',compare:'对比'},
+    prompt:{title:'提示词',placeholder:'描述您要生成的图像...',negPlaceholder:'例如：模糊、低质量、变形、水印...',enhance:'✦ 增强',templates:'📋 模板',randomizer:'🎲 随机',negToggle:'负面提示词',char:'字符',words:'词',presetSave:'将当前保存为预设...'},
+    edit:{title:'图像编辑工具',inpaint:'修复',upscale:'放大',variation:'变体',blend:'混合',inpaintDesc:'绘制区域 + 提示词',upscaleDesc:'2x / 4x 分辨率',variationDesc:'生成变体',blendDesc:'合并两张图片',inpaintTitle:'图像修复',inpaintHint:'先生成图像，然后在要修改的区域上绘制',inpaintPlaceholder:'描述应替换遮罩区域的内容...',brush:'🖌 画笔',erase:'◻ 擦除',clear:'✕ 清除',inpaintBtn:'✦ 修复',upscaleTitle:'图像放大',upscaleDesc:'使用 AI 放大模拟提高生成图像的分辨率。',upscaleBtn:'✦ 放大',selectImg:'选择要放大的图像',variationTitle:'生成变体',variationDesc:'对当前图像进行细微更改以创建变体。',strength:'强度',count:'数量',varBtn:'✦ 生成变体',blendTitle:'混合图像',blendDesc:'将两张图像合二为一。从历史记录中选择图像。',imgA:'图像 A (点击选择)',imgB:'图像 B (点击选择)',blendSub:'从历史记录中选择或上传',blendRatio:'混合比例',blendBtn:'✦ 混合'},
+    styleTransfer:{title:'风格迁移',desc:'将艺术风格应用到您的图像。请先生成图像。',selectStyle:'选择风格',strength:'强度',apply:'✦ 应用风格',noImage:'先生成图像以应用风格迁移'},
+    apiSection:{title:'API',hero:'将 AI 图像生成集成到您的应用程序中。RESTful API 支持 SDK。',keys:'API 密钥',keyName:'密钥名称（例如：我的应用）',usage:'本月用量',apiCalls:'API 调用',images:'图像',credits:'积分',endpoints:'接口',codeExamples:'代码示例',copy:'复制'},
+    canvas:{placeholder:'输入提示词并点击生成',placeholderSub:'登录后即可开始使用免费积分',before:'之前',after:'之后'},
+    gallery:{title:'🔥 社区画廊',trending:'热门',newest:'最新',mostLiked:'最多喜欢',loadMore:'加载更多'},
+    history:{title:'📜 历史记录',all:'全部',favs:'♥ 收藏',today:'今天',search:'搜索提示词...',empty:'尚无生成记录。',emptySub:'开始创作！',clear:'清空',regen:'🔄 再生',use:'📋 使用',compare:'⚖ 对比',deleted:'已删除'},
+    progress:{analyzing:'分析提示词',generating:'生成布局',rendering:'渲染细节',upscaling:'放大优化',finalizing:'最终处理',initializing:'初始化中...'},
+    auth:{signIn:'登录',signUp:'注册',signInSub:'登录以开始生成图像',signUpSub:'创建账户以开始使用',username:'用户名',email:'邮箱',password:'密码',noAccount:'还没有账户？',hasAccount:'已有账户？',welcome:'欢迎，',freeCredits:'您有 100 个免费积分。'},
+    pricing:{title:'选择套餐',sub:'解锁 AI 图像生成的完整能力',free:'免费版',pro:'专业版',enterprise:'企业版',current:'当前套餐',upgrade:'升级到专业版',contact:'联系销售',perMonth:'/月',freeFeat1:'每天 50 积分',freeFeat2:'最大 512×512',freeFeat3:'基础模型',freeFeat4:'社区画廊',proFeat1:'每月 1000 积分',proFeat2:'最大 1024×1024',proFeat3:'所有模型',proFeat4:'API 访问',proFeat5:'优先队列',proFeat6:'无水印',entFeat1:'无限积分',entFeat2:'最大 2048×2048',entFeat3:'所有模型 + 抢先体验',entFeat4:'完整 API 访问',entFeat5:'专属支持',entFeat6:'自定义模型',entFeat7:'团队协作'},
+    profile:{title:'个人资料',plan:'当前套餐',upgrade:'💎 升级套餐',signOut:'退出登录',freePlan:'免费版 — 每天 50 积分',buyCredits:'购买积分',buyCreditsSub:'购买额外积分',credits:'积分',bestValue:'最佳价值'},
+    tags:{title:'图像标签',sub:'添加标签以组织您的图像',addTag:'添加标签...',add:'添加'},
+    templates:{title:'提示词模板',sub:'选择模板开始使用'},
+    confirm:{title:'确认',clearHistory:'确定要删除所有生成历史记录吗？',cancel:'取消',confirm:'确认'},
+    toast:{generated:'已生成！',downloaded:'已下载！',copied:'已复制！',enhanced:'提示词已增强！',saved:'图像已保存！',tagAdded:'标签已添加',upgraded:'已升级到',deleted:'已删除',cancelled:'生成已取消',cleared:'历史已清空',promptFirst:'请先输入提示词',noCredits:'积分不足！请升级您的套餐。',pleasePrompt:'请输入提示词',promptCopied:'提示词已复制！',shareCopied:'分享链接已复制到剪贴板！',comparing:'对比中：拖动滑块',cfgError:'CFG 强度必须在 1 到 30 之间',selectDimensions:'请选择有效的尺寸',upgradeRes:'升级到专业版以获取更高分辨率',selectMoreCompare:'再选择一张图片进行对比',enterPresetName:'请输入预设名称',freePlanMsg:'您正在使用免费版',contactSales:'请联系 sales@artifai.com 了解企业版',inpaintFirst:'请先生成图像，然后在区域上绘制',describeMask:'请描述应替换遮罩区域的内容',inpainting:'修复中...',inpaintComplete:'修复完成！',genFirst:'请先生成图像',needTwoImages:'历史记录中至少需要 2 张图像',blending:'混合图像中...',blended:'图像已混合！',applyingStyle:'应用风格迁移中...',styleApplied:'风格已应用！',imgSelected:'已从历史记录中选择图像',genFirstPlural:'请先生成图像',welcomeMsg:'欢迎！登录获取 100 个免费积分',apiKeyCreated:'API 密钥已创建！',codeCopied:'代码已复制！',presetSaved:'预设已保存',templateLoaded:'模板已加载',variationsCount:'个变体已生成！',upscaling:'放大中',upscaledTo:'已放大到',imgSelectedCheck:'\u2713 已选择图像',allDownloaded:'所有图像已下载！',addedToFav:'已添加到收藏',removedFromFav:'已从收藏移除',enterKeyName:'请输入密钥名称',creditsAdded:'积分已添加！',enterPromptOrPreset:'请先输入提示词',pleaseLogin:'请先登录'}
+  },
+  ja:{
+    nav:{generate:'生成',edit:'編集',style:'スタイル',api:'API'},
+    btn:{generate:'✦ 生成',cancel:'✕ キャンセル',download:'⬇ PNG 保存',downloadAll:'⬇ ZIP 保存',copyPrompt:'📋 プロンプト',share:'↗ 共有',plans:'💎 プラン',save:'保存',clear:'クリア',copy:'コピー',create:'+ 作成',add:'追加',upload:'アップロード',like:'いいね',favorite:'♥',unfavorite:'♡'},
+    model:{title:'モデル',sdxl:'SDXL',dalle:'DALL·E 3',mj:'MJ v6',fast:'⚡ 高速',med:'⏱ 標準',slow:'🐢 低速'},
+    style:{title:'スタイルプリセット',none:'なし',photo:'写真',anime:'アニメ',digital:'デジタル',oil:'油絵',water:'水彩',cyber:'サイバー',fantasy:'ファンタジー',mini:'ミニマル',pixel:'ピクセル',d3:'3D',film:'映画'},
+    dim:{title:'寸法'},
+    settings:{title:'設定',steps:'ステップ',cfg:'CFG スケール',sampler:'サンプラー',advanced:'詳細設定',seed:'シード',clip:'クリップスキップ',denoise:'ノイズ除去',batch:'バッチサイズ',random:'ランダム',lock:'シードロック'},
+    mode:{title:'モード',generate:'生成',compare:'比較'},
+    prompt:{title:'プロンプト',placeholder:'生成する画像を説明してください...',negPlaceholder:'例：ぼやけた、低品質、歪んだ、透かし...',enhance:'✦ 拡張',templates:'📋 テンプレート',randomizer:'🎲 ランダム',negToggle:'ネガティブプロンプト',char:'文字',words:'語',presetSave:'現在の設定をプリセットとして保存...'},
+    edit:{title:'画像編集ツール',inpaint:'インペイント',upscale:'アップスケール',variation:'バリエーション',blend:'ブレンド',inpaintDesc:'領域を塗ってプロンプト',upscaleDesc:'2x / 4x 解像度',variationDesc:'バリエーション生成',blendDesc:'2つの画像を結合',inpaintTitle:'インペイント',inpaintHint:'画像を生成してから、修正したい部分を塗ってください',inpaintPlaceholder:'マスク領域を置き換える内容を記述...',brush:'🖌 ブラシ',erase:'◻ 消しゴム',clear:'✕ クリア',inpaintBtn:'✦ インペイント',upscaleTitle:'画像アップスケール',upscaleDesc:'AIアップスケーリングで生成画像の解像度を向上。',upscaleBtn:'✦ アップスケール',selectImg:'アップスケールする画像を選択',variationTitle:'バリエーション生成',variationDesc:'現在の画像から微調整したバリエーションを作成。',strength:'強度',count:'数',varBtn:'✦ バリエーション生成',blendTitle:'画像ブレンド',blendDesc:'2つの画像を1つに結合。履歴から画像を選択。',imgA:'画像 A（クリックして選択）',imgB:'画像 B（クリックして選択）',blendSub:'履歴から選択またはアップロード',blendRatio:'ブレンド比率',blendBtn:'✦ ブレンド'},
+    styleTransfer:{title:'スタイル変換',desc:'画像にアートスタイルを適用。先に画像を生成してください。',selectStyle:'スタイル選択',strength:'強度',apply:'✦ スタイル適用',noImage:'まず画像を生成してスタイル変換を適用'},
+    apiSection:{title:'API',hero:'AI画像生成をアプリに統合。RESTful APIとSDKをサポート。',keys:'API キー',keyName:'キー名（例：マイアプリ）',usage:'今月の使用量',apiCalls:'API 呼び出し',images:'画像',credits:'クレジット',endpoints:'エンドポイント',codeExamples:'コード例',copy:'コピー'},
+    canvas:{placeholder:'プロンプトを入力して生成をクリック',placeholderSub:'ログインして無料クレジットで開始',before:'ビフォー',after:'アフター'},
+    gallery:{title:'🔥 コミュニティギャラリー',trending:'トレンド',newest:'最新',mostLiked:'最多いいね',loadMore:'もっと見る'},
+    history:{title:'📜 履歴',all:'すべて',favs:'♥ お気に入り',today:'今日',search:'プロンプトで検索...',empty:'生成履歴がありません。',emptySub:'作成を始めましょう！',clear:'クリア',regen:'🔄 再生成',use:'📋 使用',compare:'⚖ 比較',deleted:'削除済み'},
+    progress:{analyzing:'プロンプト分析中',generating:'レイアウト生成中',rendering:'詳細レンダリング中',upscaling:'アップスケーリング中',finalizing:'最終処理中',initializing:'初期化中...'},
+    auth:{signIn:'ログイン',signUp:'サインアップ',signInSub:'ログインして画像生成を開始',signUpSub:'アカウントを作成して開始',username:'ユーザー名',email:'メール',password:'パスワード',noAccount:'アカウントをお持ちでない方は',hasAccount:'すでにアカウントをお持ちの方は',welcome:'ようこそ、',freeCredits:'100 の無料クレジットがあります。'},
+    pricing:{title:'プランを選択',sub:'AI画像生成の全機能を解放',free:'フリー',pro:'プロ',enterprise:'エンタープライズ',current:'現在のプラン',upgrade:'プロにアップグレード',contact:'営業に問い合わせ',perMonth:'/月',freeFeat1:'1日50クレジット',freeFeat2:'最大512×512',freeFeat3:'基本モデル',freeFeat4:'コミュニティギャラリー',proFeat1:'月1000クレジット',proFeat2:'最大1024×1024',proFeat3:'全モデル',proFeat4:'APIアクセス',proFeat5:'優先キュー',proFeat6:'透かしなし',entFeat1:'無制限クレジット',entFeat2:'最大2048×2048',entFeat3:'全モデル+先行アクセス',entFeat4:'完全APIアクセス',entFeat5:'専任サポート',entFeat6:'カスタムモデル',entFeat7:'チームコラボレーション'},
+    profile:{title:'プロフィール',plan:'現在のプラン',upgrade:'💎 プランアップグレード',signOut:'ログアウト',freePlan:'フリープラン — 1日50クレジット',buyCredits:'クレジット購入',buyCreditsSub:'追加クレジットを購入',credits:'クレジット',bestValue:'ベストバリュー'},
+    tags:{title:'画像タグ',sub:'タグを追加して画像を整理',addTag:'タグを追加...',add:'追加'},
+    templates:{title:'プロンプトテンプレート',sub:'テンプレートを選択して開始'},
+    confirm:{title:'確認',clearHistory:'すべての生成履歴を削除してもよろしいですか？',cancel:'キャンセル',confirm:'確認'},
+    toast:{generated:'生成しました！',downloaded:'ダウンロードしました！',copied:'コピーしました！',enhanced:'プロンプトを拡張しました！',saved:'画像を保存しました！',tagAdded:'タグを追加しました',upgraded:'アップグレードしました',deleted:'削除しました',cancelled:'生成をキャンセルしました',cleared:'履歴をクリアしました',promptFirst:'プロンプトを入力してください',noCredits:'クレジットが不足しています！プランをアップグレードしてください。',pleasePrompt:'プロンプトを入力してください',promptCopied:'プロンプトをコピーしました！',shareCopied:'共有リンクをクリップボードにコピーしました！',comparing:'比較中：スライダーをドラッグ',cfgError:'CFG スケールは1から30の間でなければなりません',selectDimensions:'有効な寸法を選択してください',upgradeRes:'高解像度のためProにアップグレードしてください',selectMoreCompare:'比較する画像をもう1枚選択してください',enterPresetName:'プリセット名を入力してください',freePlanMsg:'現在フリープランです',contactSales:'Enterpriseについてはsales@artifai.comにお問い合わせください',inpaintFirst:'画像を生成してから、領域を塗ってください',describeMask:'マスク領域を置き換える内容を記述してください',inpainting:'インペイント中...',inpaintComplete:'インペイント完了！',genFirst:'画像を先に生成してください',needTwoImages:'履歴に2枚以上の画像が必要です',blending:'画像をブレンド中...',blended:'画像をブレンドしました！',applyingStyle:'スタイル転送を適用中...',styleApplied:'スタイルが適用されました！',imgSelected:'履歴から画像を選択しました',genFirstPlural:'先に画像を生成してください',welcomeMsg:'ようこそ！ログインして100の無料クレジットを取得',apiKeyCreated:'APIキーが作成されました！',codeCopied:'コードをコピーしました！',presetSaved:'プリセットを保存しました',templateLoaded:'テンプレートを読み込みました',variationsCount:'件のバリエーションが生成されました！',upscaling:'アップスケール中',upscaledTo:'アップスケール完了',imgSelectedCheck:'\u2713 画像を選択しました',allDownloaded:'すべての画像をダウンロードしました！',addedToFav:'お気に入りに追加しました',removedFromFav:'お気に入りから削除しました',enterKeyName:'キー名を入力してください',creditsAdded:'クレジットが追加されました！',enterPromptOrPreset:'プロンプトを先に入力してください',pleaseLogin:'先にログインしてください'}
+  },
+  ko:{
+    nav:{generate:'생성',edit:'편집',style:'스타일',api:'API'},
+    btn:{generate:'✦ 생성',cancel:'✕ 생성 취소',download:'⬇ PNG 다운로드',downloadAll:'⬇ ZIP 다운로드',copyPrompt:'📋 프롬프트 복사',share:'↗ 공유',plans:'💎 요금제',save:'저장',clear:'지우기',copy:'복사',create:'+ 생성',add:'추가',upload:'업로드',like:'좋아요',favorite:'♥',unfavorite:'♡'},
+    model:{title:'모델',sdxl:'SDXL',dalle:'DALL·E 3',mj:'MJ v6',fast:'⚡ 빠름',med:'⏱ 보통',slow:'🐢 느림'},
+    style:{title:'스타일 프리셋',none:'없음',photo:'사진',anime:'애니메이션',digital:'디지털',oil:'유화',water:'수채화',cyber:'사이버',fantasy:'판타지',mini:'미니멀',pixel:'픽셀',d3:'3D',film:'영화'},
+    dim:{title:'치수'},
+    settings:{title:'설정',steps:'단계',cfg:'CFG 척도',sampler:'샘플러',advanced:'고급',seed:'시드',clip:'클립 스킵',denoise:'노이즈 제거',batch:'배치 크기',random:'랜덤',lock:'시드 잠금'},
+    mode:{title:'모드',generate:'생성',compare:'비교'},
+    prompt:{title:'프롬프트',placeholder:'생성할 이미지를 설명하세요...',negPlaceholder:'예: 흐릿함, 저품질, 왜곡, 워터마크...',enhance:'✦ 향상',templates:'📋 템플릿',randomizer:'🎲 랜덤',negToggle:'네거티브 프롬프트',char:'자',words:'단어',presetSave:'현재 설정을 프리셋으로 저장...'},
+    edit:{title:'이미지 편집 도구',inpaint:'인페인트',upscale:'업스케일',variation:'변형',blend:'블렌드',inpaintDesc:'영역 칠하기 + 프롬프트',upscaleDesc:'2x / 4x 해상도',variationDesc:'변형 생성',blendDesc:'두 이미지 병합',inpaintTitle:'인페인팅',inpaintHint:'이미지를 먼저 생성한 후 수정할 영역을 칠하세요',inpaintPlaceholder:'마스크 영역을 대체할 내용을 설명하세요...',brush:'🖌 브러시',erase:'◻ 지우개',clear:'✕ 지우기',inpaintBtn:'✦ 인페인트',upscaleTitle:'이미지 업스케일',upscaleDesc:'AI 업스케일링으로 생성된 이미지의 해상도를 높입니다.',upscaleBtn:'✦ 업스케일',selectImg:'업스케일할 이미지 선택',variationTitle:'변형 생성',variationDesc:'현재 이미지의 변형을 약간 변경하여 만듭니다.',strength:'강도',count:'개수',varBtn:'✦ 변형 생성',blendTitle:'이미지 블렌드',blendDesc:'두 이미지를 하나로 결합합니다. 기록에서 이미지를 선택하세요.',imgA:'이미지 A (클릭하여 선택)',imgB:'이미지 B (클릭하여 선택)',blendSub:'기록에서 선택 또는 업로드',blendRatio:'블렌드 비율',blendBtn:'✦ 블렌드'},
+    styleTransfer:{title:'스타일 전환',desc:'이미지에 아트 스타일을 적용합니다. 먼저 이미지를 생성하세요.',selectStyle:'스타일 선택',strength:'강도',apply:'✦ 스타일 적용',noImage:'스타일 전환을 적용하려면 먼저 이미지를 생성하세요'},
+    apiSection:{title:'API',hero:'AI 이미지 생성을 애플리케이션에 통합하세요. RESTful API 및 SDK 지원.',keys:'API 키',keyName:'키 이름 (예: 내 앱)',usage:'이번 달 사용량',apiCalls:'API 호출',images:'이미지',credits:'크레딧',endpoints:'엔드포인트',codeExamples:'코드 예제',copy:'복사'},
+    canvas:{placeholder:'프롬프트를 입력하고 생성을 클릭하세요',placeholderSub:'로그인하여 무료 크레딧으로 시작',before:'이전',after:'이후'},
+    gallery:{title:'🔥 커뮤니티 갤러리',trending:'트렌딩',newest:'최신',mostLiked:'좋아요순',loadMore:'더 보기'},
+    history:{title:'📜 기록',all:'전체',favs:'♥ 즐겨찾기',today:'오늘',search:'프롬프트로 검색...',empty:'생성 기록이 없습니다.',emptySub:'만들기를 시작하세요!',clear:'지우기',regen:'🔄 재생성',use:'📋 사용',compare:'⚖ 비교',deleted:'삭제됨'},
+    progress:{analyzing:'프롬프트 분석 중',generating:'레이아웃 생성 중',rendering:'세부사항 렌더링 중',upscaling:'업스케일링 중',finalizing:'마무리 중',initializing:'초기화 중...'},
+    auth:{signIn:'로그인',signUp:'회원가입',signInSub:'로그인하여 이미지 생성 시작',signUpSub:'계정을 만들어 시작하세요',username:'사용자명',email:'이메일',password:'비밀번호',noAccount:'계정이 없으신가요?',hasAccount:'이미 계정이 있으신가요?',welcome:'환영합니다,',freeCredits:'100개의 무료 크레딧이 있습니다.'},
+    pricing:{title:'요금제 선택',sub:'AI 이미지 생성의 모든 기능을 활용하세요',free:'무료',pro:'프로',enterprise:'엔터프라이즈',current:'현재 요금제',upgrade:'프로로 업그레이드',contact:'영업 문의',perMonth:'/월',freeFeat1:'일 50 크레딧',freeFeat2:'최대 512×512',freeFeat3:'기본 모델',freeFeat4:'커뮤니티 갤러리',proFeat1:'월 1000 크레딧',proFeat2:'최대 1024×1024',proFeat3:'모든 모델',proFeat4:'API 액세스',proFeat5:'우선 큐',proFeat6:'워터마크 없음',entFeat1:'무제한 크레딧',entFeat2:'최대 2048×2048',entFeat3:'모든 모델 + 얼리 액세스',entFeat4:'전체 API 액세스',entFeat5:'전담 지원',entFeat6:'맞춤 모델',entFeat7:'팀 협업'},
+    profile:{title:'프로필',plan:'현재 요금제',upgrade:'💎 요금제 업그레이드',signOut:'로그아웃',freePlan:'무료 요금제 — 일 50 크레딧',buyCredits:'크레딧 구매',buyCreditsSub:'추가 크레딧 구매',credits:'크레딧',bestValue:'최고 가치'},
+    tags:{title:'이미지 태그',sub:'태그를 추가하여 이미지 정리',addTag:'태그 추가...',add:'추가'},
+    templates:{title:'프롬프트 템플릿',sub:'템플릿을 선택하여 시작'},
+    confirm:{title:'확인',clearHistory:'모든 생성 기록을 삭제하시겠습니까?',cancel:'취소',confirm:'확인'},
+    toast:{generated:'생성되었습니다!',downloaded:'다운로드되었습니다!',copied:'복사되었습니다!',enhanced:'프롬프트가 향상되었습니다!',saved:'이미지가 저장되었습니다!',tagAdded:'태그가 추가되었습니다',upgraded:'업그레이드되었습니다',deleted:'삭제되었습니다',cancelled:'생성이 취소되었습니다',cleared:'기록이 지워졌습니다',promptFirst:'프롬프트를 먼저 입력하세요',noCredits:'크레딧이 부족합니다! 요금제를 업그레이드하세요.',pleasePrompt:'프롬프트를 입력하세요',promptCopied:'프롬프트가 복사되었습니다!',shareCopied:'공유 링크가 클립보드에 복사되었습니다!',comparing:'비교 중: 슬라이더를 드래그하세요',cfgError:'CFG 척도는 1에서 30 사이여야 합니다',selectDimensions:'유효한 치수를 선택하세요',upgradeRes:'더 높은 해상도를 위해 Pro로 업그레이드하세요',selectMoreCompare:'비교할 이미지를 하나 더 선택하세요',enterPresetName:'프리셋 이름을 입력하세요',freePlanMsg:'현재 무료 요금제입니다',contactSales:'Enterprise에 대해 sales@artifai.com으로 문의하세요',inpaintFirst:'이미지를 먼저 생성한 후 영역을 칠하세요',describeMask:'마스크 영역을 대체할 내용을 설명하세요',inpainting:'인페인트 중...',inpaintComplete:'인페인트 완료!',genFirst:'이미지를 먼저 생성하세요',needTwoImages:'기록에 2개 이상의 이미지가 필요합니다',blending:'이미지 블렌딩 중...',blended:'이미지가 블렌딩되었습니다!',applyingStyle:'스타일 전환 적용 중...',styleApplied:'스타일이 적용되었습니다!',imgSelected:'기록에서 이미지를 선택했습니다',genFirstPlural:'이미지를 먼저 생성하세요',welcomeMsg:'환영합니다! 로그인하여 100개의 무료 크레딧을 받으세요',apiKeyCreated:'API 키가 생성되었습니다!',codeCopied:'코드가 복사되었습니다!',presetSaved:'프리셋이 저장되었습니다',templateLoaded:'템플릿이 로드되었습니다',variationsCount:'개의 변형이 생성되었습니다!',upscaling:'업스케일링 중',upscaledTo:'업스케일 완료',imgSelectedCheck:'\u2713 이미지 선택됨',allDownloaded:'모든 이미지가 다운로드되었습니다!',addedToFav:'즐겨찾기에 추가되었습니다',removedFromFav:'즐겨찾기에서 제거되었습니다',enterKeyName:'키 이름을 입력하세요',creditsAdded:'크레딧이 추가되었습니다!',enterPromptOrPreset:'프롬프트를 먼저 입력하세요',pleaseLogin:'먼저 로그인하세요'}
+  }
+};
+"use strict";
+
+const APP_KEY = 'artifai_v4';
+const CREDIT_COSTS = { generate: 1, inpaint: 2, upscale: 3, variation: 1, blend: 2, style_transfer: 2 };
+const PLAN_LIMITS = { free: { credits: 50, maxRes: 512 }, pro: { credits: 1000, maxRes: 1024 }, enterprise: { credits: -1, maxRes: 2048 } };
+
+const MODELS = [
+  { id: 'sdxl', name: 'SDXL', icon: '🎨', speed: 'fast', tag: 'fast', quality: 'High', costMult: 1 },
+  { id: 'dalle3', name: 'DALL·E 3', icon: '🤖', speed: 'med', tag: 'med', quality: 'Ultra', costMult: 1.5 },
+  { id: 'mj6', name: 'MJ v6', icon: '✨', speed: 'slow', tag: 'slow', quality: 'Premium', costMult: 2 }
+];
+
+const STYLE_PRESETS = [
+  { id: 'none', name: 'None', icon: '⊘' },
+  { id: 'photorealistic', name: 'Photo', icon: '📷', kw: 'photorealistic, ultra detailed, 8K, DSLR' },
+  { id: 'anime', name: 'Anime', icon: '🌸', kw: 'anime style, vibrant colors, detailed illustration' },
+  { id: 'digital-art', name: 'Digital', icon: '🎨', kw: 'digital art, concept art, trending on artstation' },
+  { id: 'oil-painting', name: 'Oil', icon: '🖼', kw: 'oil painting, classical, rich textures, brush strokes' },
+  { id: 'watercolor', name: 'Water', icon: '💧', kw: 'watercolor painting, soft edges, flowing colors' },
+  { id: 'cyberpunk', name: 'Cyber', icon: '🌆', kw: 'cyberpunk style, neon lights, futuristic, dark atmosphere' },
+  { id: 'fantasy', name: 'Fantasy', icon: '🧙', kw: 'fantasy art, magical, ethereal lighting, epic' },
+  { id: 'minimalist', name: 'Mini', icon: '◻', kw: 'minimalist, clean lines, simple, modern design' },
+  { id: 'pixel-art', name: 'Pixel', icon: '👾', kw: 'pixel art, retro game style, 16-bit' },
+  { id: '3d-render', name: '3D', icon: '🎮', kw: '3D render, octane render, unreal engine, volumetric lighting' },
+  { id: 'cinematic', name: 'Film', icon: '🎬', kw: 'cinematic, dramatic lighting, film grain, anamorphic' }
+];
+
+const DIMENSIONS = [
+  { label: '512²', w: 512, h: 512, tag: 'square' },
+  { label: '768²', w: 768, h: 768, tag: 'square' },
+  { label: '1024²', w: 1024, h: 1024, tag: 'square', pro: true },
+  { label: '768×512', w: 768, h: 512, tag: 'landscape' },
+  { label: '1024×768', w: 1024, h: 768, tag: 'landscape', pro: true },
+  { label: '512×768', w: 512, h: 768, tag: 'portrait' },
+  { label: '768×1024', w: 768, h: 1024, tag: 'portrait', pro: true }
+];
+
+const STYLE_TRANSFER_STYLES = [
+  { id: 'oil', name: 'Oil Painting', icon: '🖼' },
+  { id: 'watercolor', name: 'Watercolor', icon: '💧' },
+  { id: 'pixel', name: 'Pixel Art', icon: '👾' },
+  { id: 'anime', name: 'Anime', icon: '🌸' },
+  { id: 'vangogh', name: 'Van Gogh', icon: '🌻' },
+  { id: 'sketch', name: 'Pencil Sketch', icon: '✏' }
+];
+
+const PROMPT_TEMPLATES = {
+  'Portrait': [
+    { name: 'Cinematic Portrait', prompt: 'A cinematic portrait of a person, dramatic lighting, shallow depth of field, 85mm lens, film grain, moody atmosphere' },
+    { name: 'Fantasy Character', prompt: 'A fantasy character portrait, elaborate costume, magical aura, ethereal lighting, detailed face, fantasy art style' },
+    { name: 'Street Style', prompt: 'Urban street style portrait, natural lighting, city background, candid expression, editorial photography' }
+  ],
+  'Landscape': [
+    { name: 'Epic Mountain', prompt: 'Breathtaking mountain landscape at golden hour, snow-capped peaks, alpine meadow, dramatic clouds, ultra-wide angle' },
+    { name: 'Ocean Sunset', prompt: 'Stunning ocean sunset, crashing waves, golden reflections, silhouette of palm trees, vibrant sky colors' },
+    { name: 'Forest Path', prompt: 'Enchanted forest path, sunbeams filtering through canopy, moss-covered trees, mystical atmosphere, fireflies' }
+  ],
+  'Abstract': [
+    { name: 'Fluid Art', prompt: 'Abstract fluid art, swirling colors, metallic gold accents, organic shapes, high contrast, mesmerizing patterns' },
+    { name: 'Geometric', prompt: 'Geometric abstract art, sharp lines, bold colors, mathematical precision, modern minimalist composition' },
+    { name: 'Nebula', prompt: 'Cosmic nebula abstract, vibrant purples and blues, swirling galaxies, stardust, deep space photography' }
+  ],
+  'Product': [
+    { name: 'Product Shot', prompt: 'Professional product photography, clean white background, studio lighting, sharp focus, commercial quality' },
+    { name: 'Lifestyle Product', prompt: 'Lifestyle product photography, natural setting, warm lighting, aesthetic composition, Instagram style' },
+    { name: 'Tech Gadget', prompt: 'Futuristic tech gadget, sleek design, holographic elements, dark background, neon accents, product rendering' }
+  ],
+  'Architecture': [
+    { name: 'Modern Building', prompt: 'Stunning modern architecture, glass and steel, geometric facades, dramatic perspective, golden hour lighting' },
+    { name: 'Interior Design', prompt: 'Luxury interior design, contemporary furniture, natural light, wide angle, architectural photography, warm tones' },
+    { name: 'Futuristic City', prompt: 'Futuristic cityscape, towering skyscrapers, flying vehicles, neon lights, cyberpunk atmosphere, aerial view' }
+  ]
+};
+
+const QUALITY_KEYWORDS = ['masterpiece', 'best quality', 'highly detailed', 'sharp focus', 'professional', 'award-winning', '8K resolution', 'intricate details', 'volumetric lighting'];
+
+const API_CODE_EXAMPLES = {
+  python: `<span class="kw">import</span> artifai
+
+client = artifai.<span class="fn">Client</span>(api_key=<span class="str">"your-api-key"</span>)
+
+<span class="cm"># Generate an image</span>
+result = client.<span class="fn">generate</span>(
+    prompt=<span class="str">"A majestic dragon in a nebula"</span>,
+    negative_prompt=<span class="str">"blurry, low quality"</span>,
+    model=<span class="str">"sdxl"</span>,
+    width=<span class="num">1024</span>,
+    height=<span class="num">1024</span>,
+    steps=<span class="num">30</span>,
+    cfg_scale=<span class="num">7.0</span>,
+    seed=<span class="num">42</span>
+)
+
+<span class="cm"># Save the image</span>
+result.<span class="fn">save</span>(<span class="str">"output.png"</span>)
+<span class="fn">print</span>(f<span class="str">"Image saved: {result.url}"</span>)`,
+  javascript: `<span class="kw">import</span> { ArtifAI } <span class="kw">from</span> <span class="str">'artifai'</span>;
+
+<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">ArtifAI</span>({
+  apiKey: <span class="str">'your-api-key'</span>
+});
+
+<span class="cm">// Generate an image</span>
+<span class="kw">const</span> result = <span class="kw">await</span> client.<span class="fn">generate</span>({
+  prompt: <span class="str">'A majestic dragon in a nebula'</span>,
+  negativePrompt: <span class="str">'blurry, low quality'</span>,
+  model: <span class="str">'sdxl'</span>,
+  width: <span class="num">1024</span>,
+  height: <span class="num">1024</span>,
+  steps: <span class="num">30</span>,
+  cfgScale: <span class="num">7.0</span>,
+  seed: <span class="num">42</span>
+});
+
+<span class="cm">// Download the image</span>
+<span class="kw">await</span> result.<span class="fn">download</span>(<span class="str">'output.png'</span>);
+console.<span class="fn">log</span>(<span class="str">\`Image: \${result.url}\`</span>);`,
+  curl: `<span class="cm"># Generate an image</span>
+<span class="fn">curl</span> -X POST https://api.artifai.com/v1/images/generate \\
+  -H <span class="str">"Authorization: Bearer your-api-key"</span> \\
+  -H <span class="str">"Content-Type: application/json"</span> \\
+  -d <span class="str">'{
+    "prompt": "A majestic dragon in a nebula",
+    "model": "sdxl",
+    "width": 1024,
+    "height": 1024,
+    "steps": 30,
+    "cfg_scale": 7.0,
+    "seed": 42
+  }'</span>
+
+<span class="cm"># Response:</span>
+<span class="cm"># { "id": "img_abc123", "url": "https://cdn.artifai.com/..." }</span>`
+};
+
+let S = {};
+
+function loadState() {
+  try { S = JSON.parse(localStorage.getItem(APP_KEY)) || {}; } catch(e) { S = {}; }
+  if (!S.user) S.user = null;
+  if (!S.credits) S.credits = 100;
+  if (!S.plan) S.plan = 'free';
+  if (!S.history) S.history = [];
+  if (!S.favorites) S.favorites = [];
+  if (!S.presets) S.presets = [];
+  if (!S.apiKeys) S.apiKeys = [];
+  if (!S.apiUsage) S.apiUsage = { calls: 0, images: 0, credits: 0 };
+  if (!S.communityGallery) S.communityGallery = generateCommunityGallery();
+  if (!S.galleryPage) S.galleryPage = 1;
+  if (!S.creditDailyReset) S.creditDailyReset = 0;
+  if (!S.selectedModel) S.selectedModel = 'sdxl';
+  if (!S.selectedStyle) S.selectedStyle = 'none';
+  if (!S.selectedDim) S.selectedDim = 0;
+  if (!S.lockedSeed) S.lockedSeed = false;
+  resetDailyCredits();
+}
+
+function saveState() {
+  try { localStorage.setItem(APP_KEY, JSON.stringify(S)); } catch(e) {}
+}
+
+function resetDailyCredits() {
+  const today = new Date().toDateString();
+  if (S.creditDailyReset !== today) {
+    const limit = PLAN_LIMITS[S.plan] || PLAN_LIMITS.free;
+    if (S.plan === 'free') S.credits = limit.credits;
+    else if (S.plan === 'pro') S.credits = limit.credits;
+    else S.credits = 99999;
+    S.creditDailyReset = today;
+    saveState();
+  }
+}
+
+function useCredits(amount) {
+  if (S.plan === 'enterprise') return true;
+  if (S.credits < amount) { toast(T('toast.noCredits'), 'error'); return false; }
+  S.credits -= amount;
+  S.apiUsage.credits += amount;
+  S.apiUsage.calls++;
+  updateCreditsUI();
+  saveState();
+  return true;
+}
+
+function $(id) { return document.getElementById(id); }
+function $$(sel) { return document.querySelectorAll(sel); }
+
+function toast(msg, type = 'info') {
+  const c = $('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+function showModal(id) { $(id).classList.add('visible'); }
+function hideModal(id) { $(id).classList.remove('visible'); }
+
+function confirm(title, text) {
+  return new Promise(res => {
+    $('confirmTitle').textContent = title;
+    $('confirmText').textContent = text;
+    showModal('confirmModal');
+    $('confirmOk').onclick = () => { hideModal('confirmModal'); res(true); };
+    $('confirmCancel').onclick = () => { hideModal('confirmModal'); res(false); };
+  });
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 6); }
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return Math.abs(h);
+}
+
+function seededRng(seed) {
+  let s = seed;
+  return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+}
+
+function hslToRgb(h, s, l) {
+  h /= 360; s /= 100; l /= 100;
+  let r, g, b;
+  if (s === 0) { r = g = b = l; }
+  else {
+    const hue2rgb = (p, q, t) => { if (t < 0) t += 1; if (t > 1) t -= 1; if (t < 1/6) return p + (q - p) * 6 * t; if (t < 1/2) return q; if (t < 2/3) return p + (q - p) * (2/3 - t) * 6; return p; };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+function updateCreditsUI() {
+  $('creditsCount').textContent = S.plan === 'enterprise' ? '∞' : S.credits;
+  const badge = $('planBadge');
+  badge.className = 'plan-badge ' + S.plan;
+  badge.textContent = S.plan.toUpperCase();
+}
+
+function downloadCanvas(canvas, name) {
+  const a = document.createElement('a');
+  a.download = (name || 'artifai') + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+function canvasToData(canvas) {
+  return canvas.toDataURL('image/png');
+}
+
+function dataToCanvas(dataUrl) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.width; c.height = img.height;
+      c.getContext('2d').drawImage(img, 0, 0);
+      res(c);
+    };
+    img.src = dataUrl;
+  });
+}
+
+function generateCommunityGallery() {
+  const items = [];
+  const prompts = [
+    'A crystal cave with bioluminescent fungi', 'Cyberpunk city at night, neon reflections',
+    'Ancient dragon perched on a mountain peak', 'Underwater temple with coral gardens',
+    'Steampunk airship above Victorian London', 'Japanese garden in autumn, golden leaves',
+    'Nebula formation with a dying star', 'Medieval castle on a floating island',
+    'Robot samurai in a cherry blossom storm', 'Art deco skyscraper interior, golden light',
+    'Biomechanical forest with glowing trees', 'Desert oasis at twilight, stars emerging',
+    'Cosmic whale swimming through galaxies', 'Gothic cathedral with stained glass aurora',
+    'Futuristic racing car on Mars', 'Enchanted library with floating books',
+    'Volcanic forge with a master blacksmith', 'Arctic aurora over frozen landscape',
+    'Bioluminescent deep sea creatures', 'Cloud city with rainbow bridges'
+  ];
+  const styles = ['photorealistic', 'anime', 'digital-art', 'oil-painting', 'cyberpunk', 'fantasy', '3d-render', 'cinematic'];
+  for (let i = 0; i < 20; i++) {
+    items.push({
+      id: uid(),
+      prompt: prompts[i],
+      style: styles[i % styles.length],
+      likes: Math.floor(Math.random() * 500) + 10,
+      liked: false,
+      saved: false,
+      timestamp: Date.now() - Math.random() * 86400000 * 7,
+      seed: Math.floor(Math.random() * 999999)
+    });
+  }
+  return items;
+}
+
+function generateImage(ctx, w, h, seed, prompt, model) {
+  const rng = seededRng(seed);
+  const h1 = hashStr(prompt || '');
+  ctx.clearRect(0, 0, w, h);
+  const modelIdx = MODELS.findIndex(m => m.id === model) || 0;
+  const baseHue = (h1 % 360);
+  const isDark = (h1 % 3 !== 0);
+  const bg = isDark ? [8 + rng() * 15, 8 + rng() * 15, 15 + rng() * 25] : [220 + rng() * 35, 215 + rng() * 35, 200 + rng() * 35];
+  ctx.fillStyle = `rgb(${bg[0]|0},${bg[1]|0},${bg[2]|0})`;
+  ctx.fillRect(0, 0, w, h);
+  const grd = ctx.createRadialGradient(w * (0.3 + rng() * 0.4), h * (0.3 + rng() * 0.4), 0, w/2, h/2, w * 0.8);
+  grd.addColorStop(0, `hsla(${baseHue}, 60%, ${isDark?25:70}%, 0.4)`);
+  grd.addColorStop(0.5, `hsla(${(baseHue + 60 + rng()*60)|0}, 50%, ${isDark?15:55}%, 0.3)`);
+  grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, w, h);
+  const numShapes = 8 + (h1 % 15);
+  for (let i = 0; i < numShapes; i++) {
+    const x = rng() * w;
+    const y = rng() * h;
+    const size = 20 + rng() * (w * 0.25);
+    const hue = (baseHue + rng() * 180) % 360;
+    const alpha = 0.1 + rng() * 0.4;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rng() * Math.PI * 2);
+    const type = rng();
+    if (type < 0.3) {
+      ctx.beginPath();
+      ctx.arc(0, 0, size/2, 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${hue|0}, ${50+rng()*40|0}%, ${isDark?30+rng()*40|0:50+rng()*30|0}%, ${alpha})`;
+      ctx.fill();
+    } else if (type < 0.55) {
+      ctx.fillStyle = `hsla(${hue|0}, ${40+rng()*40|0}%, ${isDark?25+rng()*35|0:45+rng()*35|0}%, ${alpha})`;
+      ctx.fillRect(-size/2, -size/2 * (0.3+rng()*1.2), size, size * (0.3+rng()*1.2));
+    } else if (type < 0.75) {
+      ctx.beginPath();
+      ctx.moveTo(0, -size/2);
+      ctx.lineTo(size/2, size/2);
+      ctx.lineTo(-size/2, size/2);
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${hue|0}, ${50+rng()*30|0}%, ${isDark?30+rng()*40|0:50+rng()*30|0}%, ${alpha})`;
+      ctx.fill();
+    } else {
+      const pts = 3 + (rng()*5|0);
+      ctx.beginPath();
+      for (let j = 0; j < pts; j++) {
+        const a = (j/pts)*Math.PI*2;
+        const r = size/2 * (0.5+rng()*0.5);
+        if (j===0) ctx.moveTo(Math.cos(a)*r, Math.sin(a)*r);
+        else ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${hue|0}, ${40+rng()*50|0}%, ${isDark?25+rng()*45|0:45+rng()*35|0}%, ${alpha})`;
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  if (modelIdx >= 1) {
+    for (let i = 0; i < 5 + rng()*8; i++) {
+      const x1 = rng()*w, y1 = rng()*h;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      for (let j = 0; j < 3; j++) ctx.lineTo(x1+(rng()-0.5)*w*0.3, y1+(rng()-0.5)*h*0.3);
+      ctx.strokeStyle = `hsla(${(baseHue+rng()*120)%360|0}, 70%, ${isDark?55:45}%, ${0.15+rng()*0.2})`;
+      ctx.lineWidth = 1 + rng()*3;
+      ctx.stroke();
+    }
+  }
+  if (modelIdx >= 2) {
+    for (let i = 0; i < 60; i++) {
+      ctx.beginPath();
+      ctx.arc(rng()*w, rng()*h, 0.5+rng()*2, 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${(baseHue+rng()*60)%360|0}, 80%, 80%, ${0.2+rng()*0.5})`;
+      ctx.fill();
+    }
+  }
+  for (let i = 0; i < 3; i++) {
+    const gx = rng()*w, gy = rng()*h;
+    const g2 = ctx.createRadialGradient(gx, gy, 0, gx, gy, 60+rng()*120);
+    g2.addColorStop(0, `hsla(${(baseHue+120+rng()*60)%360|0}, 80%, ${isDark?60:70}%, 0.2)`);
+    g2.addColorStop(1, 'transparent');
+    ctx.fillStyle = g2;
+    ctx.fillRect(0, 0, w, h);
+  }
+  const vg = ctx.createLinearGradient(0, 0, 0, h);
+  vg.addColorStop(0, isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)');
+  vg.addColorStop(0.5, 'transparent');
+  vg.addColorStop(1, isDark ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.1)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function applyStyleTransfer(srcCanvas, styleId, strength) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  const srcCtx = srcCanvas.getContext('2d');
+  const imgData = srcCtx.getImageData(0, 0, w, h);
+  const d = imgData.data;
+  const s = strength / 100;
+  switch(styleId) {
+    case 'oil':
+      for (let y = 0; y < h; y += 3) for (let x = 0; x < w; x += 3) {
+        const i = (y*w+x)*4;
+        const r=d[i],g=d[i+1],b=d[i+2];
+        ctx.fillStyle = `rgb(${(r*(1-s)+r*s)|0},${(g*(1-s)+g*0.9*s)|0},${(b*(1-s)+b*0.85*s)|0})`;
+        ctx.beginPath();
+        ctx.ellipse(x+1, y+1, 2+s*2, 2+s*1.5, Math.random()*0.5, 0, Math.PI*2);
+        ctx.fill();
+      }
+      break;
+    case 'watercolor':
+      ctx.drawImage(srcCanvas, 0, 0);
+      for (let i = 0; i < 80*s; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random()*w, Math.random()*h, 10+Math.random()*60, 0, Math.PI*2);
+        ctx.fillStyle = `hsla(${Math.random()*360}, 50%, 70%, ${0.03*s})`;
+        ctx.fill();
+      }
+      break;
+    case 'pixel':
+      const ps = Math.max(2, (4 + s*8)|0);
+      for (let y = 0; y < h; y += ps) for (let x = 0; x < w; x += ps) {
+        const i = (y*w+x)*4;
+        ctx.fillStyle = `rgb(${d[i]},${d[i+1]},${d[i+2]})`;
+        ctx.fillRect(x, y, ps, ps);
+      }
+      break;
+    case 'anime':
+      ctx.drawImage(srcCanvas, 0, 0);
+      ctx.globalCompositeOperation = 'color-burn';
+      for (let i = 0; i < 40*s; i++) {
+        ctx.beginPath();
+        const x1 = Math.random()*w, y1 = Math.random()*h;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1+(Math.random()-0.5)*200, y1+(Math.random()-0.5)*200);
+        ctx.strokeStyle = `hsla(${330+Math.random()*30}, 80%, 70%, ${0.1*s})`;
+        ctx.lineWidth = 1+s*3;
+        ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      break;
+    case 'vangogh':
+      ctx.drawImage(srcCanvas, 0, 0);
+      for (let y = 0; y < h; y += 4) for (let x = 0; x < w; x += 4) {
+        const i = (y*w+x)*4;
+        const a = Math.atan2(d[i+1]-128, d[i]-128);
+        const len = 6+s*12;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x+Math.cos(a)*len, y+Math.sin(a)*len);
+        ctx.strokeStyle = `hsla(${(d[i]+30)%360}, 70%, 60%, ${0.3*s})`;
+        ctx.lineWidth = 1+s*2;
+        ctx.stroke();
+      }
+      break;
+    case 'sketch':
+      for (let y = 0; y < h; y += 1) for (let x = 0; x < w; x += 1) {
+        const i = (y*w+x)*4;
+        const gray = (d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11)|0;
+        const inv = 255 - gray;
+        if (Math.random()*255 < inv*s) {
+          ctx.beginPath();
+          const angle = gray < 128 ? Math.PI/4 : -Math.PI/4;
+          ctx.moveTo(x, y);
+          ctx.lineTo(x+Math.cos(angle)*(2+Math.random()*3), y+Math.sin(angle)*(2+Math.random()*3));
+          ctx.strokeStyle = `rgba(40,40,40,${0.3+s*0.5})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+      break;
+    default:
+      ctx.drawImage(srcCanvas, 0, 0);
+  }
+  return c;
+}
+
+let currentImageData = null;
+let isGenerating = false;
+let genAbort = false;
+let compareImages = [];
+let selectedStStyle = 'oil';
+let selectedEditTool = 'inpaint';
+let inpaintMask = null;
+let inpaintDrawing = false;
+let batchItems = [];
+let currentApiLang = 'python';
+
+function buildModelCards() {
+  const c = $('modelCards');
+  c.innerHTML = MODELS.map(m =>
+    `<div class="model-card${S.selectedModel===m.id?' active':''}" data-model="${m.id}">
+      <div class="mc-icon">${m.icon}</div>
+      <div class="mc-name">${m.name}</div>
+      <div class="mc-speed">${m.quality}</div>
+      <div class="mc-tag ${m.tag}">${m.tag === 'fast' ? T('model.fast') : m.tag === 'med' ? T('model.med') : T('model.slow')}</div>
+    </div>`
+  ).join('');
+  c.querySelectorAll('.model-card').forEach(el => {
+    el.onclick = () => { S.selectedModel = el.dataset.model; saveState(); buildModelCards(); };
+  });
+}
+
+function buildStylePresets() {
+  const all = [...STYLE_PRESETS, ...S.presets.map(p => ({id:'custom_'+p.name,name:p.name.slice(0,5),icon:'💎',kw:p.prompt,isCustom:true}))];
+  $('presetCount').textContent = all.length;
+  const c = $('stylePresets');
+  c.innerHTML = all.map(s =>
+    `<div class="style-thumb${S.selectedStyle===s.id?' active':''}" data-style="${s.id}">
+      <div class="style-icon">${s.icon}</div>
+      <div class="style-name">${s.name}</div>
+      ${s.isCustom ? '<div class="preset-badge">U</div>' : ''}
+    </div>`
+  ).join('');
+  c.querySelectorAll('.style-thumb').forEach(el => {
+    el.onclick = () => { S.selectedStyle = el.dataset.style; saveState(); buildStylePresets(); };
+  });
+}
+
+function buildDimPresets() {
+  const c = $('dimPresets');
+  c.innerHTML = DIMENSIONS.map((d, i) =>
+    `<div class="dim-btn${S.selectedDim===i?' active':''}" data-dim="${i}">${d.label}${d.pro?' 🔒':''}</div>`
+  ).join('');
+  c.querySelectorAll('.dim-btn').forEach(el => {
+    el.onclick = () => {
+      const idx = parseInt(el.dataset.dim);
+      const dim = DIMENSIONS[idx];
+      if (dim.pro && S.plan === 'free') { toast(T('toast.upgradeRes'), 'warning'); return; }
+      S.selectedDim = idx;
+      $('sizeDisplay').textContent = dim.w + ' × ' + dim.h;
+      saveState(); buildDimPresets();
+    };
+  });
+}
+
+function buildStStyleGrid() {
+  const c = $('stStyleGrid');
+  c.innerHTML = STYLE_TRANSFER_STYLES.map(s =>
+    `<div class="st-style-card${selectedStStyle===s.id?' active':''}" data-st="${s.id}">
+      <div class="ss-icon">${s.icon}</div>
+      <div class="ss-name">${s.name}</div>
+    </div>`
+  ).join('');
+  c.querySelectorAll('.st-style-card').forEach(el => {
+    el.onclick = () => { selectedStStyle = el.dataset.st; buildStStyleGrid(); };
+  });
+}
+
+function buildHistoryFilters() {
+  const models = [...new Set(S.history.map(h => h.model))];
+  const c = $('historyFilters');
+  c.innerHTML = `<span class="hf-btn active" data-hf="all">${T('history.all')}</span>` +
+    models.map(m => `<span class="hf-btn" data-hf="${m}">${MODELS.find(x=>x.id===m)?.name||m}</span>`).join('');
+  c.querySelectorAll('.hf-btn').forEach(el => {
+    el.onclick = () => { c.querySelectorAll('.hf-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderHistory(); };
+  });
+}
+
+function buildGalleryFilters() {
+  const c = $('galleryFilters');
+  const tags = ['All', 'Photo', 'Anime', 'Digital', 'Oil', 'Cyber', 'Fantasy', '3D', 'Cinema'];
+  c.innerHTML = tags.map((t, i) => `<span class="gf-btn${i===0?' active':''}" data-gf="${t.toLowerCase()}">${t}</span>`).join('');
+  c.querySelectorAll('.gf-btn').forEach(el => {
+    el.onclick = () => { c.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderGallery(); };
+  });
+}
+
+function renderGallery() {
+  const grid = $('galleryGrid');
+  const activeFilter = document.querySelector('.gf-btn.active')?.dataset.gf || 'all';
+  const sort = $('gallerySort').value;
+  let items = [...S.communityGallery];
+  if (activeFilter !== 'all') items = items.filter(it => it.style.toLowerCase().includes(activeFilter));
+  if (sort === 'liked') items.sort((a, b) => b.likes - a.likes);
+  else if (sort === 'newest') items.sort((a, b) => b.timestamp - a.timestamp);
+  else items.sort((a, b) => (b.likes * 0.7 + b.timestamp * 0.3) - (a.likes * 0.7 + a.timestamp * 0.3));
+  const page = S.galleryPage;
+  const visible = items.slice(0, page * 9);
+  grid.innerHTML = visible.map(item => {
+    const h = 120 + (hashStr(item.prompt) % 80);
+    return `<div class="masonry-item" data-gid="${item.id}">
+      <canvas width="180" height="${h}"></canvas>
+      <div class="mi-meta">${item.prompt.slice(0, 40)}...</div>
+      <div class="mi-actions">
+        <button class="mi-btn${item.liked?' liked':''}" data-gl="${item.id}" title="Like">♥</button>
+        <button class="mi-btn" data-gs="${item.id}" title="Save">⬇</button>
+        <button class="mi-btn" data-gsh="${item.id}" title="Share">↗</button>
+      </div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.masonry-item').forEach(el => {
+    const item = items.find(it => it.id === el.dataset.gid);
+    if (!item) return;
+    const canvas = el.querySelector('canvas');
+    generateImage(canvas.getContext('2d'), canvas.width, canvas.height, item.seed, item.prompt, 'sdxl');
+  });
+  grid.querySelectorAll('.mi-btn[data-gl]').forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const item = S.communityGallery.find(it => it.id === btn.dataset.gl);
+      if (item) { item.liked = !item.liked; item.likes += item.liked ? 1 : -1; saveState(); renderGallery(); }
+    };
+  });
+  grid.querySelectorAll('.mi-btn[data-gs]').forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const item = items.find(it => it.id === btn.dataset.gs);
+      if (!item) return;
+      const canvas = btn.closest('.masonry-item').querySelector('canvas');
+      downloadCanvas(canvas, 'artifai-gallery');
+      toast(T('toast.saved'), 'success');
+    };
+  });
+  $('galleryLoadMore').style.display = visible.length < items.length ? 'block' : 'none';
+}
+
+function renderHistory() {
+  const list = $('historyList');
+  const activeFilter = document.querySelector('.hf-btn.active')?.dataset.hf || 'all';
+  const rtab = document.querySelector('.right-tab.active')?.dataset.rtab || 'all';
+  const search = $('historySearchInput').value.toLowerCase();
+  let items = [...S.history].reverse();
+  if (activeFilter !== 'all') items = items.filter(h => h.model === activeFilter);
+  if (rtab === 'favorites') items = items.filter(h => h.favorite);
+  if (rtab === 'today') { const today = new Date().toDateString(); items = items.filter(h => new Date(h.timestamp).toDateString() === today); }
+  if (search) items = items.filter(h => h.prompt.toLowerCase().includes(search));
+  if (!items.length) { list.innerHTML = '<div class="history-empty"><span>'+T('history.empty')+'</span><br><span>'+T('history.emptySub')+'</span></div>'; return; }
+  list.innerHTML = items.map(h => {
+    const isFav = h.favorite ? ' ♥' : '';
+    const d = new Date(h.timestamp);
+    const time = d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    return `<div class="history-card" data-hid="${h.id}">
+      <div class="hc-prompt">${h.prompt}</div>
+      <div class="hc-meta">${MODELS.find(m=>m.id===h.model)?.name||h.model} · ${h.width}×${h.height} · ${time}<span class="hc-fav">${isFav}</span><span class="hc-delete" data-hdel="${h.id}">✕</span></div>
+      <div class="hc-actions">
+        <span class="hc-action" data-hregen="${h.id}">🔄 ${T('history.regen').replace('🔄 ','')}</span>
+        <span class="hc-action" data-huse="${h.id}">📋 ${T('history.use').replace('📋 ','')}</span>
+        <span class="hc-action" data-hcompare="${h.id}">⚖ ${T('history.compare').replace('⚖ ','')}</span>
+      </div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.history-card').forEach(el => {
+    el.onclick = e => {
+      if (e.target.closest('.hc-delete') || e.target.closest('.hc-action')) return;
+      const h = S.history.find(x => x.id === el.dataset.hid);
+      if (h && h.imageData) showGeneratedImage(h);
+    };
+  });
+  list.querySelectorAll('.hc-delete').forEach(el => {
+    el.onclick = e => { e.stopPropagation(); S.history = S.history.filter(h => h.id !== el.dataset.hdel); saveState(); renderHistory(); toast(T('history.deleted'), 'info'); };
+  });
+  list.querySelectorAll('[data-hregen]').forEach(el => {
+    el.onclick = e => { e.stopPropagation(); const h = S.history.find(x => x.id === el.dataset.hregen); if (h) { $('promptInput').value = h.prompt; startGeneration(); } };
+  });
+  list.querySelectorAll('[data-huse]').forEach(el => {
+    el.onclick = e => { e.stopPropagation(); const h = S.history.find(x => x.id === el.dataset.huse); if (h) { $('promptInput').value = h.prompt; if (h.seed) $('seedInput').value = h.seed; updatePromptStats(); } };
+  });
+  list.querySelectorAll('[data-hcompare]').forEach(el => {
+    el.onclick = e => {
+      e.stopPropagation();
+      const h = S.history.find(x => x.id === el.dataset.hcompare);
+      if (h) { compareImages.push(h); if (compareImages.length >= 2) showComparison(); else toast(T('toast.selectMoreCompare'), 'info'); }
+    };
+  });
+}
+
+function showGeneratedImage(h) {
+  if (!h.imageData) return;
+  const canvas = $('imgCanvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.width; canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    currentImageData = h;
+    $('placeholder').style.display = 'none';
+    $('generatedImage').classList.add('visible');
+    $('batchGrid').classList.remove('visible');
+    $('comparisonContainer').classList.remove('visible');
+    $('compareView').classList.remove('visible');
+    $('sizeDisplay').textContent = img.width + ' × ' + img.height;
+    $('infoPrompt').textContent = h.prompt;
+    $('infoMeta').textContent = `${MODELS.find(m=>m.id===h.model)?.name||h.model} · Steps: ${h.steps} · CFG: ${h.cfg} · Seed: ${h.seed}`;
+    $('imgFavorite').classList.toggle('favorited', !!h.favorite);
+    $('imgFavorite').textContent = h.favorite ? '♥' : '♡';
+    renderImageTags(h);
+  };
+  img.src = h.imageData;
+}
+
+function renderImageTags(h) {
+  const c = $('imageTags');
+  if (!h.tags || !h.tags.length) { c.innerHTML = '<span class="tag-add" id="imgTagAdd">+ Tag</span>'; }
+  else {
+    c.innerHTML = h.tags.map(t => `<span class="tag">${t}<span class="tag-remove" data-tagrm="${t}">✕</span></span>`).join('') + '<span class="tag-add" id="imgTagAdd">+</span>';
+  }
+  const addBtn = c.querySelector('#imgTagAdd');
+  if (addBtn) addBtn.onclick = () => { currentTagTarget = h; openTagModal(h.tags || []); };
+  c.querySelectorAll('.tag-remove').forEach(el => {
+    el.onclick = () => { h.tags = (h.tags||[]).filter(t => t !== el.dataset.tagrm); saveState(); renderImageTags(h); };
+  });
+}
+
+let currentTagTarget = null;
+
+function openTagModal(tags) {
+  const c = $('tagList');
+  c.innerHTML = tags.map(t => `<span class="tag">${t}<span class="tag-remove" data-trm="${t}" style="cursor:pointer;color:var(--red);margin-left:4px">✕</span></span>`).join('');
+  c.querySelectorAll('.tag-remove').forEach(el => {
+    el.onclick = () => {
+      if (currentTagTarget) { currentTagTarget.tags = (currentTagTarget.tags||[]).filter(t => t !== el.dataset.trm); saveState(); openTagModal(currentTagTarget.tags||[]); renderImageTags(currentTagTarget); }
+    };
+  });
+  showModal('tagModal');
+  $('tagInput').value = '';
+  $('tagInput').focus();
+}
+
+function updatePromptStats() {
+  const v = $('promptInput').value;
+  $('promptCharCount').textContent = v.length + ' ' + T('prompt.char');
+  $('promptWordCount').textContent = (v.trim() ? v.trim().split(/\s+/).length : 0) + ' ' + T('prompt.words');
+}
+
+function enhancePrompt() {
+  const v = $('promptInput').value.trim();
+  if (!v) { toast(T('toast.promptFirst'), 'warning'); return; }
+  const picks = QUALITY_KEYWORDS.sort(() => Math.random() - 0.5).slice(0, 3 + Math.random() * 3 | 0);
+  const style = STYLE_PRESETS.find(s => s.id === S.selectedStyle);
+  let enhanced = v;
+  if (style && style.kw) enhanced += ', ' + style.kw;
+  enhanced += ', ' + picks.join(', ');
+  $('promptInput').value = enhanced;
+  updatePromptStats();
+  toast(T('toast.enhanced'), 'success');
+}
+
+function randomPrompt() {
+  const cats = Object.keys(PROMPT_TEMPLATES);
+  const cat = cats[Math.random() * cats.length | 0];
+  const tpls = PROMPT_TEMPLATES[cat];
+  const tpl = tpls[Math.random() * tpls.length | 0];
+  $('promptInput').value = tpl.prompt;
+  updatePromptStats();
+  toast(T('toast.templateLoaded') + ': ' + tpl.name, 'info');
+}
+
+function showComparison() {
+  if (compareImages.length < 2) return;
+  const [a, b] = compareImages.slice(0, 2);
+  compareImages = [];
+  $('placeholder').style.display = 'none';
+  $('generatedImage').classList.remove('visible');
+  $('batchGrid').classList.remove('visible');
+  $('comparisonContainer').classList.add('visible');
+  const loadImg = (dataUrl, container) => new Promise(res => {
+    const img = new Image();
+    img.onload = () => { const canvas = container.querySelector('canvas'); canvas.width = img.width; canvas.height = img.height; canvas.getContext('2d').drawImage(img, 0, 0); res(); };
+    img.src = dataUrl;
+  });
+  if (a.imageData && b.imageData) {
+    Promise.all([loadImg(a.imageData, $('compBefore')), loadImg(b.imageData, $('compAfter'))]).then(() => {
+      toast(T('toast.comparing'), 'info');
+    });
+  }
+}
+
+function showBatchResult(items) {
+  batchItems = items;
+  $('placeholder').style.display = 'none';
+  $('generatedImage').classList.remove('visible');
+  $('comparisonContainer').classList.remove('visible');
+  const grid = $('batchGrid');
+  const cols = items.length <= 4 ? 'cols-2' : 'cols-4';
+  grid.className = 'batch-grid visible ' + cols;
+  grid.innerHTML = items.map((item, i) => {
+    return `<div class="batch-item" data-bi="${i}">
+      <canvas width="256" height="256"></canvas>
+      <div class="batch-actions">
+        <button class="batch-action-btn" data-bdl="${i}" title="Download">⬇</button>
+        <button class="batch-action-btn" data-bfav="${i}" title="Favorite">♡</button>
+      </div>
+      <div class="batch-select" data-bsel="${i}">✓</div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.batch-item').forEach((el, i) => {
+    const canvas = el.querySelector('canvas');
+    generateImage(canvas.getContext('2d'), 256, 256, items[i].seed, items[i].prompt, items[i].model);
+    el.onclick = () => {
+      if (el.querySelector('.batch-actions:hover')) return;
+      const fullCanvas = document.createElement('canvas');
+      const dim = DIMENSIONS[S.selectedDim];
+      fullCanvas.width = dim.w; fullCanvas.height = dim.h;
+      generateImage(fullCanvas.getContext('2d'), dim.w, dim.h, items[i].seed, items[i].prompt, items[i].model);
+      const h = { id: uid(), prompt: items[i].prompt, model: items[i].model, width: dim.w, height: dim.h, steps: items[i].steps, cfg: items[i].cfg, seed: items[i].seed, timestamp: Date.now(), imageData: canvasToData(fullCanvas), favorite: false, tags: [] };
+      S.history.unshift(h);
+      saveState();
+      showGeneratedImage(h);
+      renderHistory();
+    };
+  });
+  grid.querySelectorAll('[data-bdl]').forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const canvas = btn.closest('.batch-item').querySelector('canvas');
+      downloadCanvas(canvas, 'artifai-batch');
+    };
+  });
+  $('downloadAllBtn').style.display = 'inline-flex';
+}
+
+async function startGeneration() {
+  if (!S.user) { toast(T('toast.pleaseLogin'), 'warning'); showModal('authModal'); return; }
+  const prompt = $('promptInput').value.trim();
+  if (!prompt) { toast(T('toast.pleasePrompt'), 'warning'); return; }
+  const cfgCheck = parseFloat($('cfgSlider').value);
+  if (isNaN(cfgCheck) || cfgCheck < 1 || cfgCheck > 30) { toast(T('toast.cfgError'), 'error'); return; }
+  if (S.selectedDim < 0 || S.selectedDim >= DIMENSIONS.length) { toast(T('toast.selectDimensions'), 'error'); return; }
+  const batchSize = parseInt($('batchSizeSelect').value) || 1;
+  const model = S.selectedModel;
+  const modelInfo = MODELS.find(m => m.id === model);
+  const cost = CREDIT_COSTS.generate * batchSize * (modelInfo?.costMult || 1);
+  if (!useCredits(cost)) return;
+  isGenerating = true;
+  genAbort = false;
+  $('generateBtn').classList.add('generating');
+  $('generateBtn').innerHTML = '<span class="gen-shimmer"></span>'+T('btn.generate').replace('✦ ','');
+  $('cancelBtn').classList.add('visible');
+  $('placeholder').style.display = 'none';
+  $('generatedImage').classList.add('visible');
+  $('batchGrid').classList.remove('visible');
+  $('comparisonContainer').classList.remove('visible');
+  $('compareView').classList.remove('visible');
+  $('downloadAllBtn').style.display = 'none';
+  const dim = DIMENSIONS[S.selectedDim];
+  const steps = parseInt($('stepsSlider').value);
+  const cfg = parseFloat($('cfgSlider').value);
+  const negPrompt = $('negPromptInput').value.trim();
+  const sampler = $('samplerSelect').value;
+  const seedInput = $('seedInput').value;
+  const stages = [T('progress.analyzing'), T('progress.generating'), T('progress.rendering'), T('progress.upscaling'), T('progress.finalizing')];
+  const startTime = Date.now();
+  const modelSpeed = model === 'sdxl' ? 1 : model === 'dalle3' ? 1.5 : 2;
+  const baseDelay = 500;
+  const progressOverlay = $('progressOverlay');
+  progressOverlay.classList.add('active');
+  for (let s = 0; s < 5; s++) {
+    if (genAbort) break;
+    for (let i = 0; i < 5; i++) {
+      if (i === s) $('ps' + i).className = 'progress-stage active';
+      else if (i < s) $('ps' + i).className = 'progress-stage done';
+    }
+    $('progressStageLabel').textContent = stages[s];
+    const pctStart = s * 20, pctEnd = (s + 1) * 20;
+    for (let p = pctStart; p <= pctEnd; p += 2) {
+      if (genAbort) break;
+      $('progressPercent').textContent = p + '%';
+      $('progressBarFill').style.width = p + '%';
+      await new Promise(r => setTimeout(r, baseDelay / 10));
+    }
+  }
+  progressOverlay.classList.remove('active');
+  for (let i = 0; i < 5; i++) $('ps' + i).className = 'progress-stage';
+  if (genAbort) { resetGenUI(); toast(T('toast.cancelled'), 'info'); return; }
+  const items = [];
+  for (let b = 0; b < batchSize; b++) {
+    const seed = (seedInput && !isNaN(parseInt(seedInput))) ? parseInt(seedInput) + b : Math.floor(Math.random() * 999999);
+    items.push({ prompt, model, width: dim.w, height: dim.h, steps, cfg, seed, sampler, negPrompt, timestamp: Date.now() });
+  }
+  S.apiUsage.images += batchSize;
+  if (batchSize === 1) {
+    const item = items[0];
+    const canvas = $('imgCanvas');
+    canvas.width = dim.w; canvas.height = dim.h;
+    generateImage(canvas.getContext('2d'), dim.w, dim.h, item.seed, prompt, model);
+    item.imageData = canvasToData(canvas);
+    item.id = uid(); item.favorite = false; item.tags = [];
+    S.history.unshift(item); saveState();
+    currentImageData = item;
+    $('infoPrompt').textContent = prompt;
+    $('infoMeta').textContent = `${modelInfo?.name||model} · Steps: ${steps} · CFG: ${cfg} · Seed: ${item.seed}`;
+    $('sizeDisplay').textContent = dim.w + ' × ' + dim.h;
+    $('genTime').textContent = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
+    $('genTime').classList.add('visible');
+  } else {
+    showBatchResult(items);
+  }
+  resetGenUI();
+  renderHistory();
+  buildHistoryFilters();
+  toast(`${batchSize} image${batchSize>1?'s':''} ${T('toast.generated')}`, 'success');
+}
+
+function resetGenUI() {
+  isGenerating = false; genAbort = false;
+  $('generateBtn').classList.remove('generating');
+  $('generateBtn').innerHTML = '<span class="gen-shimmer"></span>'+T('btn.generate');
+  $('cancelBtn').classList.remove('visible');
+}
+
+function renderApiKeys() {
+  const c = $('apiKeyList');
+  c.innerHTML = S.apiKeys.map(k =>
+    `<div class="api-key-row" style="margin-bottom:6px">
+      <input type="text" value="${k.key}" readonly style="font-size:10px">
+      <button class="api-key-copy" data-kcopy="${k.id}">${T('btn.copy')}</button>
+      <button class="api-key-delete" data-kdel="${k.id}">✕</button>
+    </div>`
+  ).join('');
+  c.querySelectorAll('[data-kcopy]').forEach(btn => {
+    btn.onclick = () => { navigator.clipboard?.writeText(S.apiKeys.find(k=>k.id===btn.dataset.kcopy)?.key||''); toast(T('toast.copied'), 'success'); };
+  });
+  c.querySelectorAll('[data-kdel]').forEach(btn => {
+    btn.onclick = () => { S.apiKeys = S.apiKeys.filter(k=>k.id!==btn.dataset.kdel); saveState(); renderApiKeys(); toast(T('toast.deleted'), 'info'); };
+  });
+}
+
+function updateApiUsage() {
+  const maxCalls = S.plan === 'enterprise' ? 99999 : S.plan === 'pro' ? 1000 : 50;
+  $('apiCallsUsed').textContent = S.apiUsage.calls;
+  $('apiImagesUsed').textContent = S.apiUsage.images;
+  $('apiCreditsUsed').textContent = S.apiUsage.credits;
+  $('apiCallsBar').style.width = Math.min(100, S.apiUsage.calls / maxCalls * 100) + '%';
+  $('apiImagesBar').style.width = Math.min(100, S.apiUsage.images / maxCalls * 100) + '%';
+  $('apiCreditsBar').style.width = Math.min(100, S.apiUsage.credits / maxCalls * 100) + '%';
+}
+
+function updateApiCode() {
+  $('apiCodeContent').innerHTML = API_CODE_EXAMPLES[currentApiLang] || '';
+}
+
+function renderPromptTemplates() {
+  const c = $('promptTemplates');
+  c.innerHTML = Object.entries(PROMPT_TEMPLATES).map(([cat, tpls]) =>
+    `<div class="pt-category"><div class="pt-category-title">${cat}</div>${
+      tpls.map((t, i) => `<div class="pt-item" data-tp="${cat}:${i}"><div class="pti-name">${t.name}</div><div class="pti-preview">${t.prompt}</div></div>`).join('')
+    }</div>`
+  ).join('');
+  c.querySelectorAll('.pt-item').forEach(el => {
+    el.onclick = () => {
+      const [cat, idx] = el.dataset.tp.split(':');
+      const tpl = PROMPT_TEMPLATES[cat]?.[parseInt(idx)];
+      if (tpl) { $('promptInput').value = tpl.prompt; updatePromptStats(); hideModal('templateModal'); toast(T('toast.templateLoaded') + ': ' + tpl.name, 'success'); }
+    };
+  });
+}
+
+function switchTab(tab) {
+  $$('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  $('tab-generate').style.display = tab === 'generate' ? 'block' : 'none';
+  $$('.edit-tab').forEach(t => t.classList.toggle('visible', false));
+  if (tab === 'edit') $('tab-edit').classList.add('visible');
+  else if (tab === 'style-transfer') $('tab-style-transfer').classList.add('visible');
+  else if (tab === 'api') $('tab-api').classList.add('visible');
+  if (tab === 'api') { updateApiCode(); updateApiUsage(); renderApiKeys(); }
+}
+
+function switchRightTab(rtab) {
+  $$('.right-tab').forEach(t => t.classList.toggle('active', t.dataset.rtab === rtab));
+  renderHistory();
+}
+
+function initInpaintCanvas() {
+  const canvas = $('inpaintCanvas');
+  if (!currentImageData) return;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = 400; canvas.height = Math.round(400 * img.height / img.width);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    inpaintMask = document.createElement('canvas');
+    inpaintMask.width = canvas.width; inpaintMask.height = canvas.height;
+    $('inpaintHint').style.display = 'none';
+    canvas.style.display = 'block';
+  };
+  img.src = currentImageData.imageData;
+}
+
+function setupEventListeners() {
+  $('promptInput').oninput = updatePromptStats;
+  $('promptInput').onkeydown = function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); startGeneration(); } };
+  $('negPromptToggle').onclick = () => { $('negPromptToggle').classList.toggle('open'); $('negPromptContent').classList.toggle('open'); };
+  $('advancedToggle').onclick = () => { $('advancedToggle').classList.toggle('open'); $('advancedContent').classList.toggle('open'); };
+  $('stepsSlider').oninput = function() { $('stepsVal').textContent = this.value; };
+  $('cfgSlider').oninput = function() { $('cfgVal').textContent = this.value; };
+  $('clipSlider').oninput = function() { $('clipVal').textContent = this.value; };
+  $('denoiseSlider').oninput = function() { $('denoiseVal').textContent = (this.value / 100).toFixed(2); };
+  $('variationStrength').oninput = function() { $('variationVal').textContent = (this.value / 100).toFixed(2); };
+  $('blendRatio').oninput = function() { $('blendVal').textContent = this.value + '%'; };
+  $('stStrength').oninput = function() { $('stVal').textContent = this.value + '%'; };
+
+  $('randomSeedBtn').onclick = () => { $('seedInput').value = ''; };
+  $('lockSeedBtn').onclick = () => { S.lockedSeed = !S.lockedSeed; $('lockSeedBtn').classList.toggle('active', S.lockedSeed); saveState(); if (S.lockedSeed && !$('seedInput').value) $('seedInput').value = Math.floor(Math.random() * 999999); };
+
+  $('generateBtn').onclick = startGeneration;
+  $('cancelBtn').onclick = () => { genAbort = true; };
+
+  $$('.nav-tab').forEach(t => { t.onclick = () => switchTab(t.dataset.tab); });
+  $$('.right-tab').forEach(t => { t.onclick = () => switchRightTab(t.dataset.rtab); });
+
+  $$('.mode-btn').forEach(b => { b.onclick = () => { $$('.mode-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); }; });
+
+  $$('.edit-tool').forEach(t => {
+    t.onclick = () => {
+      $$('.edit-tool').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      selectedEditTool = t.dataset.tool;
+      ['inpaint', 'upscale', 'variation', 'blend'].forEach(tool => {
+        const el = $('tool-' + tool);
+        if (el) el.style.display = tool === selectedEditTool ? 'block' : 'none';
+      });
+      if (selectedEditTool === 'inpaint') initInpaintCanvas();
+    };
+  });
+
+  $('downloadBtn').onclick = () => { if (!S.user) { toast(T('toast.pleaseLogin'), 'warning'); showModal('authModal'); return; } if (currentImageData) { downloadCanvas($('imgCanvas'), 'artifai-' + currentImageData.seed); toast(T('toast.downloaded'), 'success'); } };
+  $('downloadAllBtn').onclick = () => { if (!S.user) { toast(T('toast.pleaseLogin'), 'warning'); showModal('authModal'); return; } batchItems.forEach((item, i) => { const c = document.querySelectorAll('.batch-item canvas')[i]; if (c) downloadCanvas(c, 'artifai-batch-' + i); }); toast(T('toast.allDownloaded'), 'success'); };
+  $('copyPromptBtn').onclick = () => { if (currentImageData) { navigator.clipboard?.writeText(currentImageData.prompt); toast(T('toast.promptCopied'), 'success'); } };
+  $('shareBtn').onclick = () => toast(T('toast.shareCopied'), 'success');
+  $('pricingBtn').onclick = () => showModal('pricingModal');
+  $('pricingClose').onclick = () => hideModal('pricingModal');
+  $('creditsBadge').onclick = () => {
+    if (S.user) {
+      $('profileAvatar').textContent = S.user.username.charAt(0).toUpperCase();
+      $('profileName').textContent = S.user.username;
+      $('profileEmail').textContent = S.user.email;
+      $('profileCredits').textContent = (S.plan === 'enterprise' ? '∞' : S.credits) + ' ✦';
+      $('profilePlan').textContent = S.plan.charAt(0).toUpperCase() + S.plan.slice(1) + ' Plan — ' + (PLAN_LIMITS[S.plan]?.credits === -1 ? 'Unlimited' : PLAN_LIMITS[S.plan]?.credits + ' credits') + (S.plan === 'free' ? '/day' : '/mo');
+      showModal('profileModal');
+    } else {
+      showModal('authModal');
+    }
+  };
+  $('profileClose').onclick = () => hideModal('profileModal');
+  $('logoutBtn').onclick = () => { S.user = null; S.plan = 'free'; S.credits = 100; saveState(); hideModal('profileModal'); updateCreditsUI(); toast(T('profile.signOut'), 'info'); };
+  $('profileUpgradeBtn').onclick = () => { hideModal('profileModal'); showModal('pricingModal'); };
+
+  $('imgDownload').onclick = () => { if (!S.user) { toast(T('toast.pleaseLogin'), 'warning'); showModal('authModal'); return; } if (currentImageData) { downloadCanvas($('imgCanvas'), 'artifai-' + currentImageData.seed); toast(T('toast.downloaded'), 'success'); } };
+  $('imgFavorite').onclick = () => {
+    if (!S.user) { toast(T('toast.pleaseLogin'), 'warning'); showModal('authModal'); return; }
+    if (!currentImageData) return;
+    currentImageData.favorite = !currentImageData.favorite;
+    $('imgFavorite').classList.toggle('favorited', currentImageData.favorite);
+    $('imgFavorite').textContent = currentImageData.favorite ? '♥' : '♡';
+    saveState(); renderHistory();
+    toast(currentImageData.favorite ? T('toast.addedToFav') : T('toast.removedFromFav'), 'info');
+  };
+  $('imgAddTag').onclick = () => { if (currentImageData) { currentTagTarget = currentImageData; openTagModal(currentImageData.tags || []); } };
+  $('tagClose').onclick = () => hideModal('tagModal');
+  $('tagAddBtn').onclick = () => {
+    const v = $('tagInput').value.trim();
+    if (!v || !currentTagTarget) return;
+    if (!currentTagTarget.tags) currentTagTarget.tags = [];
+    if (!currentTagTarget.tags.includes(v)) { currentTagTarget.tags.push(v); saveState(); openTagModal(currentTagTarget.tags); renderImageTags(currentTagTarget); toast(T('toast.tagAdded'), 'success'); }
+    $('tagInput').value = '';
+  };
+  $('tagInput').onkeydown = e => { if (e.key === 'Enter') $('tagAddBtn').click(); };
+
+  $('authClose').onclick = () => hideModal('authModal');
+  $('authToggle').onclick = () => {
+    const isSignUp = $('authTitle').getAttribute('data-i18n-state') === 'signup';
+    if (isSignUp) {
+      $('authTitle').textContent = T('auth.signIn'); $('authTitle').setAttribute('data-i18n-state','signin');
+      $('authSub').textContent = T('auth.signInSub');
+      $('authSubmit').textContent = T('auth.signIn');
+      $('authSwitch').innerHTML = T('auth.noAccount') + ' <a id="authToggle">' + T('auth.signUp') + '</a>';
+    } else {
+      $('authTitle').textContent = T('auth.signUp'); $('authTitle').setAttribute('data-i18n-state','signup');
+      $('authSub').textContent = T('auth.signUpSub');
+      $('authSubmit').textContent = T('auth.signUp');
+      $('authSwitch').innerHTML = T('auth.hasAccount') + ' <a id="authToggle">' + T('auth.signIn') + '</a>';
+    }
+    document.querySelector('#authSwitch a').onclick = $('authToggle').onclick;
+  };
+  $('authSubmit').onclick = () => {
+    const username = $('authUsername').value.trim();
+    const email = $('authEmail').value.trim();
+    if (!username || !email) { toast(T('toast.pleasePrompt'), 'warning'); return; }
+    S.user = { username, email };
+    saveState();
+    hideModal('authModal');
+    updateCreditsUI();
+    toast(T('auth.welcome') + ' ' + username + '! ' + T('auth.freeCredits'), 'success');
+  };
+
+  $('clearHistoryBtn').onclick = async () => {
+    if (await confirm(T('confirm.title'), T('confirm.clearHistory'))) {
+      S.history = []; saveState(); renderHistory(); buildHistoryFilters(); toast(T('toast.cleared'), 'info');
+    }
+  };
+
+  $('historySearchInput').oninput = renderHistory;
+  $('gallerySort').onchange = renderGallery;
+  $('galleryLoadMore').onclick = () => { S.galleryPage++; saveState(); renderGallery(); };
+
+  $('enhanceBtn').onclick = enhancePrompt;
+  $('randomBtn').onclick = randomPrompt;
+  $('promptHelperBtn').onclick = enhancePrompt;
+  $('templatesBtn').onclick = () => { renderPromptTemplates(); showModal('templateModal'); };
+  $('templateClose').onclick = () => hideModal('templateModal');
+  $('savePresetBtn').onclick = () => {
+    const name = $('presetNameInput').value.trim();
+    if (!name) { toast(T('toast.enterPresetName'), 'warning'); return; }
+    const prompt = $('promptInput').value.trim();
+    if (!prompt) { toast(T('toast.enterPromptOrPreset'), 'warning'); return; }
+    S.presets.push({ name, prompt, model: S.selectedModel, style: S.selectedStyle });
+    saveState(); buildStylePresets();
+    $('presetNameInput').value = '';
+    toast(T('toast.presetSaved') + ': ' + name, 'success');
+  };
+
+  $$('.api-code-tab').forEach(t => { t.onclick = () => { $$('.api-code-tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); currentApiLang = t.dataset.lang; updateApiCode(); }; });
+  $('copyApiCode').onclick = () => { navigator.clipboard?.writeText($('apiCodeContent').textContent); toast(T('toast.copied'), 'success'); };
+  $('createKeyBtn').onclick = () => {
+    const name = $('newKeyName').value.trim();
+    if (!name) { toast(T('toast.promptFirst'), 'warning'); return; }
+    const key = 'af_' + name.toLowerCase().replace(/\s+/g,'_') + '_' + uid();
+    S.apiKeys.push({ id: uid(), name, key, created: Date.now() });
+    saveState(); renderApiKeys();
+    $('newKeyName').value = '';
+    toast(T('toast.apiKeyCreated'), 'success');  };
+
+  $$('.pricing-card[data-plan]').forEach(card => {
+    card.querySelector('.pc-btn').onclick = () => {
+      const plan = card.dataset.plan;
+      if (plan === 'free') { toast(T('toast.freePlanMsg'), 'info'); return; }
+      if (plan === 'enterprise') { toast(T('toast.contactSales'), 'info'); return; }
+      S.plan = plan;
+      const limit = PLAN_LIMITS[plan];
+      S.credits = limit.credits;
+      saveState(); updateCreditsUI();
+      hideModal('pricingModal');
+      toast(T('toast.upgraded') + ' ' + plan.charAt(0).toUpperCase() + plan.slice(1) + '! 🎉', 'success');
+    };
+  });
+
+  $$('.pricing-card[data-credits]').forEach(card => {
+    card.onclick = () => {
+      const credits = parseInt(card.dataset.credits);
+      S.credits += credits;
+      saveState(); updateCreditsUI();
+      hideModal('creditPurchaseModal');
+      toast('+' + credits + ' ' + T('toast.creditsAdded'), 'success');
+    };
+  });
+  $('creditPurchaseClose').onclick = () => hideModal('creditPurchaseModal');
+
+  $('inpaintBrushBtn').onclick = () => { inpaintDrawing = true; $('inpaintBrushBtn').classList.add('primary'); $('inpaintEraseBtn').classList.remove('primary'); };
+  $('inpaintEraseBtn').onclick = () => { inpaintDrawing = false; $('inpaintEraseBtn').classList.add('primary'); $('inpaintBrushBtn').classList.remove('primary'); };
+  $('inpaintClearBtn').onclick = () => {
+    if (inpaintMask) { const ctx = inpaintMask.getContext('2d'); ctx.clearRect(0, 0, inpaintMask.width, inpaintMask.height); initInpaintCanvas(); }
+  };
+
+  const inpCanvas = $('inpaintCanvas');
+  let inpaintLastX, inpaintLastY;
+  inpCanvas.onmousedown = e => {
+    if (!inpaintMask) return;
+    inpaintDrawing = true;
+    const rect = inpCanvas.getBoundingClientRect();
+    inpaintLastX = (e.clientX - rect.left) * (inpCanvas.width / rect.width);
+    inpaintLastY = (e.clientY - rect.top) * (inpCanvas.height / rect.height);
+  };
+  inpCanvas.onmousemove = e => {
+    if (!inpaintDrawing || !inpaintMask) return;
+    const rect = inpCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (inpCanvas.width / rect.width);
+    const y = (e.clientY - rect.top) * (inpCanvas.height / rect.height);
+    const maskCtx = inpaintMask.getContext('2d');
+    const mainCtx = inpCanvas.getContext('2d');
+    maskCtx.beginPath(); maskCtx.arc(x, y, 15, 0, Math.PI * 2); maskCtx.fill();
+    mainCtx.beginPath(); mainCtx.arc(x, y, 15, 0, Math.PI * 2);
+    mainCtx.fillStyle = 'rgba(255, 100, 100, 0.35)'; mainCtx.fill();
+    inpaintLastX = x; inpaintLastY = y;
+  };
+  inpCanvas.onmouseup = () => { inpaintDrawing = false; };
+  inpCanvas.onmouseleave = () => { inpaintDrawing = false; };
+
+  $('inpaintGenBtn').onclick = async () => {
+    if (!inpaintMask) { toast(T('toast.inpaintFirst'), 'warning'); return; }
+    const prompt = $('inpaintPrompt').value.trim();
+    if (!prompt) { toast(T('toast.describeMask'), 'warning'); return; }
+    if (!useCredits(CREDIT_COSTS.inpaint)) return;
+    toast(T('toast.inpainting'), 'info');
+    await new Promise(r => setTimeout(r, 1500));
+    const canvas = $('inpaintCanvas');
+    const w = canvas.width, h = canvas.height;
+    const seed = Math.floor(Math.random() * 999999);
+    generateImage(canvas.getContext('2d'), w, h, seed, prompt, S.selectedModel);
+    const item = { id: uid(), prompt: '[Inpaint] ' + prompt, model: S.selectedModel, width: w, height: h, steps: 30, cfg: 7, seed, timestamp: Date.now(), imageData: canvasToData(canvas), favorite: false, tags: ['inpaint'] };
+    S.history.unshift(item); saveState(); renderHistory();
+    toast(T('toast.inpaintComplete'), 'success');
+  };
+
+  $('upscaleBtn').onclick = async () => {
+    if (!currentImageData) { toast(T('toast.genFirst'), 'warning'); return; }
+    if (!useCredits(CREDIT_COSTS.upscale)) return;
+    const scaleEl = document.querySelector('.dim-btn.active[data-scale]');
+    const scale = scaleEl ? parseInt(scaleEl.dataset.scale) : 2;
+    toast(T('toast.upscaling') + ' ' + scale + 'x...', 'info');
+    await new Promise(r => setTimeout(r, 2000));
+    const srcCanvas = $('imgCanvas');
+    const newW = srcCanvas.width * scale, newH = srcCanvas.height * scale;
+    const c = document.createElement('canvas');
+    c.width = newW; c.height = newH;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(srcCanvas, 0, 0, newW, newH);
+    srcCanvas.width = newW; srcCanvas.height = newH;
+    srcCanvas.getContext('2d').drawImage(c, 0, 0);
+    const item = { id: uid(), prompt: '[Upscale ' + scale + 'x] ' + currentImageData.prompt, model: currentImageData.model, width: newW, height: newH, steps: currentImageData.steps, cfg: currentImageData.cfg, seed: currentImageData.seed, timestamp: Date.now(), imageData: canvasToData(srcCanvas), favorite: false, tags: ['upscale'] };
+    S.history.unshift(item); saveState(); renderHistory();
+    $('sizeDisplay').textContent = newW + ' × ' + newH;
+    toast(T('toast.upscaledTo') + ' ' + newW + '×' + newH + '!', 'success');
+  };
+
+  $('variationBtn').onclick = async () => {
+    if (!currentImageData) { toast(T('toast.genFirst'), 'warning'); return; }
+    const count = parseInt($('variationCount').value);
+    if (!useCredits(CREDIT_COSTS.variation * count)) return;
+    toast(T('toast.applyingStyle') + ' ' + count + ' ...', 'info');
+    await new Promise(r => setTimeout(r, 2000));
+    const items = [];
+    for (let i = 0; i < count; i++) {
+      const seed = currentImageData.seed + (i + 1) * 100 + Math.floor(Math.random() * 50);
+      items.push({ prompt: currentImageData.prompt, model: currentImageData.model, width: currentImageData.width, height: currentImageData.height, steps: currentImageData.steps, cfg: currentImageData.cfg, seed, timestamp: Date.now() });
+    }
+    showBatchResult(items);
+    resetGenUI();
+    toast(count + ' ' + T('toast.variationsCount'), 'success');
+  };
+
+  $('blendBtn').onclick = async () => {
+    if (S.history.length < 2) { toast(T('toast.needTwoImages'), 'warning'); return; }
+    if (!useCredits(CREDIT_COSTS.blend)) return;
+    toast(T('toast.blending'), 'info');
+    await new Promise(r => setTimeout(r, 1500));
+    const ratio = parseInt($('blendRatio').value) / 100;
+    const a = S.history[0], b = S.history[1];
+    if (a.imageData && b.imageData) {
+      const cA = await dataToCanvas(a.imageData);
+      const cB = await dataToCanvas(b.imageData);
+      const result = blendImages(cA, cB, ratio);
+      const item = { id: uid(), prompt: '[Blend] ' + a.prompt + ' + ' + b.prompt, model: a.model, width: result.width, height: result.height, steps: 30, cfg: 7, seed: Math.floor(Math.random() * 999999), timestamp: Date.now(), imageData: canvasToData(result), favorite: false, tags: ['blend'] };
+      S.history.unshift(item); saveState(); showGeneratedImage(item); renderHistory();
+      toast(T('toast.blended'), 'success');
+    }
+  };
+
+  $('stApplyBtn').onclick = async () => {
+    if (!currentImageData) { toast(T('toast.genFirst'), 'warning'); return; }
+    if (!useCredits(CREDIT_COSTS.style_transfer)) return;
+    toast(T('toast.applyingStyle'), 'info');
+    await new Promise(r => setTimeout(r, 2000));
+    const srcCanvas = $('imgCanvas');
+    const strength = parseInt($('stStrength').value);
+    const result = applyStyleTransfer(srcCanvas, selectedStStyle, strength);
+    const w = result.width, h = result.height;
+    srcCanvas.width = w; srcCanvas.height = h;
+    srcCanvas.getContext('2d').drawImage(result, 0, 0);
+    const stName = STYLE_TRANSFER_STYLES.find(s => s.id === selectedStStyle)?.name || selectedStStyle;
+    const item = { id: uid(), prompt: '[Style: ' + stName + '] ' + currentImageData.prompt, model: currentImageData.model, width: w, height: h, steps: currentImageData.steps, cfg: currentImageData.cfg, seed: currentImageData.seed, timestamp: Date.now(), imageData: canvasToData(srcCanvas), favorite: false, tags: ['style-transfer', stName.toLowerCase()] };
+    S.history.unshift(item); saveState(); renderHistory();
+    $('infoPrompt').textContent = item.prompt;
+    toast(T('toast.styleApplied'), 'success');
+  };
+
+  let compDragging = false;
+  function updateComparison(clientX) {
+    const container = $('comparisonContainer');
+    const rect = container.getBoundingClientRect();
+    let x = (clientX - rect.left) / rect.width;
+    x = Math.max(0.05, Math.min(0.95, x));
+    $('compBefore').style.clipPath = `inset(0 ${(1-x)*100}% 0 0)`;
+    $('compAfter').style.clipPath = `inset(0 0 0 ${x*100}%)`;
+    $('comparisonSlider').style.left = (x * 100) + '%';
+  }
+  $('comparisonSlider').onmousedown = (e) => { compDragging = true; e.preventDefault(); };
+  document.onmousemove = e => { if (compDragging) updateComparison(e.clientX); };
+  document.onmouseup = () => { compDragging = false; };
+  $('comparisonSlider').addEventListener('touchstart', (e) => { compDragging = true; e.preventDefault(); }, {passive:false});
+  document.addEventListener('touchmove', (e) => { if (compDragging && e.touches[0]) updateComparison(e.touches[0].clientX); }, {passive:true});
+  document.addEventListener('touchend', () => { compDragging = false; });
+
+  document.querySelectorAll('.upload-zone').forEach(zone => {
+    zone.onclick = () => {
+      if (S.history.length) {
+        toast(T('toast.imgSelected'), 'success');
+        zone.style.borderStyle = 'solid';
+        zone.style.borderColor = 'var(--green)';
+        zone.querySelector('.uz-text').textContent = T('toast.imgSelectedCheck');
+      } else {
+        toast(T('toast.genFirstPlural'), 'warning');
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-scale]').forEach(btn => {
+    btn.onclick = () => {
+      btn.parentElement.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+  });
+}
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key=el.getAttribute('data-i18n');
+    var val=T(key);
+    if(val&&val!==key){
+      // For elements that have only text content and possibly child elements with data-i18n
+      // we only update if the element has no child data-i18n elements
+      if(!el.querySelector('[data-i18n]')){
+        // Preserve icon prefixes (emoji or symbol at start)
+        var text=el.textContent;
+        var match=text.match(/^(\s*[^\w\s][\s]*)/);
+        if(match&&text.replace(match[1],'').trim()){
+          el.textContent=match[1]+val;
+        } else {
+          el.textContent=val;
+        }
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
+    var key=el.getAttribute('data-i18n-placeholder');
+    var val=T(key);
+    if(val&&val!==key) el.placeholder=val;
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){
+    var key=el.getAttribute('data-i18n-title');
+    var val=T(key);
+    if(val&&val!==key) el.title=val;
+  });
+  // Update gallery sort options
+  var gs=$('gallerySort');
+  if(gs){
+    var opts=gs.querySelectorAll('option');
+    if(opts[0])opts[0].textContent=T('gallery.trending');
+    if(opts[1])opts[1].textContent=T('gallery.newest');
+    if(opts[2])opts[2].textContent=T('gallery.mostLiked');
+  }
+}
+
+function afterLangChange(){
+  applyI18n();
+  buildModelCards();
+  buildStylePresets();
+  buildDimPresets();
+  buildStStyleGrid();
+  buildHistoryFilters();
+  buildGalleryFilters();
+  renderHistory();
+  renderGallery();
+  updateApiCode();
+  updateApiUsage();
+  renderApiKeys();
+  updatePromptStats();
+  if(currentImageData){
+    $('infoPrompt').textContent=currentImageData.prompt;
+    var mi=MODELS.find(m=>m.id===currentImageData.model);
+    $('infoMeta').textContent=(mi?mi.name:currentImageData.model)+' · Steps: '+currentImageData.steps+' · CFG: '+currentImageData.cfg+' · Seed: '+currentImageData.seed;
+  }
+}
+
+function init() {
+  loadState();
+  updateCreditsUI();
+  buildModelCards();
+  buildStylePresets();
+  buildDimPresets();
+  buildStStyleGrid();
+  buildHistoryFilters();
+  buildGalleryFilters();
+  renderHistory();
+  renderGallery();
+  updateApiCode();
+  updateApiUsage();
+  renderApiKeys();
+  updatePromptStats();
+  setupEventListeners();
+  const dim = DIMENSIONS[S.selectedDim];
+  $('sizeDisplay').textContent = dim.w + ' × ' + dim.h;
+  if (S.lockedSeed) $('lockSeedBtn').classList.add('active');
+  if (!S.user) {
+    setTimeout(() => toast(T('toast.welcomeMsg'), 'info'), 500);
+  }
+  renderLangSwitcher();
+}
+
+init();
+</script>
+</body>
+</html>

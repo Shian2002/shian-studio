@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowSync — Automate Your Workflow with AI-Powered Sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#4F46E5;--primary-light:#6366F1;--primary-dark:#4338CA;
+  --primary-bg:#EEF2FF;--text:#1E1B4B;--text-secondary:#6B7280;
+  --white:#FFFFFF;--bg:#F9FAFB;--border:#E5E7EB;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
+  --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);
+  --radius:12px;--radius-lg:16px;
+  --card-bg:#fff;--card-hover:rgba(79,70,229,.04);
+  --hero-gradient-start:#fff;--hero-gradient-end:var(--primary-bg);
+  --navbar-bg:rgba(255,255,255,.85);
+}
+[data-theme="dark"]{
+  --text:#E2E8F0;--text-secondary:#A5B4C8;
+  --white:#0F172A;--bg:#151E2E;--border:#334155;
+  --primary-bg:rgba(79,70,229,.15);--card-bg:#1E293B;--card-hover:rgba(79,70,229,.1);
+  --hero-gradient-start:#0F172A;--hero-gradient-end:#1E293B;
+  --navbar-bg:rgba(15,23,42,.85);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--text);background:var(--white);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+
+.fade-up{opacity:0;transform:translateY(40px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+.slide-left{opacity:0;transform:translateX(-40px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.slide-left.visible{opacity:1;transform:translateX(0)}
+.slide-right{opacity:0;transform:translateX(40px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.slide-right.visible{opacity:1;transform:translateX(0)}
+.scale-in{opacity:0;transform:scale(.92);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.scale-in.visible{opacity:1;transform:scale(1)}
+.delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}.delay-3{transition-delay:.3s}
+.delay-4{transition-delay:.4s}.delay-5{transition-delay:.5s}.delay-6{transition-delay:.6s}
+
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--navbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:box-shadow .3s,background .4s}
+.navbar.scrolled{box-shadow:var(--shadow)}
+.navbar-inner{display:flex;align-items:center;justify-content:space-between;height:72px;max-width:1200px;margin:0 auto;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.375rem;color:var(--primary)}
+.nav-logo svg{width:32px;height:32px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-size:.9375rem;font-weight:500;color:var(--text-secondary);transition:color .2s;position:relative}
+.nav-links a:hover{color:var(--primary)}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--primary);transition:width .2s;border-radius:1px}
+.nav-links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:16px}
+.theme-toggle{width:40px;height:40px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--text);font-size:1.1rem}
+.theme-toggle:hover{border-color:var(--primary);color:var(--primary);transform:rotate(20deg)}
+.nav-cta{display:inline-flex;align-items:center;padding:10px 22px;background:var(--primary);color:#fff;font-size:.9375rem;font-weight:600;border-radius:8px;transition:all .2s;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+.nav-cta:hover{background:var(--primary-dark);box-shadow:0 4px 12px rgba(79,70,229,.4);transform:translateY(-1px)}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:8px;cursor:pointer}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+
+.hero{padding:140px 0 80px;background:linear-gradient(180deg,var(--hero-gradient-start) 0%,var(--hero-gradient-end) 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(79,70,229,.08) 0%,transparent 70%);border-radius:50%;will-change:transform;transition:transform .1s linear}
+.hero::after{content:'';position:absolute;bottom:-100px;left:-150px;width:400px;height:400px;background:radial-gradient(circle,rgba(79,70,229,.06) 0%,transparent 70%);border-radius:50%}
+.hero .container{display:flex;align-items:center;gap:64px;position:relative;z-index:1}
+.hero-content{flex:1;max-width:560px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:var(--primary-bg);border:1px solid rgba(79,70,229,.15);border-radius:100px;font-size:.8125rem;font-weight:600;color:var(--primary);margin-bottom:24px}
+.hero-badge span{width:6px;height:6px;background:var(--primary);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:3.5rem;font-weight:800;line-height:1.1;letter-spacing:-.02em;color:var(--text);margin-bottom:20px}
+.hero h1 .gradient-text{background:linear-gradient(135deg,var(--primary) 0%,#7C3AED 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:1.1875rem;color:var(--text-secondary);line-height:1.7;margin-bottom:36px;max-width:480px}
+.hero-buttons{display:flex;gap:16px;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--primary);color:#fff;font-size:1rem;font-weight:600;border-radius:10px;transition:all .25s;box-shadow:0 4px 14px rgba(79,70,229,.35);position:relative;overflow:hidden}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 6px 20px rgba(79,70,229,.4)}
+.btn-primary .spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.btn-primary.loading .spinner{display:block}
+.btn-primary.loading .btn-text{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--card-bg);color:var(--text);font-size:1rem;font-weight:600;border-radius:10px;border:1px solid var(--border);transition:all .25s;box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
+.btn-secondary svg{width:20px;height:20px}
+.hero-image{flex:1;max-width:560px;position:relative}
+.hero-mockup{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--primary) 0%,#7C3AED 50%,#EC4899 100%);border-radius:var(--radius-lg);box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.1);position:relative;overflow:hidden;padding:12px}
+.mockup-browser-bar{background:rgba(255,255,255,.2);border-radius:8px 8px 0 0;padding:10px 14px;display:flex;align-items:center;gap:8px;backdrop-filter:blur(10px)}
+.mockup-dot{width:10px;height:10px;border-radius:50%}
+.mockup-dot:first-child{background:#FF5F57}
+.mockup-dot:nth-child(2){background:#FFBD2E}
+.mockup-dot:nth-child(3){background:#28CA41}
+.mockup-url{flex:1;text-align:center;font-size:.75rem;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);border-radius:4px;padding:4px 12px;margin-left:8px}
+.mockup-content{background:rgba(255,255,255,.1);border-radius:0 0 8px 8px;height:calc(100% - 40px);backdrop-filter:blur(10px);display:flex;flex-direction:column;padding:20px;gap:12px}
+.mockup-row{display:flex;gap:10px}
+.mockup-block{background:rgba(255,255,255,.15);border-radius:8px;flex:1}
+.mockup-block.tall{flex:1.5}
+.mockup-stat{display:flex;gap:10px;margin-top:4px}
+.mockup-stat-item{flex:1;background:rgba(255,255,255,.12);border-radius:6px;padding:10px;text-align:center}
+.mockup-stat-item .val{font-size:.875rem;font-weight:700;color:rgba(255,255,255,.9)}
+.mockup-stat-item .label{font-size:.625rem;color:rgba(255,255,255,.5);margin-top:2px}
+
+.social-proof{padding:48px 0;border-bottom:1px solid var(--border);background:var(--card-bg);transition:background .4s}
+.social-proof p{text-align:center;font-size:.9375rem;color:var(--text-secondary);font-weight:500;margin-bottom:32px}
+.social-proof p strong{color:var(--text);font-weight:700}
+.logo-bar{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap;opacity:.45}
+.logo-placeholder{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
+.logo-placeholder svg{width:24px;height:24px}
+
+.features{padding:100px 0;background:var(--card-bg);transition:background .4s}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:.8125rem;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.section-label svg{width:16px;height:16px}
+.section-title{font-size:2.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:16px;line-height:1.15}
+.section-desc{font-size:1.0625rem;color:var(--text-secondary);max-width:560px;margin-bottom:56px}
+.features .section-desc,.features-header{text-align:center;margin-left:auto;margin-right:auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{padding:32px;border:1px solid var(--border);border-radius:var(--radius-lg);transition:all .3s;background:var(--card-bg)}
+.feature-card:hover{border-color:rgba(79,70,229,.3);box-shadow:0 8px 30px rgba(79,70,229,.08);transform:translateY(-4px);background:var(--card-hover)}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.feature-icon svg{width:24px;height:24px;color:var(--primary);stroke:var(--primary)}
+.feature-card h3{font-size:1.125rem;font-weight:700;margin-bottom:10px}
+.feature-card p{font-size:.9375rem;color:var(--text-secondary);line-height:1.65}
+
+.comparison{padding:100px 0;background:var(--bg);transition:background .4s}
+.comparison .section-header{text-align:center}
+.comparison-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card-bg)}
+.comparison-table{width:100%;border-collapse:collapse;font-size:.9375rem}
+.comparison-table th{padding:16px 20px;text-align:left;font-weight:700;font-size:.8125rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);border-bottom:2px solid var(--border);background:var(--bg)}
+.comparison-table th:first-child{width:30%}
+.comparison-table th.our-col{background:var(--primary-bg);color:var(--primary)}
+.comparison-table td{padding:14px 20px;border-bottom:1px solid var(--border);transition:background .2s}
+.comparison-table tr:hover td{background:var(--card-hover)}
+.comparison-table tr:last-child td{border-bottom:none}
+.comparison-table td:first-child{font-weight:600;color:var(--text)}
+.comparison-table td.our-col{background:rgba(79,70,229,.03);font-weight:600}
+.comparison-table tr:hover td.our-col{background:rgba(79,70,229,.06)}
+.check{color:#22C55E;font-size:1.125rem;font-weight:700}
+.cross{color:#EF4444;font-size:1.125rem;font-weight:700}
+
+.integrations{padding:80px 0;background:var(--card-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);transition:background .4s}
+.integrations .section-header{text-align:center;margin-bottom:48px}
+.partner-bar{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.partner-logo{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.9375rem;font-weight:700;color:var(--text-secondary);transition:all .25s;min-width:130px}
+.partner-logo:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
+.partner-logo svg{width:20px;height:20px}
+
+.live-demo{padding:100px 0;background:var(--bg);transition:background .4s}
+.live-demo .section-header{text-align:center}
+.demo-container{max-width:720px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:32px}
+.demo-video{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--primary) 0%,#7C3AED 50%,#EC4899 100%);border-radius:var(--radius-lg);position:relative;overflow:hidden;box-shadow:var(--shadow-xl);cursor:pointer;transition:transform .3s}
+.demo-video:hover{transform:scale(1.01)}
+.demo-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,0,0,.3);transition:transform .2s}
+.demo-play-btn:hover{transform:translate(-50%,-50%) scale(1.1)}
+.demo-play-btn svg{width:32px;height:32px;margin-left:4px;color:var(--primary)}
+.demo-video-label{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(8px);padding:8px 20px;border-radius:100px;color:#fff;font-size:.8125rem;font-weight:600;white-space:nowrap}
+
+.interactive-demo{padding:100px 0;background:var(--card-bg);border-top:1px solid var(--border);transition:background .4s}
+.interactive-demo .section-header{text-align:center}
+.demo-walkthrough{max-width:800px;margin:0 auto;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg)}
+.demo-steps-nav{display:flex;border-bottom:1px solid var(--border)}
+.demo-step-tab{flex:1;padding:16px;text-align:center;font-size:.875rem;font-weight:600;color:var(--text-secondary);border:none;background:none;cursor:pointer;transition:all .2s;position:relative}
+.demo-step-tab.active{color:var(--primary);background:var(--primary-bg)}
+.demo-step-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--primary)}
+.demo-step-tab .step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--text-secondary);font-size:.75rem;margin-right:8px;transition:all .2s}
+.demo-step-tab.active .step-num{background:var(--primary);color:#fff}
+.demo-step-tab.completed .step-num{background:#22C55E;color:#fff}
+.demo-step-tab.completed{color:var(--text)}
+.demo-step-content{padding:40px;min-height:340px;display:none;animation:demoFadeIn .4s ease}
+.demo-step-content.active{display:block}
+@keyframes demoFadeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.demo-step-content h3{font-size:1.25rem;font-weight:700;margin-bottom:12px}
+.demo-step-content p{color:var(--text-secondary);margin-bottom:24px;line-height:1.7}
+.demo-mock{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px}
+.demo-mock-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.demo-mock-row:last-child{margin-bottom:0}
+.demo-mock-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.demo-mock-text{flex:1}
+.demo-mock-text strong{display:block;font-size:.875rem;margin-bottom:2px}
+.demo-mock-text span{font-size:.75rem;color:var(--text-secondary)}
+.demo-mock-check{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .3s}
+.demo-mock-check.done{background:#22C55E;color:#fff}
+.demo-mock-check.pending{background:var(--border);color:var(--text-secondary)}
+.demo-progress{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:24px}
+.demo-progress-bar{height:100%;background:linear-gradient(90deg,var(--primary),#7C3AED);border-radius:3px;transition:width .5s cubic-bezier(.16,1,.3,1)}
+.demo-step-actions{display:flex;justify-content:space-between;align-items:center}
+.demo-step-actions .btn-primary{padding:10px 24px;font-size:.9375rem}
+.demo-step-actions .btn-skip{color:var(--text-secondary);font-size:.875rem;font-weight:500;padding:10px 16px;transition:color .2s}
+.demo-step-actions .btn-skip:hover{color:var(--primary)}
+
+.security{padding:80px 0;background:var(--card-bg);transition:background .4s}
+.security .section-header{text-align:center;margin-bottom:48px}
+.badge-grid{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.compliance-badge{display:flex;align-items:center;gap:12px;padding:20px 28px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);transition:all .25s}
+.compliance-badge:hover{border-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-2px)}
+.compliance-badge .badge-icon{width:48px;height:48px;border-radius:12px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--primary)}
+.compliance-badge .badge-info .badge-name{font-size:.9375rem;font-weight:700;color:var(--text)}
+.compliance-badge .badge-info .badge-desc{font-size:.75rem;color:var(--text-secondary);margin-top:2px}
+.uptime-display{display:flex;align-items:center;justify-content:center;gap:32px;margin-top:40px;padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);max-width:600px;margin-left:auto;margin-right:auto}
+.uptime-stat{text-align:center}
+.uptime-stat .uptime-value{font-size:2rem;font-weight:800;color:var(--primary)}
+.uptime-stat .uptime-label{font-size:.8125rem;color:var(--text-secondary);margin-top:4px}
+.uptime-dot{width:12px;height:12px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite}
+
+.faq{padding:100px 0;background:var(--bg);transition:background .4s}
+.faq .section-header{text-align:center;margin-bottom:56px}
+.faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .25s}
+.faq-item:hover{border-color:rgba(79,70,229,.2)}
+.faq-item.active{border-color:var(--primary);box-shadow:0 4px 12px rgba(79,70,229,.08)}
+.faq-question{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;cursor:pointer;font-size:1rem;font-weight:600;color:var(--text);gap:16px;transition:color .2s;-webkit-user-select:none;user-select:none}
+.faq-item.active .faq-question{color:var(--primary)}
+.faq-question svg{width:20px;height:20px;flex-shrink:0;transition:transform .3s;color:var(--text-secondary)}
+.faq-item.active .faq-question svg{transform:rotate(180deg);color:var(--primary)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
+.faq-item.active .faq-answer{max-height:300px}
+.faq-answer-inner{padding:0 24px 20px}
+.faq-answer p{font-size:.9375rem;color:var(--text-secondary);line-height:1.7}
+
+.stats{padding:80px 0;background:var(--card-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);transition:background .4s}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center}
+.stat-item .stat-number{font-size:3rem;font-weight:800;color:var(--primary);letter-spacing:-.02em;line-height:1}
+.stat-item .stat-suffix{font-size:1.5rem;font-weight:700;color:var(--primary)}
+.stat-item .stat-label{font-size:.9375rem;color:var(--text-secondary);margin-top:8px;font-weight:500}
+
+.pricing{padding:100px 0;background:var(--bg);transition:background .4s}
+.pricing .section-header{text-align:center}
+.pricing-toggle-wrap{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:48px}
+.pricing-toggle-wrap span{font-size:.9375rem;font-weight:600;color:var(--text-secondary);transition:color .2s}
+.pricing-toggle-wrap span.active{color:var(--text)}
+.pricing-toggle{position:relative;width:56px;height:30px;background:var(--border);border-radius:15px;cursor:pointer;transition:background .3s;border:2px solid transparent}
+.pricing-toggle.active{background:var(--primary)}
+.pricing-toggle .toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .3s cubic-bezier(.68,-.55,.265,1.55);box-shadow:var(--shadow-sm)}
+.pricing-toggle.active .toggle-knob{transform:translateX(26px)}
+.pricing-save-badge{display:inline-flex;padding:4px 12px;background:rgba(34,197,94,.1);color:#22C55E;font-size:.75rem;font-weight:700;border-radius:100px;opacity:0;transform:scale(.8);transition:all .3s}
+.pricing-save-badge.visible{opacity:1;transform:scale(1)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+.pricing-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px;transition:all .3s;position:relative}
+.pricing-card:hover{box-shadow:var(--shadow-lg)}
+.pricing-card.popular{border-color:var(--primary);box-shadow:0 8px 30px rgba(79,70,229,.12)}
+.popular-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:.75rem;font-weight:600;padding:4px 16px;border-radius:100px;white-space:nowrap}
+.pricing-card h3{font-size:1.25rem;font-weight:700;margin-bottom:6px}
+.pricing-card .price-desc{font-size:.875rem;color:var(--text-secondary);margin-bottom:24px}
+.pricing-price{display:flex;align-items:baseline;gap:4px;margin-bottom:24px;height:48px;overflow:hidden;position:relative}
+.pricing-price .currency{font-size:1.25rem;font-weight:700;color:var(--text)}
+.pricing-price .amount{font-size:3rem;font-weight:800;color:var(--text);line-height:1;transition:opacity .3s,transform .3s}
+.pricing-price .period{font-size:.9375rem;color:var(--text-secondary)}
+.pricing-features{list-style:none;margin-bottom:32px;display:flex;flex-direction:column;gap:12px}
+.pricing-features li{display:flex;align-items:center;gap:10px;font-size:.9375rem;color:var(--text);position:relative}
+.pricing-features li svg{width:18px;height:18px;color:var(--primary);flex-shrink:0}
+.pricing-features li .feature-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:6px 12px;border-radius:6px;font-size:.75rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+.pricing-features li .feature-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text)}
+.pricing-features li:hover .feature-tooltip{opacity:1}
+.pricing-card .btn-primary{width:100%;justify-content:center}
+.pricing-card .btn-outline{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:transparent;color:var(--primary);font-size:1rem;font-weight:600;border-radius:10px;border:2px solid var(--primary);transition:all .25s}
+.pricing-card .btn-outline:hover{background:var(--primary);color:#fff}
+.guarantee-badge{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:32px;padding:16px 24px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:var(--radius);max-width:480px;margin-left:auto;margin-right:auto}
+.guarantee-badge svg{width:24px;height:24px;color:#22C55E;flex-shrink:0}
+.guarantee-badge span{font-size:.9375rem;font-weight:600;color:var(--text)}
+
+.testimonials{padding:100px 0;background:var(--card-bg);transition:background .4s}
+.testimonials .section-header{text-align:center}
+.carousel-wrap{position:relative;max-width:900px;margin:0 auto;overflow:hidden}
+.carousel-track{display:flex;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.testimonial-slide{min-width:100%;padding:0 12px}
+.testimonial-card{padding:40px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card-bg);transition:all .3s;text-align:center}
+.testimonial-card .t-logo{font-size:2rem;margin-bottom:20px;display:block}
+.testimonial-stars{display:flex;gap:2px;margin-bottom:20px;justify-content:center}
+.testimonial-stars svg{width:18px;height:18px;color:#FBBF24;fill:#FBBF24}
+.testimonial-card blockquote{font-size:1.0625rem;color:var(--text);line-height:1.8;margin-bottom:28px;font-style:normal;max-width:600px;margin-left:auto;margin-right:auto}
+.testimonial-author{display:flex;align-items:center;justify-content:center;gap:12px}
+.testimonial-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9375rem;color:#fff;flex-shrink:0}
+.testimonial-info .name{font-weight:600;font-size:.9375rem}
+.testimonial-info .company{font-size:.8125rem;color:var(--text-secondary)}
+.carousel-dots{display:flex;justify-content:center;gap:8px;margin-top:32px}
+.carousel-dot{width:10px;height:10px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s;border:none}
+.carousel-dot.active{background:var(--primary);width:28px;border-radius:5px}
+.carousel-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:var(--card-bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:2;box-shadow:var(--shadow)}
+.carousel-nav:hover{border-color:var(--primary);color:var(--primary);box-shadow:var(--shadow-lg)}
+.carousel-nav.prev{left:-22px}
+.carousel-nav.next{right:-22px}
+
+.cta-section{padding:100px 0;background:linear-gradient(135deg,var(--primary) 0%,#7C3AED 100%);text-align:center;color:#fff;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:-50%;right:-20%;width:500px;height:500px;background:rgba(255,255,255,.05);border-radius:50%}
+.cta-section::after{content:'';position:absolute;bottom:-30%;left:-10%;width:400px;height:400px;background:rgba(255,255,255,.04);border-radius:50%}
+.cta-section .container{position:relative;z-index:1}
+.cta-section h2{font-size:2.5rem;font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
+.cta-section p{font-size:1.125rem;opacity:.85;margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto}
+.cta-form{display:flex;gap:12px;max-width:460px;margin:0 auto}
+.cta-form input{flex:1;padding:14px 20px;border:2px solid rgba(255,255,255,.25);border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:1rem;font-family:inherit;outline:none;backdrop-filter:blur(10px);transition:border-color .2s}
+.cta-form input::placeholder{color:rgba(255,255,255,.6)}
+.cta-form input:focus{border-color:rgba(255,255,255,.6)}
+.cta-form button{padding:14px 28px;background:#fff;color:var(--primary);font-size:1rem;font-weight:600;border-radius:10px;transition:all .25s;white-space:nowrap}
+.cta-form button:hover{background:#F0F0FF;transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,.15)}
+
+.footer{padding:64px 0 32px;background:#0F172A;color:rgba(255,255,255,.7)}
+[data-theme="dark"] .footer{background:#0B1120}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.footer-brand .footer-logo{font-size:1.375rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.footer-brand .footer-logo svg{width:28px;height:28px}
+.footer-brand p{font-size:.875rem;line-height:1.7;max-width:280px}
+.footer-col h4{font-size:.875rem;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col a{font-size:.875rem;transition:color .2s;cursor:pointer}
+.footer-col a:hover{color:#fff}
+.footer-bottom{padding-top:32px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;font-size:.8125rem}
+
+.chat-float{position:fixed;bottom:24px;right:24px;z-index:90;width:60px;height:60px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(79,70,229,.4);transition:all .3s;border:none}
+.chat-float:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(79,70,229,.5)}
+.chat-float svg{width:28px;height:28px}
+.chat-float .chat-pulse{position:absolute;width:100%;height:100%;border-radius:50%;background:var(--primary);animation:chatPulse 2s infinite}
+@keyframes chatPulse{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.8);opacity:0}}
+.chat-tooltip{position:absolute;bottom:calc(100% + 12px);right:0;background:#0F172A;color:#fff;padding:10px 16px;border-radius:10px;font-size:.8125rem;font-weight:600;white-space:nowrap;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;box-shadow:var(--shadow-lg)}
+.chat-tooltip::after{content:'';position:absolute;top:100%;right:20px;border:6px solid transparent;border-top-color:#0F172A}
+.chat-float:hover .chat-tooltip{opacity:1;transform:translateY(0)}
+.chat-float.has-unread::after{content:'';position:absolute;top:4px;right:4px;width:14px;height:14px;border-radius:50%;background:#EF4444;border:2px solid #fff;animation:pulse 1.5s infinite}
+
+.chat-widget{position:fixed;bottom:96px;right:24px;z-index:91;width:380px;background:var(--card-bg);border-radius:var(--radius-lg);box-shadow:var(--shadow-xl);border:1px solid var(--border);display:none;flex-direction:column;overflow:hidden;animation:chatSlideUp .3s ease}
+.chat-widget.active{display:flex}
+@keyframes chatSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.chat-widget-header{padding:16px 20px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:space-between}
+.chat-widget-header h4{font-size:.9375rem;font-weight:600}
+.chat-widget-header .header-right{display:flex;align-items:center;gap:4px}
+.chat-widget-header .header-right span{font-size:.75rem;opacity:.8}
+.chat-widget-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:background .2s}
+.chat-widget-close:hover{background:rgba(255,255,255,.3)}
+.chat-widget-messages{flex:1;padding:16px 20px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.chat-msg{padding:10px 14px;border-radius:12px;font-size:.85rem;line-height:1.5;max-width:85%}
+.chat-msg.bot{background:var(--bg);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg.user{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-quick-replies{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 12px}
+.chat-quick-btn{padding:6px 14px;border:1px solid var(--border);border-radius:100px;background:var(--card-bg);color:var(--text-secondary);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s}
+.chat-quick-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-bg)}
+.chat-widget-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+.chat-widget-input input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;outline:none;transition:border-color .2s;background:var(--card-bg);color:var(--text)}
+.chat-widget-input input:focus{border-color:var(--primary)}
+.chat-widget-input button{padding:10px 16px;background:var(--primary);color:#fff;border-radius:8px;font-size:.85rem;font-weight:600;transition:background .2s}
+.chat-widget-input button:hover{background:var(--primary-dark)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:2000;display:none;align-items:center;justify-content:center;animation:mFadeIn .2s ease}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card-bg);border-radius:var(--radius-lg);padding:36px;max-width:440px;width:90%;box-shadow:var(--shadow-xl);position:relative;animation:mSlideIn .3s ease}
+@keyframes mFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes mSlideIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;font-size:1.1rem;color:var(--text-secondary);transition:all .2s}
+.modal-close:hover{background:var(--border);color:var(--text)}
+.modal h2{font-size:1.35rem;font-weight:800;margin-bottom:6px;color:var(--text)}
+.modal .modal-sub{font-size:.88rem;color:var(--text-secondary);margin-bottom:24px}
+.modal label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary);margin-bottom:6px;margin-top:16px}
+.modal label:first-of-type{margin-top:0}
+.modal input,.modal select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.92rem;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;background:var(--card-bg)}
+.modal input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.modal .input-error{border-color:#EF4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important}
+.modal .error-text{color:#EF4444;font-size:.75rem;margin-top:4px;display:none}
+.modal .input-error + .error-text{display:block}
+.modal .btn-primary-full{width:100%;margin-top:20px;padding:12px;text-align:center;border-radius:10px;font-size:.92rem;font-weight:600;color:#fff;background:var(--primary);transition:all .25s;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.35);position:relative;overflow:hidden}
+.modal .btn-primary-full:hover{background:var(--primary-dark)}
+.modal .btn-primary-full .spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+.modal .btn-primary-full.loading .spinner{display:inline-block}
+.modal .btn-primary-full.loading .btn-label{opacity:0}
+.modal-step{display:none}
+.modal-step.active{display:block;animation:stepFadeIn .3s ease}
+@keyframes stepFadeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.modal-progress{display:flex;gap:8px;margin-bottom:24px}
+.modal-progress-dot{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s}
+.modal-progress-dot.active{background:var(--primary)}
+.modal-progress-dot.completed{background:#22C55E}
+.signup-success{text-align:center;padding:20px 0}
+.signup-success .success-icon{width:72px;height:72px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:successPop .5s cubic-bezier(.68,-.55,.265,1.55)}
+@keyframes successPop{from{transform:scale(0)}to{transform:scale(1)}}
+.signup-success .success-icon svg{width:36px;height:36px;color:#22C55E}
+.signup-success h3{font-size:1.25rem;font-weight:700;margin-bottom:8px}
+.signup-success p{color:var(--text-secondary);margin-bottom:24px}
+
+.dashboard-preview{padding:20px;background:var(--bg);border-radius:var(--radius);margin-top:16px}
+.dashboard-preview h4{font-size:.875rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.dp-metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.dp-metric{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.dp-metric .dp-val{font-size:1.25rem;font-weight:800;color:var(--primary)}
+.dp-metric .dp-lbl{font-size:.625rem;color:var(--text-secondary);margin-top:2px}
+.dp-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.dp-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#7C3AED)}
+.dp-bar-label{display:flex;justify-content:space-between;font-size:.625rem;color:var(--text-secondary);margin-bottom:8px}
+
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--card-bg);border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.1);padding:20px;display:none;animation:cookieSlideUp .4s ease}
+.cookie-banner.visible{display:block}
+@keyframes cookieSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cookie-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.cookie-inner p{font-size:.875rem;color:var(--text-secondary);flex:1;line-height:1.6}
+.cookie-inner p strong{color:var(--text)}
+.cookie-actions{display:flex;gap:12px;flex-shrink:0}
+.cookie-accept{padding:10px 24px;background:var(--primary);color:#fff;font-size:.875rem;font-weight:600;border-radius:8px;transition:all .2s;border:none;cursor:pointer}
+.cookie-accept:hover{background:var(--primary-dark)}
+.cookie-customize{padding:10px 24px;background:var(--bg);color:var(--text);font-size:.875rem;font-weight:600;border-radius:8px;border:1px solid var(--border);transition:all .2s;cursor:pointer}
+.cookie-customize:hover{border-color:var(--primary);color:var(--primary)}
+.cookie-details{display:none;padding:16px 0;border-top:1px solid var(--border);margin-top:16px}
+.cookie-details.visible{display:block}
+.cookie-category{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.cookie-category:last-child{border-bottom:none}
+.cookie-category-info h5{font-size:.875rem;font-weight:600;color:var(--text)}
+.cookie-category-info p{font-size:.75rem;color:var(--text-secondary);margin-top:2px}
+.cookie-toggle{position:relative;width:44px;height:24px;background:var(--border);border-radius:12px;cursor:pointer;transition:background .3s;border:none}
+.cookie-toggle.active{background:#22C55E}
+.cookie-toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .3s}
+.cookie-toggle.active::after{transform:translateX(20px)}
+
+.mobile-menu{display:none;position:fixed;inset:0;z-index:99;background:var(--card-bg);flex-direction:column;padding:88px 24px 24px;gap:8px;transition:background .4s}
+.mobile-menu.active{display:flex}
+.mobile-menu a{font-size:1.125rem;font-weight:500;padding:14px 0;border-bottom:1px solid var(--border);color:var(--text)}
+.mobile-menu .nav-cta{text-align:center;margin-top:16px;display:block}
+
+.toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;border-radius:8px;color:white;font-size:14px;animation:slideInRight .3s ease;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.toast.success{background:#10B981}
+.toast.info{background:#3B82F6}
+.toast.warning{background:#F59E0B}
+@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+@media print{
+  .navbar,.footer,.chat-float,.chat-widget,.cookie-banner,.mobile-menu,.toast-container,.modal-overlay,.hamburger,.cta-form button,.btn-primary,.btn-secondary,.btn-outline,.carousel-nav,.demo-play-btn{display:none!important}
+  body{background:#fff!important;color:#000!important}
+  .hero{padding-top:40px!important;background:#fff!important}
+  .hero::before,.hero::after{display:none!important}
+  .cta-section{background:#f5f5f5!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  section{page-break-inside:avoid}
+  .fade-up,.slide-left,.slide-right,.scale-in{opacity:1!important;transform:none!important}
+}
+@media(max-width:1024px){
+  .hero .container{flex-direction:column;text-align:center;gap:48px}
+  .hero-content{max-width:100%}
+  .hero p{margin-left:auto;margin-right:auto}
+  .hero-buttons{justify-content:center}
+  .hero-image{max-width:480px}
+  .features-grid,.pricing-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:2fr 1fr 1fr}
+  .footer-grid .footer-col:nth-child(5){grid-column:span 2}
+  .section-title{font-size:2rem}
+  .comparison-table{font-size:.8125rem}
+  .comparison-table th,.comparison-table td{padding:10px 12px}
+  .carousel-nav.prev{left:0}
+  .carousel-nav.next{right:0}
+}
+@media(max-width:768px){
+  .nav-links,.nav-right .nav-cta{display:none}
+  .hamburger{display:flex}
+  .features-grid,.pricing-grid{grid-template-columns:1fr}
+  .hero h1{font-size:2.25rem}
+  .hero{padding:120px 0 60px}
+  .cta-form{flex-direction:column}
+  .cta-section h2{font-size:1.75rem}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .footer-grid .footer-brand{grid-column:span 2}
+  .footer-bottom{flex-direction:column;gap:12px;text-align:center}
+  .logo-bar{gap:32px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .partner-bar{gap:12px}
+  .partner-logo{min-width:100px;padding:10px 16px;font-size:.8125rem}
+  .badge-grid{gap:12px}
+  .compliance-badge{padding:14px 18px}
+  .chat-widget{width:calc(100% - 48px);right:24px;bottom:90px}
+  .cookie-inner{flex-direction:column;text-align:center}
+  .cookie-actions{flex-direction:column;width:100%}
+  .cookie-accept,.cookie-customize{width:100%;text-align:center}
+  .carousel-nav{display:none}
+  .demo-step-tab{font-size:.7rem;padding:12px 8px}
+  .demo-step-tab .step-num{display:none}
+  .uptime-display{flex-direction:column;gap:16px}
+}
+@media(max-width:480px){
+  .hero h1{font-size:1.875rem}
+  .hero-buttons{flex-direction:column;width:100%}
+  .hero-buttons a,.hero-buttons button{width:100%;justify-content:center;text-align:center}
+  .container{padding:0 16px}
+  .stat-item .stat-number{font-size:2.25rem}
+  .dp-metric-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#4F46E5"/><path d="M8 10h6v2H8zM14 14h6v2h-6zM18 10h6v2h-6z" fill="white"/><path d="M10 18h12v2H10z" fill="white" opacity=".6"/><path d="M12 22h8v2h-8z" fill="white" opacity=".4"/></svg>
+      FlowSync
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#comparison">Compare</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-right">
+      <div id="langSwitcher" style="position:relative;display:inline-block;"></div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="nav-cta" onclick="openModal('signupModal')">Start Free Trial</button>
+    </div>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" onclick="toggleMenu()">Features</a>
+  <a href="#comparison" onclick="toggleMenu()">Compare</a>
+  <a href="#pricing" onclick="toggleMenu()">Pricing</a>
+  <a href="#faq" onclick="toggleMenu()">FAQ</a>
+  <button class="nav-cta" onclick="toggleMenu();openModal('signupModal')" style="text-align:center;margin-top:16px">Start Free Trial</button>
+  <button class="theme-toggle" onclick="toggleTheme()" style="margin-top:12px;align-self:center">🌙 Toggle Theme</button>
+</div>
+
+<section class="hero" id="heroSection">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge"><span></span> Now in Public Beta — Try it free</div>
+      <h1>Automate Your Workflow with <span class="gradient-text">AI-Powered Sync</span></h1>
+      <p>FlowSync connects your tools, automates repetitive tasks, and keeps your team aligned — all powered by intelligent AI that learns how you work.</p>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="openModal('signupModal')">
+          <span class="btn-text">Start Free Trial</span>
+          <span class="spinner"></span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-secondary" onclick="openModal('demoModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Watch Demo
+        </button>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="hero-mockup">
+        <div class="mockup-browser-bar">
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-url">app.flowsync.io/dashboard</div>
+        </div>
+        <div class="mockup-content">
+          <div class="mockup-row" style="gap:10px;flex:1">
+            <div class="mockup-block tall" style="display:flex;flex-direction:column;gap:8px;padding:14px">
+              <div style="font-size:.7rem;color:rgba(255,255,255,.5);font-weight:600">SYNC STATUS</div>
+              <div style="display:flex;gap:8px;flex:1">
+                <div style="flex:1;background:rgba(255,255,255,.12);border-radius:6px;padding:8px">
+                  <div style="font-size:.75rem;font-weight:700;color:rgba(255,255,255,.9)">247</div>
+                  <div style="font-size:.55rem;color:rgba(255,255,255,.45)">Synced</div>
+                </div>
+                <div style="flex:1;background:rgba(255,255,255,.12);border-radius:6px;padding:8px">
+                  <div style="font-size:.75rem;font-weight:700;color:#34D399">98%</div>
+                  <div style="font-size:.55rem;color:rgba(255,255,255,.45)">Uptime</div>
+                </div>
+              </div>
+            </div>
+            <div class="mockup-block" style="padding:14px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:.7rem;color:rgba(255,255,255,.5);font-weight:600">ACTIVE WORKFLOWS</div>
+              <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+                <div style="height:8px;background:rgba(255,255,255,.15);border-radius:4px;width:100%"></div>
+                <div style="height:8px;background:rgba(255,255,255,.15);border-radius:4px;width:80%"></div>
+                <div style="height:8px;background:rgba(255,255,255,.15);border-radius:4px;width:65%"></div>
+                <div style="height:8px;background:rgba(255,255,255,.15);border-radius:4px;width:90%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mockup-stat">
+            <div class="mockup-stat-item"><div class="val">1.2M</div><div class="label">Events Processed</div></div>
+            <div class="mockup-stat-item"><div class="val">340ms</div><div class="label">Avg Latency</div></div>
+            <div class="mockup-stat-item"><div class="val">12</div><div class="label">Active Integrations</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats" id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item fade-up">
+        <div class="stat-number"><span class="counter" data-target="10000">0</span><span class="stat-suffix">+</span></div>
+        <div class="stat-label">Teams using FlowSync</div>
+      </div>
+      <div class="stat-item fade-up delay-1">
+        <div class="stat-number"><span class="counter" data-target="200">0</span><span class="stat-suffix">+</span></div>
+        <div class="stat-label">Integrations available</div>
+      </div>
+      <div class="stat-item fade-up delay-2">
+        <div class="stat-number"><span class="counter" data-target="99">0</span><span class="stat-suffix">.9%</span></div>
+        <div class="stat-label">Uptime guarantee</div>
+      </div>
+      <div class="stat-item fade-up delay-3">
+        <div class="stat-number"><span class="counter" data-target="50">0</span><span class="stat-suffix">M+</span></div>
+        <div class="stat-label">Events processed daily</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="security" id="security">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Security
+      </div>
+      <h2 class="section-title">Enterprise-grade security & compliance</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">Your data is protected by the highest industry standards.</p>
+    </div>
+    <div class="badge-grid fade-up">
+      <div class="compliance-badge"><div class="badge-icon">🔒</div><div class="badge-info"><div class="badge-name">SOC 2 Type II</div><div class="badge-desc">Audited annually</div></div></div>
+      <div class="compliance-badge"><div class="badge-icon">🇪🇺</div><div class="badge-info"><div class="badge-name">GDPR</div><div class="badge-desc">EU data protection</div></div></div>
+      <div class="compliance-badge"><div class="badge-icon">🏥</div><div class="badge-info"><div class="badge-name">HIPAA</div><div class="badge-desc">Healthcare ready</div></div></div>
+      <div class="compliance-badge"><div class="badge-icon">🛡️</div><div class="badge-info"><div class="badge-name">ISO 27001</div><div class="badge-desc">InfoSec certified</div></div></div>
+    </div>
+    <div class="uptime-display fade-up">
+      <div class="uptime-stat"><div class="uptime-value">99.99%</div><div class="uptime-label">Current Uptime</div></div>
+      <div class="uptime-dot"></div>
+      <div class="uptime-stat"><div class="uptime-value">0</div><div class="uptime-label">Incidents (30 days)</div></div>
+      <div class="uptime-stat"><div class="uptime-value">&lt;5min</div><div class="uptime-label">Avg Recovery Time</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="social-proof">
+  <div class="container">
+    <p>Trusted by <strong id="customerCount">10,000+</strong> teams at</p>
+    <div class="logo-bar">
+      <div class="logo-placeholder"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Acme Corp</div>
+      <div class="logo-placeholder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>Globex</div>
+      <div class="logo-placeholder"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 22 22 2 22"/></svg>Initech</div>
+      <div class="logo-placeholder"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="4"/></svg>Hooli</div>
+      <div class="logo-placeholder"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l5 9H7z"/></svg>Vehement</div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-header fade-up">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Features
+      </div>
+      <h2 class="section-title">Everything you need to streamline your workflow</h2>
+      <p class="section-desc">Powerful features designed to save time, reduce errors, and keep your entire team moving forward — effortlessly.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-up delay-1">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h3>Lightning-Fast Sync</h3>
+        <p>Real-time data synchronization across all your tools. Changes propagate instantly with sub-second latency.</p>
+      </div>
+      <div class="feature-card fade-up delay-2">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>Smart Automation</h3>
+        <p>AI learns your patterns and suggests automations that save 10+ hours per week on repetitive tasks.</p>
+      </div>
+      <div class="feature-card fade-up delay-3">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Enterprise Security</h3>
+        <p>SOC 2 Type II compliant with end-to-end encryption, SSO, and role-based access control built in.</p>
+      </div>
+      <div class="feature-card fade-up delay-1">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+        <h3>200+ Integrations</h3>
+        <p>Connect Slack, Jira, GitHub, Notion, Salesforce, and 200+ other tools your team already uses.</p>
+      </div>
+      <div class="feature-card fade-up delay-2">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <h3>Custom Workflows</h3>
+        <p>Build visual workflows with our drag-and-drop builder. No code required — just connect, configure, and go.</p>
+      </div>
+      <div class="feature-card fade-up delay-3">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Team Collaboration</h3>
+        <p>Share workflows, assign tasks, and track progress together. Keep everyone on the same page, always.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="comparison" id="comparison">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Comparison
+      </div>
+      <h2 class="section-title">See how we stack up</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">FlowSync delivers more features at a better value than the competition.</p>
+    </div>
+    <div class="comparison-table-wrap fade-up">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="our-col">FlowSync</th>
+            <th>Competitor A</th>
+            <th>Competitor B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AI-Powered Automation</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>Real-Time Sync</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>200+ Integrations</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td><td><span class="check">&#x2713;</span></td></tr>
+          <tr><td>Custom Workflows</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>SOC 2 Compliance</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td><td><span class="check">&#x2713;</span></td></tr>
+          <tr><td>SSO / SAML</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>99.9% Uptime SLA</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>Free Plan Available</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>AI Workflow Builder</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="cross">&#x2717;</span></td><td><span class="cross">&#x2717;</span></td></tr>
+          <tr><td>Priority Support</td><td class="our-col"><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="integrations">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Integrations
+      </div>
+      <h2 class="section-title">Connects with your favorite tools</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">200+ integrations and growing. Here are some of our most popular.</p>
+    </div>
+    <div class="partner-bar fade-up">
+      <div class="partner-logo">💬 Slack</div>
+      <div class="partner-logo">🐙 GitHub</div>
+      <div class="partner-logo">📋 Jira</div>
+      <div class="partner-logo">📝 Notion</div>
+      <div class="partner-logo">💰 Salesforce</div>
+      <div class="partner-logo">💳 Stripe</div>
+      <div class="partner-logo">🎨 Figma</div>
+      <div class="partner-logo">☁️ AWS</div>
+    </div>
+  </div>
+</section>
+
+<section class="live-demo" id="live-demo">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Live Demo
+      </div>
+      <h2 class="section-title">See FlowSync in action</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">Watch a 2-minute walkthrough of how teams use FlowSync to automate their workflows.</p>
+    </div>
+    <div class="demo-container fade-up">
+      <div class="demo-video" onclick="playDemo(this)">
+        <div class="demo-play-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div class="demo-video-label">&#x25B6; Watch 2-min Demo</div>
+      </div>
+      <button class="btn-primary" onclick="openModal('signupModal')"><span class="btn-text">Try It Free — No Credit Card Required</span><span class="spinner"></span></button>
+    </div>
+  </div>
+</section>
+
+<section class="interactive-demo" id="interactive-demo">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Interactive Demo
+      </div>
+      <h2 class="section-title">Try it yourself</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">Walk through how FlowSync works in 4 simple steps.</p>
+    </div>
+    <div class="demo-walkthrough fade-up">
+      <div class="demo-steps-nav" id="demoStepsNav">
+        <button class="demo-step-tab active" onclick="goToDemoStep(0)"><span class="step-num">1</span>Connect</button>
+        <button class="demo-step-tab" onclick="goToDemoStep(1)"><span class="step-num">2</span>Configure</button>
+        <button class="demo-step-tab" onclick="goToDemoStep(2)"><span class="step-num">3</span>Automate</button>
+        <button class="demo-step-tab" onclick="goToDemoStep(3)"><span class="step-num">4</span>Monitor</button>
+      </div>
+      <div class="demo-progress"><div class="demo-progress-bar" id="demoProgressBar" style="width:25%"></div></div>
+      <div class="demo-step-content active" id="demoStep0">
+        <h3>Connect your tools</h3>
+        <p>Link your favorite apps in seconds. FlowSync supports 200+ integrations out of the box.</p>
+        <div class="demo-mock">
+          <div class="demo-mock-row"><div class="demo-mock-icon" style="background:rgba(79,70,229,.1)">💬</div><div class="demo-mock-text"><strong>Slack</strong><span>Real-time messaging</span></div><div class="demo-mock-check done">✓</div></div>
+          <div class="demo-mock-row"><div class="demo-mock-icon" style="background:rgba(236,72,153,.1)">🐙</div><div class="demo-mock-text"><strong>GitHub</strong><span>Code repositories</span></div><div class="demo-mock-check done">✓</div></div>
+          <div class="demo-mock-row"><div class="demo-mock-icon" style="background:rgba(245,158,11,.1)">📋</div><div class="demo-mock-text"><strong>Jira</strong><span>Project tracking</span></div><div class="demo-mock-check pending">+</div></div>
+        </div>
+        <div class="demo-step-actions"><button class="btn-skip">Skip tour</button><button class="btn-primary" onclick="goToDemoStep(1)"><span class="btn-text">Next: Configure</span><span class="spinner"></span></button></div>
+      </div>
+      <div class="demo-step-content" id="demoStep1">
+        <h3>Configure your workflow</h3>
+        <p>Use our visual builder to define triggers, actions, and conditions — no coding required.</p>
+        <div class="demo-mock">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <div style="padding:10px 16px;background:var(--primary-bg);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--primary)">When new PR →</div>
+            <div style="color:var(--text-secondary)">→</div>
+            <div style="padding:10px 16px;background:rgba(236,72,153,.1);border-radius:8px;font-size:.8rem;font-weight:600;color:#EC4899">Post to Slack</div>
+            <div style="color:var(--text-secondary)">→</div>
+            <div style="padding:10px 16px;background:rgba(34,197,94,.1);border-radius:8px;font-size:.8rem;font-weight:600;color:#22C55E">Update Jira</div>
+          </div>
+        </div>
+        <div class="demo-step-actions"><button class="btn-skip" onclick="goToDemoStep(0)">Back</button><button class="btn-primary" onclick="goToDemoStep(2)"><span class="btn-text">Next: Automate</span><span class="spinner"></span></button></div>
+      </div>
+      <div class="demo-step-content" id="demoStep2">
+        <h3>AI automates the rest</h3>
+        <p>Our AI learns your patterns and suggests optimizations. Sit back and watch the magic happen.</p>
+        <div class="demo-mock">
+          <div style="padding:16px;background:var(--primary-bg);border-radius:8px;border-left:3px solid var(--primary)">
+            <div style="font-size:.8rem;font-weight:600;color:var(--primary);margin-bottom:4px">🤖 AI Suggestion</div>
+            <div style="font-size:.8rem;color:var(--text-secondary)">Detected 3 similar workflows. Merge into a single pipeline to save 45 min/week.</div>
+          </div>
+        </div>
+        <div class="demo-step-actions"><button class="btn-skip" onclick="goToDemoStep(1)">Back</button><button class="btn-primary" onclick="goToDemoStep(3)"><span class="btn-text">Next: Monitor</span><span class="spinner"></span></button></div>
+      </div>
+      <div class="demo-step-content" id="demoStep3">
+        <h3>Monitor everything in real-time</h3>
+        <p>Track performance, errors, and throughput from a single dashboard.</p>
+        <div class="demo-mock">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div style="text-align:center;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px"><div style="font-size:1.25rem;font-weight:800;color:var(--primary)">1,247</div><div style="font-size:.625rem;color:var(--text-secondary)">Events Today</div></div>
+            <div style="text-align:center;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px"><div style="font-size:1.25rem;font-weight:800;color:#22C55E">340ms</div><div style="font-size:.625rem;color:var(--text-secondary)">Avg Latency</div></div>
+            <div style="text-align:center;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px"><div style="font-size:1.25rem;font-weight:800;color:#F59E0B">99.9%</div><div style="font-size:.625rem;color:var(--text-secondary)">Success Rate</div></div>
+          </div>
+        </div>
+        <div class="demo-step-actions"><button class="btn-skip" onclick="goToDemoStep(2)">Back</button><button class="btn-primary" onclick="openModal('signupModal')"><span class="btn-text">Start Free Trial</span><span class="spinner"></span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Pricing</div>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">Start free. Upgrade as you grow. No hidden fees, ever.</p>
+    </div>
+    <div class="pricing-toggle-wrap fade-up">
+      <span class="active" id="monthlyLabel">Monthly</span>
+      <div class="pricing-toggle" id="pricingToggle" onclick="togglePricing()"><div class="toggle-knob"></div></div>
+      <span id="yearlyLabel">Yearly</span>
+      <span class="pricing-save-badge" id="saveBadge">Save 20%</span>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card fade-up delay-1">
+        <h3>Starter</h3>
+        <p class="price-desc">For individuals and small projects</p>
+        <div class="pricing-price"><span class="currency">$</span><span class="amount" data-monthly="0" data-yearly="0">0</span><span class="period">/ month</span></div>
+        <ul class="pricing-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Up to 5 workflows<span class="feature-tooltip">Create up to 5 active automation workflows</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>1,000 events/month<span class="feature-tooltip">Process up to 1,000 sync events per month</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>10 integrations</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Community support</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Basic analytics</li>
+        </ul>
+        <button class="btn-outline" onclick="openModal('signupModal')">Get Started Free</button>
+      </div>
+      <div class="pricing-card popular fade-up delay-2">
+        <div class="popular-badge">Most Popular</div>
+        <h3>Professional</h3>
+        <p class="price-desc">For growing teams and businesses</p>
+        <div class="pricing-price"><span class="currency">$</span><span class="amount" data-monthly="49" data-yearly="39">49</span><span class="period">/ month</span></div>
+        <ul class="pricing-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited workflows<span class="feature-tooltip">No limit on active automation workflows</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>100,000 events/month<span class="feature-tooltip">Process up to 100K sync events per month</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>200+ integrations</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI workflow builder<span class="feature-tooltip">AI suggests and auto-creates workflows</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Advanced analytics & SSO</li>
+        </ul>
+        <button class="btn-primary" onclick="openModal('signupModal')" style="width:100%;justify-content:center">Start Free Trial</button>
+      </div>
+      <div class="pricing-card fade-up delay-3">
+        <h3>Enterprise</h3>
+        <p class="price-desc">For large organizations with custom needs</p>
+        <div class="pricing-price"><span class="amount" data-monthly="Custom" data-yearly="Custom" style="font-size:2rem">Custom</span></div>
+        <ul class="pricing-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Professional</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited events<span class="feature-tooltip">No event volume limits</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Dedicated account manager</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Custom SLA (99.99%)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>On-premise deployment<span class="feature-tooltip">Deploy on your own infrastructure</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>HIPAA / BAA & 24/7 phone support</li>
+        </ul>
+        <button class="btn-outline" onclick="openModal('signupModal')">Contact Sales</button>
+      </div>
+    </div>
+    <div class="guarantee-badge fade-up">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>14-day free trial on all plans. No credit card required. Cancel anytime.</span>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Testimonials</div>
+      <h2 class="section-title">Loved by teams worldwide</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">See what our customers have to say about FlowSync.</p>
+    </div>
+    <div class="carousel-wrap fade-up">
+      <button class="carousel-nav prev" onclick="moveCarousel(-1)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="carousel-track" id="carouselTrack">
+        <div class="testimonial-slide"><div class="testimonial-card"><span class="t-logo">🏢</span><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg></div><blockquote>"FlowSync saved our team 15 hours per week. The AI automation is genuinely magical — it predicted workflow bottlenecks before we even noticed them."</blockquote><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#4F46E5,#7C3AED)">SC</div><div class="testimonial-info"><div class="name">Sarah Chen</div><div class="company">VP of Engineering, Acme Corp</div></div></div></div></div>
+        <div class="testimonial-slide"><div class="testimonial-card"><span class="t-logo">🚀</span><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg></div><blockquote>"We migrated from Zapier and haven't looked back. The real-time sync is 10x faster and the AI suggestions are incredibly accurate."</blockquote><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#EC4899,#F59E0B)">MR</div><div class="testimonial-info"><div class="name">Marcus Rodriguez</div><div class="company">CTO, LaunchPad Startups</div></div></div></div></div>
+        <div class="testimonial-slide"><div class="testimonial-card"><span class="t-logo">💡</span><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg></div><blockquote>"SOC 2 compliance and SSO support made IT approval a breeze. FlowSync checked every security box from day one."</blockquote><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#22C55E,#06B6D4)">AL</div><div class="testimonial-info"><div class="name">Anna Liu</div><div class="company">Head of Ops, DataFlow Inc</div></div></div></div></div>
+        <div class="testimonial-slide"><div class="testimonial-card"><span class="t-logo">🛒</span><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg></div><blockquote>"Connected Shopify, Stripe, and our CRM in under an hour. Order data flows seamlessly across all platforms. Revenue tracking is automated."</blockquote><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">JP</div><div class="testimonial-info"><div class="name">James Park</div><div class="company">CEO, ShopWave</div></div></div></div></div>
+        <div class="testimonial-slide"><div class="testimonial-card"><span class="t-logo">🎯</span><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg></div><blockquote>"The API documentation is the best I've seen. We built 12 custom integrations in our first sprint. Developer experience is top-notch."</blockquote><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#6366F1,#A855F7)">TN</div><div class="testimonial-info"><div class="name">Tina Nguyen</div><div class="company">Lead Developer, NexGen Labs</div></div></div></div></div>
+        <div class="testimonial-slide"><div class="testimonial-card"><span class="t-logo">📊</span><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FBBF24"/></svg></div><blockquote>"The analytics dashboard alone is worth the subscription. We can see exactly where bottlenecks are and the AI suggests fixes automatically."</blockquote><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#0EA5E9,#6366F1)">DK</div><div class="testimonial-info"><div class="name">David Kim</div><div class="company">Analytics Lead, MetricAI</div></div></div></div></div>
+      </div>
+      <button class="carousel-nav next" onclick="moveCarousel(1)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> FAQ</div>
+      <h2 class="section-title">Frequently asked questions</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto">Everything you need to know. Can't find an answer? Chat with us.</p>
+    </div>
+    <div class="faq-list fade-up" id="faqList"></div>
+  </div>
+</section>
+
+<section class="cta-section" id="cta">
+  <div class="container">
+    <h2 class="fade-up">Ready to automate your workflow?</h2>
+    <p class="fade-up delay-1">Join 10,000+ teams already using FlowSync. Start your free trial today.</p>
+    <div class="cta-form fade-up delay-2">
+      <input type="email" id="ctaEmail" placeholder="Enter your work email">
+      <button onclick="ctaSignup()">Get Started Free</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#4F46E5"/><path d="M8 10h6v2H8zM14 14h6v2h-6zM18 10h6v2h-6z" fill="white"/><path d="M10 18h12v2H10z" fill="white" opacity=".6"/></svg>FlowSync</div>
+        <p>AI-powered workflow automation for modern teams.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#">Integrations</a></li><li><a href="#security">Security</a></li><li><a href="#">Changelog</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Press Kit</a></li></ul></div>
+      <div class="footer-col"><h4>Resources</h4><ul><li><a href="#">Documentation</a></li><li><a href="#">API Reference</a></li><li><a href="#">Community</a></li><li><a href="#">Status Page</a></li></ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Cookie Policy</a></li><li><a href="#">DPA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 FlowSync, Inc. All rights reserved.</span><span>Made with &#x2764;&#xFE0F; for productive teams</span></div>
+  </div>
+</footer>
+
+<button class="chat-float" id="chatFloat" onclick="toggleChat()">
+  <span class="chat-pulse"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="chat-tooltip">Chat with us!</span>
+</button>
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-widget-header"><div><h4>FlowSync Support</h4><div class="header-right"><span class="uptime-dot" style="width:8px;height:8px"></span><span>Online now</span></div></div><button class="chat-widget-close" onclick="toggleChat()">&times;</button></div>
+  <div class="chat-widget-messages" id="chatMessages"></div>
+  <div class="chat-quick-replies" id="chatQuickReplies">
+    <button class="chat-quick-btn" onclick="sendQuickReply('Pricing info')">Pricing info</button>
+    <button class="chat-quick-btn" onclick="sendQuickReply('How does AI work?')">How does AI work?</button>
+    <button class="chat-quick-btn" onclick="sendQuickReply('Enterprise plans')">Enterprise plans</button>
+  </div>
+  <div class="chat-widget-input">
+    <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="signupModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('signupModal')">&times;</button>
+    <div class="modal-step active" id="signupStep1">
+      <div class="modal-progress"><div class="modal-progress-dot active"></div><div class="modal-progress-dot"></div><div class="modal-progress-dot"></div></div>
+      <h2>Create your account</h2>
+      <p class="modal-sub">Start your 14-day free trial. No credit card required.</p>
+      <label for="signupEmail">Work Email</label>
+      <input type="email" id="signupEmail" placeholder="you@company.com" value="demo@company.com">
+      <div class="error-text" id="errorEmail">Please enter a valid work email address.</div>
+      <label for="signupCompany">Company Name</label>
+      <input type="text" id="signupCompany" placeholder="Acme Corp" value="Demo Corp">
+      <div class="error-text" id="errorCompany">Company name is required.</div>
+      <button class="btn-primary-full" onclick="signupStep2()"><span class="btn-label">Continue</span><span class="spinner"></span></button>
+      <div id="demoPreFilled" style="text-align:center;margin-top:12px;font-size:.78rem;color:#888">Demo pre-filled — just click Continue →</div>
+    </div>
+    <div class="modal-step" id="signupStep2">
+      <div class="modal-progress"><div class="modal-progress-dot completed"></div><div class="modal-progress-dot active"></div><div class="modal-progress-dot"></div></div>
+      <h2>Set up your profile</h2>
+      <p class="modal-sub">Almost there! Tell us a bit about yourself.</p>
+      <label for="signupName">Full Name</label>
+      <input type="text" id="signupName" placeholder="Jane Smith" value="Demo User">
+      <div class="error-text" id="errorName">Please enter your full name.</div>
+      <label for="signupPassword">Password</label>
+      <input type="password" id="signupPassword" placeholder="Min 8 characters" value="demo1234">
+      <div class="error-text" id="errorPassword">Password must be at least 8 characters.</div>
+      <label for="signupRole">Your Role</label>
+      <select id="signupRole"><option value="">Select your role</option><option value="engineer">Engineer</option><option value="designer">Designer</option><option value="pm" selected>Product Manager</option><option value="executive">Executive</option><option value="ops">Operations</option><option value="other">Other</option></select>
+      <button class="btn-primary-full" onclick="signupStep3()"><span class="btn-label">Create Account</span><span class="spinner"></span></button>
+    </div>
+    <div class="modal-step" id="signupStep3">
+      <div class="modal-progress"><div class="modal-progress-dot completed"></div><div class="modal-progress-dot completed"></div><div class="modal-progress-dot active"></div></div>
+      <div class="signup-success">
+        <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h3>Welcome to FlowSync! &#x1F389;</h3>
+        <p>Your account is ready. Here's a preview of your new dashboard.</p>
+        <div class="dashboard-preview">
+          <h4>Your Dashboard</h4>
+          <div class="dp-metric-row"><div class="dp-metric"><div class="dp-val">0</div><div class="dp-lbl">Workflows</div></div><div class="dp-metric"><div class="dp-val">0</div><div class="dp-lbl">Events</div></div><div class="dp-metric"><div class="dp-val">0</div><div class="dp-lbl">Integrations</div></div></div>
+          <div class="dp-bar"><div class="dp-bar-fill" style="width:0%"></div></div>
+          <div class="dp-bar-label"><span>Setup Progress</span><span>0%</span></div>
+          <div class="dp-bar"><div class="dp-bar-fill" style="width:100%"></div></div>
+          <div class="dp-bar-label"><span>Account Status</span><span>Ready!</span></div>
+        </div>
+        <button class="btn-primary" onclick="closeModal('signupModal')" style="margin-top:16px;padding:12px 28px"><span class="btn-text">Start Building &#x2192;</span><span class="spinner"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="demoModal">
+  <div class="modal" style="max-width:640px">
+    <button class="modal-close" onclick="closeModal('demoModal')">&times;</button>
+    <div style="aspect-ratio:16/9;background:linear-gradient(135deg,var(--primary),#7C3AED,#EC4899);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:16px">
+      <div class="demo-play-btn" style="position:static;transform:none"><svg viewBox="0 0 24 24" fill="currentColor" style="margin-left:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    </div>
+    <h2>Product Demo</h2>
+    <p class="modal-sub">See how FlowSync automates your entire workflow in under 2 minutes.</p>
+    <button class="btn-primary-full" onclick="closeModal('demoModal');openModal('signupModal')"><span class="btn-label">Start Free Trial</span><span class="spinner"></span></button>
+  </div>
+</div>
+
+<div class="cookie-banner" id="cookieBanner">
+  <div class="container">
+    <div class="cookie-inner">
+      <p>We use cookies to enhance your experience. By continuing you agree to our use of cookies. <strong>Learn more</strong></p>
+      <div class="cookie-actions"><button class="cookie-customize" onclick="toggleCookieDetails()">Customize</button><button class="cookie-accept" onclick="acceptCookies()">Accept All</button></div>
+    </div>
+    <div class="cookie-details" id="cookieDetails">
+      <div class="cookie-category"><div class="cookie-category-info"><h5>Essential Cookies</h5><p>Required for the website to function properly.</p></div><button class="cookie-toggle active" disabled></button></div>
+      <div class="cookie-category"><div class="cookie-category-info"><h5>Analytics Cookies</h5><p>Help us understand how visitors interact with the website.</p></div><button class="cookie-toggle" onclick="this.classList.toggle('active')"></button></div>
+      <div class="cookie-category"><div class="cookie-category-info"><h5>Marketing Cookies</h5><p>Used to track visitors across websites for advertising.</p></div><button class="cookie-toggle" onclick="this.classList.toggle('active')"></button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ===== I18N ===== */
+var LANGS=[
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'zh',name:'中文',flag:'🇨🇳'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'},
+  {code:'ko',name:'한국어',flag:'🇰🇷'}
+];
+var curLang=(function(){try{var s=localStorage.getItem('shian-locale');if(s&&LANGS.find(function(l){return l.code===s}))return s}catch(e){}return'en'})();
+function T(key){
+  var keys=key.split('.');var val=I18N[curLang];
+  for(var i=0;i<keys.length;i++){if(val&&typeof val==='object')val=val[keys[i]];else return key}
+  return(val===undefined||val===null)?key:val;
+}
+function setLang(code){
+  curLang=code;try{localStorage.setItem('shian-locale',code)}catch(e){}
+  renderLangSwitcher();
+  afterLangChange();
+}
+function renderLangSwitcher(){
+  var el=document.getElementById('langSwitcher');if(!el)return;
+  var cur=LANGS.find(function(l){return l.code===curLang})||LANGS[0];
+  el.innerHTML='<button onclick="toggleLangMenu()" style="background:none;border:1px solid #333;border-radius:6px;padding:4px 8px;color:inherit;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px">'+cur.flag+' '+cur.code.toUpperCase()+' ▾</button><div id="langMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e1e1e;border:1px solid #333;border-radius:8px;overflow:hidden;z-index:9999;min-width:130px">'+LANGS.map(function(l){return'<button onclick="setLang(\''+l.code+'\')" style="display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:'+(l.code===curLang?'var(--accent,#4F46E5)':'none')+';color:'+(l.code===curLang?'#fff':'#999')+';cursor:pointer;font-size:12px">'+l.flag+' '+l.name+'</button>'}).join('')+'</div>';
+}
+function toggleLangMenu(){
+  var m=document.getElementById('langMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+var I18N={
+  en:{
+    nav:{features:'Features',compare:'Compare',pricing:'Pricing',faq:'FAQ',start:'Start Free Trial',login:'Sign In'},
+    hero:{badge:'Now in Public Beta — Try it free',title:'Automate Your Workflow with',titleSpan:'AI-Powered Sync',desc:'FlowSync connects your tools, automates repetitive tasks, and keeps your team aligned — all powered by intelligent AI that learns how you work.',start:'Start Free Trial',watch:'Watch Demo'},
+    features:{title:'Features',heading:'Everything you need to streamline your workflow',desc:'Powerful features designed to save time, reduce errors, and keep your entire team moving forward — effortlessly.',card1Title:'Lightning-Fast Sync',card1Desc:'Real-time data synchronization across all your tools. Changes propagate instantly with sub-second latency.',card2Title:'Smart Automation',card2Desc:'AI learns your patterns and suggests automations that save 10+ hours per week on repetitive tasks.',card3Title:'Enterprise Security',card3Desc:'SOC 2 Type II compliant with end-to-end encryption, SSO, and role-based access control built in.',card4Title:'200+ Integrations',card4Desc:'Connect Slack, Jira, GitHub, Notion, Salesforce, and 200+ other tools your team already uses.',card5Title:'Custom Workflows',card5Desc:'Build visual workflows with our drag-and-drop builder. No code required — just connect, configure, and go.',card6Title:'Team Collaboration',card6Desc:'Share workflows, assign tasks, and track progress together. Keep everyone on the same page, always.'},
+    comparison:{title:'Comparison',heading:'See how we stack up',desc:'FlowSync delivers more features at a better value than the competition.',feature:'Feature',our:'FlowSync',compA:'Competitor A',compB:'Competitor B',aiPower:'AI-Powered Automation',realtime:'Real-Time Sync',integrations:'200+ Integrations',customWf:'Custom Workflows',soc2:'SOC 2 Compliance',sso:'SSO / SAML',uptime:'99.9% Uptime SLA',freePlan:'Free Plan Available',aiBuilder:'AI Workflow Builder',prioritySupport:'Priority Support'},
+    integrations:{title:'Integrations',heading:'Connects with your favorite tools',desc:'200+ integrations and growing. Here are some of our most popular.'},
+    demo:{title:'Live Demo',heading:'See FlowSync in action',desc:'Watch a 2-minute walkthrough of how teams use FlowSync to automate their workflows.',watch:'Watch 2-min Demo',try:'Try It Free — No Credit Card Required',videoPlay:'Demo video would play here',videoEmbed:'Integration with Vimeo/YouTube embed'},
+    interact:{title:'Interactive Demo',heading:'Try it yourself',desc:'Walk through how FlowSync works in 4 simple steps.',step1:'Connect',step2:'Configure',step3:'Automate',step4:'Monitor',s1Title:'Connect your tools',s1Desc:'Link your favorite apps in seconds. FlowSync supports 200+ integrations out of the box.',s2Title:'Configure your workflow',s2Desc:'Use our visual builder to define triggers, actions, and conditions — no coding required.',s3Title:'AI automates the rest',s3Desc:'Our AI learns your patterns and suggests optimizations. Sit back and watch the magic happen.',s4Title:'Monitor everything in real-time',s4Desc:'Track performance, errors, and throughput from a single dashboard.',skip:'Skip tour',next:'Next',back:'Back'},
+    pricing:{title:'Pricing',heading:'Simple, transparent pricing',desc:'Start free. Upgrade as you grow. No hidden fees, ever.',monthly:'Monthly',yearly:'Yearly',save:'Save 20%',starter:'Starter',starterDesc:'For individuals and small projects',pro:'Professional',proDesc:'For growing teams and businesses',enterprise:'Enterprise',enterpriseDesc:'For large organizations with custom needs',custom:'Custom',perMonth:'/ month',starterCta:'Get Started Free',proCta:'Start Free Trial',enterpriseCta:'Contact Sales',popular:'Most Popular',feat1:'Up to 5 workflows',feat2:'1,000 events/month',feat3:'10 integrations',feat4:'Community support',feat5:'Basic analytics',featPro1:'Unlimited workflows',featPro2:'100,000 events/month',featPro3:'200+ integrations',featPro4:'AI workflow builder',featPro5:'Priority support',featPro6:'Advanced analytics & SSO',featEnt1:'Everything in Professional',featEnt2:'Unlimited events',featEnt3:'Dedicated account manager',featEnt4:'Custom SLA (99.99%)',featEnt5:'On-premise deployment',featEnt6:'HIPAA / BAA & 24/7 phone support',guarantee:'14-day free trial on all plans. No credit card required. Cancel anytime.'},
+    testimonials:{title:'Testimonials',heading:'Loved by teams worldwide',desc:'See what our customers have to say about FlowSync.'},
+    faq:{title:'FAQ',heading:'Frequently asked questions',desc:'Everything you need to know. Can\'t find an answer? Chat with us.',q1:'What is FlowSync and how does it work?',a1:'FlowSync is an AI-powered workflow automation platform that connects your favorite tools and automates repetitive tasks. Simply connect your apps, define triggers and actions using our visual builder, and let FlowSync handle the rest.',q2:'Is there a free plan available?',a2:'Yes! Our Starter plan is completely free and includes 5 workflows, 1,000 events per month, and 10 integrations. No credit card required to get started.',q3:'How does the AI automation work?',a3:'Our AI analyzes your workflow patterns, identifies repetitive tasks, and suggests automations. It can predict bottlenecks, recommend optimal configurations, and auto-create workflows based on your usage history.',q4:'Is my data secure with FlowSync?',a4:'Absolutely. We\'re SOC 2 Type II certified, GDPR compliant, and HIPAA ready. All data is encrypted in transit and at rest using AES-256 encryption. We also offer SSO/SAML support.',q5:'Can I cancel my subscription at any time?',a5:'Yes, you can cancel at any time with no penalties. All paid plans come with a 14-day free trial. If you cancel, you retain access until the end of your billing period.',q6:'What integrations do you support?',a6:'We support 200+ integrations including Slack, GitHub, Jira, Notion, Salesforce, Stripe, Google Workspace, Microsoft 365, Figma, AWS, and many more. We also offer a REST API and webhooks.',q7:'Do you offer on-premise deployment?',a7:'Yes, our Enterprise plan includes on-premise deployment options. Run FlowSync entirely within your own infrastructure for maximum data control and compliance.',q8:'What kind of support do you offer?',a8:'Community support for Starter plans, priority email and chat for Professional, and 24/7 phone support with a dedicated account manager for Enterprise. Average response time is under 2 hours.',q9:'Can I migrate from Zapier or Make?',a9:'Yes! We offer a one-click migration tool that imports existing workflows from Zapier, Make, and other platforms. Free migration assistance for Professional and Enterprise plans.'},
+    cta:{heading:'Ready to automate your workflow?',desc:'Join 10,000+ teams already using FlowSync. Start your free trial today.',placeholder:'Enter your work email',btn:'Get Started Free'},
+    footer:{tagline:'AI-powered workflow automation for modern teams.',product:'Product',company:'Company',resources:'Resources',legal:'Legal',feat:'Features',price:'Pricing',integrations:'Integrations',security:'Security',changelog:'Changelog',about:'About',blog:'Blog',careers:'Careers',press:'Press Kit',docs:'Documentation',api:'API Reference',community:'Community',status:'Status Page',privacy:'Privacy Policy',terms:'Terms of Service',cookie:'Cookie Policy',dpa:'DPA',copyright:'© 2026 FlowSync, Inc. All rights reserved.',made:'Made with ❤️ for productive teams'},
+    cookie:{text:'We use cookies to enhance your experience. By continuing you agree to our use of cookies.',learn:'Learn more',customize:'Customize',accept:'Accept All',essential:'Essential Cookies',essentialDesc:'Required for the website to function properly.',analytics:'Analytics Cookies',analyticsDesc:'Help us understand how visitors interact with the website.',marketing:'Marketing Cookies',marketingDesc:'Used to track visitors across websites for advertising.'},
+    chat:{online:'Online now',placeholder:'Type a message...',send:'Send',header:'FlowSync Support',tooltip:'Chat with us!',welcome:'Hi there! 👋 Welcome to FlowSync. How can I help you today?',quickPricing:'Pricing info',quickAI:'How does AI work?',quickEnterprise:'Enterprise plans'},
+    toast:{welcome:'Welcome to FlowSync! 🎉',created:'Account created successfully!',cookie:'Cookie preferences saved!',email:'Please enter a valid email address.',building:'Start Building →'},
+    mobile:{toggle:'Toggle Theme'},
+    signup:{step1Title:'Create your account',step1Sub:'Start your 14-day free trial. No credit card required.',workEmail:'Work Email',company:'Company Name',continue:'Continue',step2Title:'Set up your profile',step2Sub:'Almost there! Tell us a bit about yourself.',fullName:'Full Name',password:'Password',role:'Your Role',createAccount:'Create Account',step3Title:'Welcome to FlowSync!',step3Sub:'Your account is ready. Here\'s a preview of your new dashboard.',workflows:'Workflows',events:'Events',integrations:'Integrations',dashboard:'Your Dashboard',setup:'Setup Progress',accountStatus:'Account Status',ready:'Ready!',emailPlaceholder:'you@company.com',companyPlaceholder:'Acme Corp',namePlaceholder:'Jane Smith',passPlaceholder:'Min 8 characters',selectRole:'Select your role',startBuilding:'Start Building →',errorEmailInvalid:'Please enter a valid work email address.',errorCompanyRequired:'Company name is required.',errorPersonalEmail:'Please use a work email address.',errorNameRequired:'Please enter your full name.',errorPasswordMin:'Password must be at least 8 characters.',demoPreFilled:'Demo pre-filled — just click Continue →'},
+    demoModal:{title:'Product Demo',desc:'See how FlowSync automates your entire workflow in under 2 minutes.',start:'Start Free Trial'},
+    security:{title:'Security',heading:'Enterprise-grade security & compliance',desc:'Your data is protected by the highest industry standards.',soc2:'SOC 2 Type II',soc2Desc:'Audited annually',gdpr:'GDPR',gdprDesc:'EU data protection',hipaa:'HIPAA',hipaaDesc:'Healthcare ready',iso:'ISO 27001',isoDesc:'InfoSec certified',uptime:'Current Uptime',incidents:'Incidents (30 days)',recovery:'Avg Recovery Time'},
+    stats:{teams:'Teams using FlowSync',integrations:'Integrations available',uptime:'Uptime guarantee',events:'Events processed daily'},
+    trusted:'Trusted by',
+    teams:'teams at',
+    social:'Trusted by'
+  },
+  zh:{
+    nav:{features:'功能',compare:'对比',pricing:'定价',faq:'常见问题',start:'免费试用',login:'登录'},
+    hero:{badge:'公开测试中 — 免费试用',title:'用 AI 驱动同步',titleSpan:'自动化工作流',desc:'FlowSync 连接您的工具、自动执行重复性任务，并让您的团队保持一致 — 全部由学习您工作方式的智能 AI 提供支持。',start:'免费试用',watch:'观看演示'},
+    features:{title:'功能',heading:'简化工作流所需的一切',desc:'强大功能，旨在节省时间、减少错误，让整个团队轻松前进。',card1Title:'闪电同步',card1Desc:'所有工具间的实时数据同步。更改以亚秒级延迟即时传播。',card2Title:'智能自动化',card2Desc:'AI 学习您的模式并建议自动化，每周节省 10+ 小时的重复性任务时间。',card3Title:'企业级安全',card3Desc:'符合 SOC 2 Type II 标准，内置端到端加密、SSO 和基于角色的访问控制。',card4Title:'200+ 集成',card4Desc:'连接 Slack、Jira、GitHub、Notion、Salesforce 以及您团队已在使用的 200+ 其他工具。',card5Title:'自定义工作流',card5Desc:'使用拖放构建器创建可视化工作流。无需代码 — 只需连接、配置即可。',card6Title:'团队协作',card6Desc:'共享工作流、分配任务、共同跟踪进度。始终保持团队同步。'},
+    comparison:{title:'对比',heading:'看看我们的优势',desc:'FlowSync 以更优的价值提供更多功能。',feature:'功能',our:'FlowSync',compA:'竞争对手 A',compB:'竞争对手 B',aiPower:'AI 驱动自动化',realtime:'实时同步',integrations:'200+ 集成',customWf:'自定义工作流',soc2:'SOC 2 合规',sso:'SSO / SAML',uptime:'99.9% 正常运行时间 SLA',freePlan:'免费计划',aiBuilder:'AI 工作流构建器',prioritySupport:'优先支持'},
+    integrations:{title:'集成',heading:'连接您喜爱的工具',desc:'200+ 集成且持续增长。以下是一些最受欢迎的集成。'},
+    demo:{title:'在线演示',heading:'观看 FlowSync 演示',desc:'观看 2 分钟的视频，了解团队如何使用 FlowSync 自动化工作流。',watch:'观看 2 分钟演示',try:'免费试用 — 无需信用卡',videoPlay:'演示视频将在此处播放',videoEmbed:'集成 Vimeo/YouTube 嵌入'},
+    interact:{title:'互动演示',heading:'亲自尝试',desc:'通过 4 个简单步骤了解 FlowSync 的工作原理。',step1:'连接',step2:'配置',step3:'自动化',step4:'监控',s1Title:'连接您的工具',s1Desc:'几秒钟内连接您喜爱的应用。FlowSync 开箱即支持 200+ 集成。',s2Title:'配置工作流',s2Desc:'使用可视化构建器定义触发器、操作和条件 — 无需编码。',s3Title:'AI 自动完成其余工作',s3Desc:'AI 学习您的模式并建议优化。坐下来观看奇迹发生。',s4Title:'实时监控一切',s4Desc:'从单个仪表板跟踪性能、错误和吞吐量。',skip:'跳过导览',next:'下一步',back:'上一步'},
+    pricing:{title:'定价',heading:'简单透明的定价',desc:'免费开始，随着成长升级。绝不收取隐藏费用。',monthly:'月付',yearly:'年付',save:'节省 20%',starter:'入门版',starterDesc:'适合个人和小型项目',pro:'专业版',proDesc:'适合成长中的团队和企业',enterprise:'企业版',enterpriseDesc:'适合有定制需求的大型组织',custom:'定制',perMonth:'/ 月',starterCta:'免费开始',proCta:'免费试用',enterpriseCta:'联系销售',popular:'最受欢迎',feat1:'最多 5 个工作流',feat2:'每月 1,000 个事件',feat3:'10 个集成',feat4:'社区支持',feat5:'基础分析',featPro1:'无限工作流',featPro2:'每月 100,000 个事件',featPro3:'200+ 集成',featPro4:'AI 工作流构建器',featPro5:'优先支持',featPro6:'高级分析 & SSO',featEnt1:'专业版所有功能',featEnt2:'无限事件',featEnt3:'专属客户经理',featEnt4:'自定义 SLA (99.99%)',featEnt5:'本地部署',featEnt6:'HIPAA / BAA & 24/7 电话支持',guarantee:'所有计划均享 14 天免费试用。无需信用卡。随时取消。'},
+    testimonials:{title:'用户评价',heading:'深受全球团队喜爱',desc:'看看客户对 FlowSync 的评价。'},
+    faq:{title:'常见问题',heading:'常见问题解答',desc:'您需要了解的一切。找不到答案？与我们在线聊天。',q1:'FlowSync 是什么，如何运作？',a1:'FlowSync 是一个 AI 驱动的工作流自动化平台，可连接您喜爱的工具并自动执行重复性任务。只需连接您的应用，使用可视化构建器定义触发器和操作，让 FlowSync 处理其余工作。',q2:'有免费计划吗？',a2:'有！我们的入门版完全免费，包含 5 个工作流、每月 1,000 个事件和 10 个集成。无需信用卡即可开始。',q3:'AI 自动化如何工作？',a3:'我们的 AI 分析您的工作流模式，识别重复性任务，并建议自动化。它可以预测瓶颈、推荐最佳配置，并根据您的使用历史自动创建工作流。',q4:'我的数据在 FlowSync 中安全吗？',a4:'绝对安全。我们通过了 SOC 2 Type II 认证，符合 GDPR，并为 HIPAA 做好了准备。所有数据在传输和静态时均使用 AES-256 加密。我们还提供 SSO/SAML 支持。',q5:'我可以随时取消订阅吗？',a5:'是的，您可以随时取消，无需任何罚款。所有付费计划均提供 14 天免费试用。如果取消，您可以在当前计费周期结束前继续使用。',q6:'你们支持哪些集成？',a6:'我们支持 200+ 集成，包括 Slack、GitHub、Jira、Notion、Salesforce、Stripe、Google Workspace、Microsoft 365、Figma、AWS 等。我们还提供 REST API 和 Webhook。',q7:'你们提供本地部署吗？',a7:'是的，我们的企业版包含本地部署选项。在您自己的基础设施中完全运行 FlowSync，实现最大的数据控制和合规性。',q8:'你们提供什么样的支持？',a8:'入门版提供社区支持，专业版提供优先邮件和聊天支持，企业版提供 24/7 电话支持和专属客户经理。平均响应时间不超过 2 小时。',q9:'我可以从 Zapier 或 Make 迁移吗？',a9:'可以！我们提供一键迁移工具，可从 Zapier、Make 和其他平台导入现有工作流。专业版和企业版提供免费迁移协助。'},
+    cta:{heading:'准备好自动化工作流了吗？',desc:'加入 10,000+ 已在使用 FlowSync 的团队。立即开始免费试用。',placeholder:'输入您的工作邮箱',btn:'免费开始'},
+    footer:{tagline:'面向现代团队的 AI 驱动工作流自动化。',product:'产品',company:'公司',resources:'资源',legal:'法律',feat:'功能',price:'定价',integrations:'集成',security:'安全',changelog:'更新日志',about:'关于',blog:'博客',careers:'招聘',press:'新闻资料',docs:'文档',api:'API 参考',community:'社区',status:'状态页',privacy:'隐私政策',terms:'服务条款',cookie:'Cookie 政策',dpa:'数据处理协议',copyright:'© 2026 FlowSync, Inc. 保留所有权利。',made:'为高效团队打造 ❤️'},
+    cookie:{text:'我们使用 Cookie 来提升您的体验。继续使用即表示您同意我们使用 Cookie。',learn:'了解更多',customize:'自定义',accept:'接受全部',essential:'必要 Cookie',essentialDesc:'网站正常运行所必需的。',analytics:'分析 Cookie',analyticsDesc:'帮助我们了解访问者如何与网站互动。',marketing:'营销 Cookie',marketingDesc:'用于跨网站跟踪访问者以进行广告投放。'},
+    chat:{online:'在线',placeholder:'输入消息...',send:'发送',header:'FlowSync 客服',tooltip:'与我们聊天！',welcome:'您好！👋 欢迎使用 FlowSync。有什么可以帮助您的？',quickPricing:'价格信息',quickAI:'AI 如何工作？',quickEnterprise:'企业方案'},
+    toast:{welcome:'欢迎使用 FlowSync！🎉',created:'账户创建成功！',cookie:'Cookie 偏好已保存！',email:'请输入有效的邮箱地址。',building:'开始构建 →'},
+    mobile:{toggle:'切换主题'},
+    signup:{step1Title:'创建账户',step1Sub:'开始 14 天免费试用。无需信用卡。',workEmail:'工作邮箱',company:'公司名称',continue:'继续',step2Title:'设置个人资料',step2Sub:'快完成了！请告诉我们一些关于您的信息。',fullName:'全名',password:'密码',role:'您的角色',createAccount:'创建账户',step3Title:'欢迎使用 FlowSync！',step3Sub:'您的账户已就绪。以下是您新仪表板的预览。',workflows:'工作流',events:'事件',integrations:'集成',dashboard:'您的仪表板',setup:'设置进度',accountStatus:'账户状态',ready:'就绪！',emailPlaceholder:'you@company.com',companyPlaceholder:'Acme Corp',namePlaceholder:'张三',passPlaceholder:'至少 8 个字符',selectRole:'选择您的角色',startBuilding:'开始构建 →',errorEmailInvalid:'请输入有效的工作邮箱地址。',errorCompanyRequired:'公司名称为必填项。',errorPersonalEmail:'请使用工作邮箱。',errorNameRequired:'请输入您的全名。',errorPasswordMin:'密码至少为 8 个字符。',demoPreFilled:'演示预填 — 点击继续 →'},
+    demoModal:{title:'产品演示',desc:'了解 FlowSync 如何在 2 分钟内自动化您整个工作流。',start:'免费试用'},
+    security:{title:'安全',heading:'企业级安全与合规',desc:'您的数据受到最高行业标准的保护。',soc2:'SOC 2 Type II',soc2Desc:'年度审计',gdpr:'GDPR',gdprDesc:'欧盟数据保护',hipaa:'HIPAA',hipaaDesc:'医疗合规',iso:'ISO 27001',isoDesc:'信息安全认证',uptime:'当前运行时间',incidents:'事故数 (30 天)',recovery:'平均恢复时间'},
+    stats:{teams:'团队使用 FlowSync',integrations:'可用集成',uptime:'运行时间保证',events:'每日处理事件'},
+    trusted:'受到',
+    teams:'团队的信任',
+    social:'受到信任'
+  },
+  ja:{
+    nav:{features:'機能',compare:'比較',pricing:'料金',faq:'よくある質問',start:'無料トライアル',login:'ログイン'},
+    hero:{badge:'公開ベータ版 — 無料でお試し',title:'AI 駆動の同期で',titleSpan:'ワークフローを自動化',desc:'FlowSync はツールを接続し、反復作業を自動化し、チームの連携を維持します。すべてはあなたの作業方法を学習するインテリジェント AI が支えます。',start:'無料トライアル',watch:'デモを見る'},
+    features:{title:'機能',heading:'ワークフローを効率化するすべて',desc:'時間を節約し、エラーを減らし、チーム全体を前進させる強力な機能。',card1Title:'超高速同期',card1Desc:'全ツール間のリアルタイムデータ同期。変更はサブ秒のレイテンシで即座に伝播します。',card2Title:'スマート自動化',card2Desc:'AI がパターンを学習し、反復作業を週 10 時間以上節約する自動化を提案。',card3Title:'エンタープライズセキュリティ',card3Desc:'SOC 2 Type II 準拠、エンドツーエンド暗号化、SSO、RBAC を内蔵。',card4Title:'200+ 統合',card4Desc:'Slack、Jira、GitHub、Notion、Salesforce など 200 以上のツールと接続。',card5Title:'カスタムワークフロー',card5Desc:'ドラッグ＆ドロップビルダーでビジュアルワークフローを作成。コード不要。',card6Title:'チームコラボレーション',card6Desc:'ワークフローを共有、タスクを割り当て、進捗を追跡。常にチームの認識を統一。'},
+    comparison:{title:'比較',heading:'他社との違い',desc:'FlowSync はより良い価値でより多くの機能を提供します。',feature:'機能',our:'FlowSync',compA:'競合 A',compB:'競合 B',aiPower:'AI 自動化',realtime:'リアルタイム同期',integrations:'200+ 統合',customWf:'カスタムワークフロー',soc2:'SOC 2 準拠',sso:'SSO / SAML',uptime:'99.9% 稼働 SLA',freePlan:'無料プラン',aiBuilder:'AI ワークフロービルダー',prioritySupport:'優先サポート'},
+    integrations:{title:'統合',heading:'お気に入りのツールと連携',desc:'200 以上の統合に対応。最も人気の高いものをご紹介します。'},
+    demo:{title:'ライブデモ',heading:'FlowSync の動作を見る',desc:'チームが FlowSync でワークフローを自動化する方法を 2 分でご紹介。',watch:'2 分のデモを見る',try:'無料でお試し — クレジットカード不要',videoPlay:'デモ動画はここで再生されます',videoEmbed:'Vimeo/YouTube 埋め込みとの統合'},
+    interact:{title:'インタラクティブデモ',heading:'自分で試す',desc:'4 つの簡単なステップで FlowSync の仕組みを体験。',step1:'接続',step2:'設定',step3:'自動化',step4:'監視',s1Title:'ツールを接続',s1Desc:'お気に入りのアプリを数秒で連携。FlowSync は 200 以上の統合に対応。',s2Title:'ワークフローを設定',s2Desc:'ビジュアルビルダーでトリガー、アクション、条件を定義。コーディング不要。',s3Title:'AI が自動化',s3Desc:'AI がパターンを学習し最適化を提案。魔法が起こるのを見守りましょう。',s4Title:'リアルタイム監視',s4Desc:'単一のダッシュボードからパフォーマンス、エラー、スループットを追跡。',skip:'スキップ',next:'次へ',back:'戻る'},
+    pricing:{title:'料金',heading:'シンプルで透明な料金',desc:'無料で開始。成長に合わせてアップグレード。隠れた費用は一切ありません。',monthly:'月額',yearly:'年額',save:'20% お得',starter:'スターター',starterDesc:'個人と小規模プロジェクト向け',pro:'プロフェッショナル',proDesc:'成長するチームと企業向け',enterprise:'エンタープライズ',enterpriseDesc:'カスタムニーズのある大規模組織向け',custom:'カスタム',perMonth:'/ 月',starterCta:'無料で開始',proCta:'無料トライアル',enterpriseCta:'営業に問い合わせ',popular:'最も人気',feat1:'最大 5 ワークフロー',feat2:'月 1,000 イベント',feat3:'10 統合',feat4:'コミュニティサポート',feat5:'基本分析',featPro1:'無制限ワークフロー',featPro2:'月 100,000 イベント',featPro3:'200+ 統合',featPro4:'AI ワークフロービルダー',featPro5:'優先サポート',featPro6:'高度な分析 & SSO',featEnt1:'プロフェッショナルのすべて',featEnt2:'無制限イベント',featEnt3:'専任アカウントマネージャー',featEnt4:'カスタム SLA (99.99%)',featEnt5:'オンプレミス展開',featEnt6:'HIPAA / BAA & 24/7 電話サポート',guarantee:'全プラン 14 日間無料トライアル。クレジットカード不要。いつでもキャンセル可能。'},
+    testimonials:{title:'お客様の声',heading:'世界中のチームに愛される',desc:'FlowSync に関するお客様の声をご覧ください。'},
+    faq:{title:'よくある質問',heading:'よくある質問',desc:'知っておくべきことすべて。答えが見つかりませんか？チャットでお問い合わせください。',q1:'FlowSync とは何ですか？どのように機能しますか？',a1:'FlowSync は AI 駆動のワークフロー自動化プラットフォームです。お気に入りのツールを接続し、反復作業を自動化します。アプリを接続し、ビジュアルビルダーでトリガーとアクションを定義するだけで、FlowSync が残りを処理します。',q2:'無料プランはありますか？',a2:'はい！スタータープランは完全に無料で、5 つのワークフロー、月 1,000 イベント、10 統合が含まれています。クレジットカード不要で開始できます。',q3:'AI 自動化はどのように機能しますか？',a3:'AI はワークフローのパターンを分析し、反復タスクを特定し、自動化を提案します。ボトルネックを予測し、最適な構成を推奨し、使用履歴に基づいてワークフローを自動作成できます。',q4:'データは安全ですか？',a4:'もちろんです。SOC 2 Type II 認定、GDPR 準拠、HIPAA 対応です。すべてのデータは転送時および保存時に AES-256 暗号化されます。SSO/SAML サポートも提供しています。',q5:'いつでもサブスクリプションをキャンセルできますか？',a5:'はい、いつでもペナルティなしでキャンセルできます。すべての有料プランには 14 日間の無料トライアルが付いています。キャンセルした場合、請求期間の終了まではアクセスできます。',q6:'どの統合をサポートしていますか？',a6:'Slack、GitHub、Jira、Notion、Salesforce、Stripe、Google Workspace、Microsoft 365、Figma、AWS など 200 以上の統合をサポートしています。REST API と Webhook も提供しています。',q7:'オンプレミス展開はありますか？',a7:'はい、エンタープライズプランにはオンプレミス展開オプションが含まれています。FlowSync を独自のインフラストラクチャ内で完全に実行できます。',q8:'どのようなサポートを提供していますか？',a8:'スタータープランはコミュニティサポート、プロフェッショナルは優先メール・チャットサポート、エンタープライズは 24/7 電話サポートと専任アカウントマネージャーです。平均応答時間は 2 時間以内です。',q9:'Zapier や Make から移行できますか？',a9:'はい！ワンクリック移行ツールで、Zapier、Make、その他のプラットフォームから既存のワークフローをインポートできます。プロフェッショナルおよびエンタープライズプランでは無料移行サポートを提供しています。'},
+    cta:{heading:'ワークフローを自動化しませんか？',desc:'10,000 以上のチームが FlowSync を利用。今すぐ無料トライアルを開始。',placeholder:'仕事用メールアドレス',btn:'無料で開始'},
+    footer:{tagline:'モダンチームのための AI 駆動ワークフロー自動化。',product:'製品',company:'会社',resources:'リソース',legal:'法的情報',feat:'機能',price:'料金',integrations:'統合',security:'セキュリティ',changelog:'更新履歴',about:'会社概要',blog:'ブログ',careers:'採用情報',press:'プレスキット',docs:'ドキュメント',api:'API リファレンス',community:'コミュニティ',status:'ステータスページ',privacy:'プライバシーポリシー',terms:'利用規約',cookie:'Cookie ポリシー',dpa:'DPA',copyright:'© 2026 FlowSync, Inc. 全著作権所有。',made:'生産的なチームのために ❤️'},
+    cookie:{text:'お客様の体験を向上させるために Cookie を使用しています。継続して使用することで Cookie の使用に同意したものとみなします。',learn:'詳細',customize:'カスタマイズ',accept:'すべて許可',essential:'必須 Cookie',essentialDesc:'ウェブサイトの適切な機能に必要です。',analytics:'分析 Cookie',analyticsDesc:'訪問者がウェブサイトとどのようにインタラクションするかを理解するのに役立ちます。',marketing:'マーケティング Cookie',marketingDesc:'広告目的で訪問者を追跡するために使用されます。'},
+    chat:{online:'オンライン',placeholder:'メッセージを入力...',send:'送信',header:'FlowSync サポート',tooltip:'チャットで相談！',welcome:'こんにちは！👋 FlowSync へようこそ。何かお手伝いできますか？',quickPricing:'料金情報',quickAI:'AI の仕組み',quickEnterprise:'エンタープライズプラン'},
+    toast:{welcome:'FlowSync へようこそ！🎉',created:'アカウントが作成されました！',cookie:'Cookie 設定を保存しました！',email:'有効なメールアドレスを入力してください。',building:'構築を開始 →'},
+    mobile:{toggle:'テーマ切替'},
+    signup:{step1Title:'アカウント作成',step1Sub:'14 日間の無料トライアルを開始。クレジットカード不要。',workEmail:'仕事用メール',company:'会社名',continue:'続ける',step2Title:'プロフィール設定',step2Sub:'もう少しです！あなたについて教えてください。',fullName:'氏名',password:'パスワード',role:'役割',createAccount:'アカウント作成',step3Title:'FlowSync へようこそ！',step3Sub:'アカウントの準備ができました。新しいダッシュボードのプレビューです。',workflows:'ワークフロー',events:'イベント',integrations:'統合',dashboard:'ダッシュボード',setup:'セットアップ進捗',accountStatus:'アカウント状態',ready:'準備完了！',emailPlaceholder:'you@company.com',companyPlaceholder:'Acme Corp',namePlaceholder:'山田太郎',passPlaceholder:'8 文字以上',selectRole:'役割を選択',startBuilding:'構築を開始 →',errorEmailInvalid:'有効な仕事用メールアドレスを入力してください。',errorCompanyRequired:'会社名は必須です。',errorPersonalEmail:'仕事用メールアドレスを使用してください。',errorNameRequired:'氏名を入力してください。',errorPasswordMin:'パスワードは8文字以上必要です。',demoPreFilled:'デモ事前入力 — 続けるをクリック →'},
+    demoModal:{title:'製品デモ',desc:'FlowSync が 2 分足らずでワークフロー全体を自動化する方法をご覧ください。',start:'無料トライアル'},
+    security:{title:'セキュリティ',heading:'エンタープライズグレードのセキュリティとコンプライアンス',desc:'お客様のデータは最高の業界標準によって保護されています。',soc2:'SOC 2 Type II',soc2Desc:'年次監査',gdpr:'GDPR',gdprDesc:'EU データ保護',hipaa:'HIPAA',hipaaDesc:'医療準拠',iso:'ISO 27001',isoDesc:'情報セキュリティ認証',uptime:'現在の稼働率',incidents:'インシデント (30 日)',recovery:'平均復旧時間'},
+    stats:{teams:'チームが FlowSync を利用',integrations:'利用可能な統合',uptime:'稼働保証',events:'日次処理イベント'},
+    trusted:'信頼する',
+    teams:'のチーム',
+    social:'信頼されている'
+  },
+  ko:{
+    nav:{features:'기능',compare:'비교',pricing:'가격',faq:'자주 묻는 질문',start:'무료 체험',login:'로그인'},
+    hero:{badge:'공개 베타 — 무료로 체험하기',title:'AI 기반 동기화로',titleSpan:'워크플로 자동화',desc:'FlowSync는 도구를 연결하고, 반복 작업을 자동화하며, 팀의 협업을 유지합니다. 모든 것은 사용자의 작업 방식을 학습하는 지능형 AI로 구동됩니다.',start:'무료 체험',watch:'데모 보기'},
+    features:{title:'기능',heading:'워크플로를 간소화하는 모든 것',desc:'시간을 절약하고 오류를 줄이며 팀 전체를 앞으로 나아가게 하는 강력한 기능.','card1Title':'초고속 동기화','card1Desc':'모든 도구 간 실시간 데이터 동기화. 변경 사항이 즉시 전파됩니다.','card2Title':'스마트 자동화','card2Desc':'AI가 패턴을 학습하여 반복 작업에서 주 10시간 이상 절약하는 자동화를 제안합니다.','card3Title':'엔터프라이즈 보안','card3Desc':'SOC 2 Type II 준수, 종단간 암호화, SSO 및 RBAC 내장.','card4Title':'200+ 통합','card4Desc':'Slack, Jira, GitHub, Notion, Salesforce 등 200개 이상의 도구 연결.','card5Title':'사용자 정의 워크플로','card5Desc':'드래그 앤 드롭 빌더로 시각적 워크플로 생성. 코드 불필요.','card6Title':'팀 협업','card6Desc':'워크플로 공유, 작업 할당, 진행 상황 추적. 팀의 싱크를 유지.'},
+    comparison:{title:'비교',heading:'차이를 확인하세요',desc:'FlowSync는 더 나은 가치로 더 많은 기능을 제공합니다.',feature:'기능',our:'FlowSync',compA:'경쟁사 A',compB:'경쟁사 B',aiPower:'AI 기반 자동화',realtime:'실시간 동기화',integrations:'200+ 통합',customWf:'사용자 정의 워크플로',soc2:'SOC 2 준수',sso:'SSO / SAML',uptime:'99.9% 가동 SLA',freePlan:'무료 플랜',aiBuilder:'AI 워크플로 빌더',prioritySupport:'우선 지원'},
+    integrations:{title:'통합',heading:'즐겨 사용하는 도구와 연결',desc:'200개 이상의 통합 지원. 가장 인기 있는 통합을 소개합니다.'},
+    demo:{title:'라이브 데모',heading:'FlowSync 작동 확인',desc:'팀이 FlowSync로 워크플로를 자동화하는 방법을 2분 만에 확인하세요.',watch:'2분 데모 보기',try:'무료 체험 — 신용카드 불필요',videoPlay:'데모 영상이 여기에서 재생됩니다',videoEmbed:'Vimeo/YouTube 임베드 연동'},
+    interact:{title:'인터랙티브 데모',heading:'직접 사용해보기',desc:'4단계로 FlowSync 작동 방식 체험.',step1:'연결',step2:'설정',step3:'자동화',step4:'모니터링',s1Title:'도구 연결',s1Desc:'즐겨찾는 앱을 몇 초 만에 연결. FlowSync는 200개 이상의 통합 지원.',s2Title:'워크플로 설정',s2Desc:'시각적 빌더로 트리거, 액션, 조건 정의 — 코딩 불필요.',s3Title:'AI가 나머지 자동화',s3Desc:'AI가 패턴을 학습하고 최적화 제안. 마법이 일어나는 것을 지켜보세요.',s4Title:'모든 것을 실시간 모니터링',s4Desc:'단일 대시보드에서 성능, 오류, 처리량 추적.',skip:'둘러보기 건너뛰기',next:'다음',back:'이전'},
+    pricing:{title:'가격',heading:'간단하고 투명한 가격',desc:'무료로 시작하고 성장에 따라 업그레이드. 숨은 비용 없음.',monthly:'월간',yearly:'연간',save:'20% 할인',starter:'스타터',starterDesc:'개인 및 소규모 프로젝트용',pro:'프로페셔널',proDesc:'성장하는 팀과 기업용',enterprise:'엔터프라이즈',enterpriseDesc:'맞춤형 니즈를 가진 대규모 조직용',custom:'맞춤형',perMonth:'/ 월',starterCta:'무료로 시작',proCta:'무료 체험',enterpriseCta:'영업 문의',popular:'가장 인기',feat1:'최대 5개 워크플로',feat2:'월 1,000개 이벤트',feat3:'10개 통합',feat4:'커뮤니티 지원',feat5:'기본 분석',featPro1:'무제한 워크플로',featPro2:'월 100,000개 이벤트',featPro3:'200+ 통합',featPro4:'AI 워크플로 빌더',featPro5:'우선 지원',featPro6:'고급 분석 & SSO',featEnt1:'프로페셔널의 모든 기능',featEnt2:'무제한 이벤트',featEnt3:'전담 계정 관리자',featEnt4:'맞춤 SLA (99.99%)',featEnt5:'온프레미스 배포',featEnt6:'HIPAA / BAA & 24/7 전화 지원',guarantee:'모든 플랜 14일 무료 체험. 신용카드 불필요. 언제든 취소 가능.'},
+    testimonials:{title:'사용후기',heading:'전 세계 팀의 사랑을 받는',desc:'고객들이 FlowSync에 대해 말하는 것을 확인하세요.'},
+    faq:{title:'자주 묻는 질문',heading:'자주 묻는 질문',desc:'알아야 할 모든 것. 답변을 찾을 수 없나요? 채팅으로 문의하세요.',q1:'FlowSync이란 무엇이며 어떻게 작동하나요?',a1:'FlowSync은 AI 기반 워크플로 자동화 플랫폼으로, 즐겨 사용하는 도구를 연결하고 반복 작업을 자동화합니다. 앱을 연결하고 비주얼 빌더로 트리거와 액션을 정의하면 FlowSync이 나머지를 처리합니다.',q2:'무료 플랜이 있나요?',a2:'네! 스타터 플랜은 완전 무료이며 5개 워크플로, 월 1,000개 이벤트, 10개 통합이 포함됩니다. 신용카드 없이 시작할 수 있습니다.',q3:'AI 자동화는 어떻게 작동하나요?',a3:'AI가 워크플로 패턴을 분석하여 반복 작업을 식별하고 자동화를 제안합니다. 병목 현상을 예측하고 최적의 구성을 추천하며 사용 기록을 기반으로 워크플로를 자동 생성할 수 있습니다.',q4:'FlowSync에서 데이터가 안전한가요?',a4:'물론입니다. SOC 2 Type II 인증, GDPR 준수, HIPAA 대응이 완료되었습니다. 모든 데이터는 전송 중 및 저장 시 AES-256으로 암호화됩니다. SSO/SAML도 지원합니다.',q5:'언제든지 구독을 취소할 수 있나요?',a5:'네, 언제든지 벌금 없이 취소할 수 있습니다. 모든 유료 플랜에는 14일 무료 체험이 포함됩니다. 취소 시 청구 기간이 끝날 때까지 접근이 유지됩니다.',q6:'어떤 통합을 지원하나요?',a6:'Slack, GitHub, Jira, Notion, Salesforce, Stripe, Google Workspace, Microsoft 365, Figma, AWS 등 200개 이상의 통합을 지원합니다. REST API와 웹훅도 제공합니다.',q7:'온프레미스 배포를 제공하나요?',a7:'네, 엔터프라이즈 플랜에는 온프레미스 배포 옵션이 포함됩니다. 자체 인프라에서 FlowSync를 완전히 실행할 수 있습니다.',q8:'어떤 지원을 제공하나요?',a8:'스타터 플랜은 커뮤니티 지원, 프로페셔널은 우선 이메일 및 채팅 지원, 엔터프라이즈는 24/7 전화 지원과 전담 계정 관리자를 제공합니다. 평균 응답 시간은 2시간 이내입니다.',q9:'Zapier나 Make에서 마이그레이션할 수 있나요?',a9:'네! 원클릭 마이그레이션 도구로 Zapier, Make 및 기타 플랫폼에서 기존 워크플로를 가져올 수 있습니다. 프로페셔널 및 엔터프라이즈 플랜은 무료 마이그레이션 지원을 제공합니다.'},
+    cta:{heading:'워크플로 자동화를 준비하셨나요?',desc:'10,000개 이상의 팀이 FlowSync를 사용 중입니다. 지금 무료 체험을 시작하세요.',placeholder:'업무용 이메일 입력',btn:'무료로 시작'},
+    footer:{tagline:'현대 팀을 위한 AI 기반 워크플로 자동화.',product:'제품',company:'회사',resources:'리소스',legal:'법률',feat:'기능',price:'가격',integrations:'통합',security:'보안',changelog:'변경 로그',about:'소개',blog:'블로그',careers:'채용',press:'프레스킷',docs:'문서',api:'API 참조',community:'커뮤니티',status:'상태 페이지',privacy:'개인정보 처리방침',terms:'서비스 약관',cookie:'쿠키 정책',dpa:'DPA',copyright:'© 2026 FlowSync, Inc. 모든 권리 보유.',made:'생산적인 팀을 위해 ❤️'},
+    cookie:{text:'쿠키를 사용하여 경험을 향상시킵니다. 계속 사용하면 쿠키 사용에 동의하는 것으로 간주됩니다.',learn:'자세히',customize:'사용자 정의',accept:'모두 수락',essential:'필수 쿠키',essentialDesc:'웹사이트가 제대로 작동하는 데 필요합니다.',analytics:'분석 쿠키',analyticsDesc:'방문자가 웹사이트와 상호 작용하는 방식을 이해하는 데 도움을 줍니다.',marketing:'마케팅 쿠키',marketingDesc:'광고 목적으로 웹사이트 간 방문자를 추적하는 데 사용됩니다.'},
+    chat:{online:'온라인',placeholder:'메시지 입력...',send:'보내기',header:'FlowSync 지원',tooltip:'채팅하세요!',welcome:'안녕하세요! 👋 FlowSync에 오신 것을 환영합니다. 무엇을 도와드릴까요?',quickPricing:'가격 정보',quickAI:'AI 작동 방식',quickEnterprise:'엔터프라이즈 플랜'},
+    toast:{welcome:'FlowSync에 오신 것을 환영합니다! 🎉',created:'계정이 생성되었습니다!',cookie:'쿠키 기본 설정이 저장되었습니다!',email:'유효한 이메일 주소를 입력하세요.',building:'구축 시작 →'},
+    mobile:{toggle:'테마 전환'},
+    signup:{step1Title:'계정 만들기',step1Sub:'14일 무료 체험 시작. 신용카드 불필요.',workEmail:'업무용 이메일',company:'회사 이름',continue:'계속',step2Title:'프로필 설정',step2Sub:'거의 다 왔습니다! 자신에 대해 알려주세요.',fullName:'성명',password:'비밀번호',role:'역할',createAccount:'계정 만들기',step3Title:'FlowSync에 오신 것을 환영합니다!',step3Sub:'계정이 준비되었습니다. 새 대시보드 미리보기입니다.',workflows:'워크플로',events:'이벤트',integrations:'통합',dashboard:'대시보드',setup:'설정 진행률',accountStatus:'계정 상태',ready:'준비 완료!',emailPlaceholder:'you@company.com',companyPlaceholder:'Acme Corp',namePlaceholder:'홍길동',passPlaceholder:'최소 8자',selectRole:'역할 선택',startBuilding:'구축 시작 →',errorEmailInvalid:'유효한 업무용 이메일을 입력하세요.',errorCompanyRequired:'회사 이름은 필수입니다.',errorPersonalEmail:'업무용 이메일을 사용하세요.',errorNameRequired:'성명을 입력하세요.',errorPasswordMin:'비밀번호는 8자 이상이어야 합니다.',demoPreFilled:'데모 사전 입력 — 계속 클릭 →'},
+    demoModal:{title:'제품 데모',desc:'FlowSync가 2분 안에 전체 워크플로를 자동화하는 방법을 확인하세요.',start:'무료 체험'},
+    security:{title:'보안',heading:'엔터프라이즈급 보안 및 규정 준수',desc:'데이터는 최고 수준의 업계 표준으로 보호됩니다.',soc2:'SOC 2 Type II',soc2Desc:'연간 감사',gdpr:'GDPR',gdprDesc:'EU 데이터 보호',hipaa:'HIPAA',hipaaDesc:'의료 준수',iso:'ISO 27001',isoDesc:'정보보안 인증',uptime:'현재 가동률',incidents:'인시던트 (30일)',recovery:'평균 복구 시간'},
+    stats:{teams:'팀이 FlowSync 사용',integrations:'사용 가능한 통합',uptime:'가동 보장',events:'일일 처리 이벤트'},
+    trusted:'신뢰하는',
+    teams:'팀',
+    social:'신뢰받는'
+  }
+};
+(function(){
+renderLangSwitcher();
+afterLangChange();
+var savedTheme=localStorage.getItem('fs-theme')||'light';
+document.documentElement.setAttribute('data-theme',savedTheme);
+updateThemeIcon(savedTheme);
+window.toggleTheme=function(){var c=document.documentElement.getAttribute('data-theme'),n=c==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('fs-theme',n);updateThemeIcon(n)};
+function updateThemeIcon(t){var b=document.getElementById('themeToggle');if(b)b.textContent=t==='light'?'\uD83C\uDF19':'\u2600\uFE0F'}
+
+window.toggleMenu=function(){var m=document.getElementById('mobileMenu'),h=document.getElementById('hamburger'),s=h.querySelectorAll('span');m.classList.toggle('active');if(m.classList.contains('active')){s[0].style.transform='rotate(45deg) translate(5px,5px)';s[1].style.opacity='0';s[2].style.transform='rotate(-45deg) translate(5px,-5px)'}else{s[0].style.transform='';s[1].style.opacity='';s[2].style.transform=''}};
+
+window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>20)n.classList.add('scrolled');else n.classList.remove('scrolled')},{passive:true});
+
+var hs=document.getElementById('heroSection');
+if(hs)hs.addEventListener('mousemove',function(e){var r=hs.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-0.5,y=(e.clientY-r.top)/r.height-0.5;hs.style.backgroundImage='radial-gradient(ellipse at '+(50+x*20)+'% '+(50+y*20)+'%, rgba(79,70,229,0.06) 0%, transparent 50%)'});
+
+var obs=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-up,.slide-left,.slide-right,.scale-in').forEach(function(el){obs.observe(el)});
+
+var countersAnimated=false;
+var ss=document.getElementById('stats');
+if(ss){var co=new IntersectionObserver(function(en){if(en[0].isIntersecting&&!countersAnimated){countersAnimated=true;animateCounters()}},{threshold:0.3});co.observe(ss)}
+function animateCounters(){document.querySelectorAll('.counter').forEach(function(c){var t=parseInt(c.getAttribute('data-target')),d=2000,s=0,st=null;function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/d,1),e=1-Math.pow(1-p,3);c.textContent=Math.floor(e*t).toLocaleString();if(p<1)requestAnimationFrame(step);else c.textContent=t.toLocaleString()}requestAnimationFrame(step)})}
+
+window.togglePricing=function(){var t=document.getElementById('pricingToggle'),y=t.classList.toggle('active'),ml=document.getElementById('monthlyLabel'),yl=document.getElementById('yearlyLabel'),sb=document.getElementById('saveBadge');ml.classList.toggle('active',!y);yl.classList.toggle('active',y);sb.classList.toggle('visible',y);document.querySelectorAll('.pricing-price .amount').forEach(function(el){var m=el.getAttribute('data-monthly'),v=el.getAttribute('data-yearly');el.style.opacity='0';el.style.transform='translateY(-10px)';setTimeout(function(){el.textContent=y?v:m;el.style.opacity='1';el.style.transform='translateY(0)'},200)});localStorage.setItem('fs-pricing',y?'yearly':'monthly')};
+var sp=localStorage.getItem('fs-pricing');
+if(sp==='yearly'){document.getElementById('pricingToggle').classList.add('active');document.getElementById('yearlyLabel').classList.add('active');document.getElementById('monthlyLabel').classList.remove('active');document.getElementById('saveBadge').classList.add('visible');document.querySelectorAll('.pricing-price .amount').forEach(function(el){el.textContent=el.getAttribute('data-yearly')})}
+
+var faqData=[
+{q:'What is FlowSync and how does it work?',a:'FlowSync is an AI-powered workflow automation platform that connects your favorite tools and automates repetitive tasks. Simply connect your apps, define triggers and actions using our visual builder, and let FlowSync handle the rest.'},
+{q:'Is there a free plan available?',a:'Yes! Our Starter plan is completely free and includes 5 workflows, 1,000 events per month, and 10 integrations. No credit card required to get started.'},
+{q:'How does the AI automation work?',a:'Our AI analyzes your workflow patterns, identifies repetitive tasks, and suggests automations. It can predict bottlenecks, recommend optimal configurations, and auto-create workflows based on your usage history.'},
+{q:'Is my data secure with FlowSync?',a:'Absolutely. We\'re SOC 2 Type II certified, GDPR compliant, and HIPAA ready. All data is encrypted in transit and at rest using AES-256 encryption. We also offer SSO/SAML support.'},
+{q:'Can I cancel my subscription at any time?',a:'Yes, you can cancel at any time with no penalties. All paid plans come with a 14-day free trial. If you cancel, you retain access until the end of your billing period.'},
+{q:'What integrations do you support?',a:'We support 200+ integrations including Slack, GitHub, Jira, Notion, Salesforce, Stripe, Google Workspace, Microsoft 365, Figma, AWS, and many more. We also offer a REST API and webhooks.'},
+{q:'Do you offer on-premise deployment?',a:'Yes, our Enterprise plan includes on-premise deployment options. Run FlowSync entirely within your own infrastructure for maximum data control and compliance.'},
+{q:'What kind of support do you offer?',a:'Community support for Starter plans, priority email and chat for Professional, and 24/7 phone support with a dedicated account manager for Enterprise. Average response time is under 2 hours.'},
+{q:'Can I migrate from Zapier or Make?',a:'Yes! We offer a one-click migration tool that imports existing workflows from Zapier, Make, and other platforms. Free migration assistance for Professional and Enterprise plans.'}
+];
+function renderFaq(){
+  var faqDataI18n=[
+    {q:'faq.q1',a:'faq.a1'},{q:'faq.q2',a:'faq.a2'},{q:'faq.q3',a:'faq.a3'},
+    {q:'faq.q4',a:'faq.a4'},{q:'faq.q5',a:'faq.a5'},{q:'faq.q6',a:'faq.a6'},
+    {q:'faq.q7',a:'faq.a7'},{q:'faq.q8',a:'faq.a8'},{q:'faq.q9',a:'faq.a9'}
+  ];
+  var fl=document.getElementById('faqList');if(!fl)return;fl.innerHTML='';
+  faqDataI18n.forEach(function(item){
+    var d=document.createElement('div');d.className='faq-item';
+    d.innerHTML='<div class="faq-question" onclick="toggleFaq(this)">'+T(item.q)+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer"><div class="faq-answer-inner"><p>'+T(item.a)+'</p></div></div>';
+    fl.appendChild(d);
+  });
+}
+renderFaq();
+
+window.toggleFaq=function(el){var item=el.parentElement,was=item.classList.contains('active');document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('active')});if(!was)item.classList.add('active')};
+
+var currentSlide=0,totalSlides=document.querySelectorAll('.testimonial-slide').length,autoInterval;
+function initDots(){var dc=document.getElementById('carouselDots');for(var i=0;i<totalSlides;i++){var d=document.createElement('button');d.className='carousel-dot'+(i===0?' active':'');d.setAttribute('data-idx',i);d.onclick=function(){goToSlide(parseInt(this.getAttribute('data-idx')))};dc.appendChild(d)}}
+initDots();
+function updateCarousel(){document.getElementById('carouselTrack').style.transform='translateX(-'+currentSlide*100+'%)';document.querySelectorAll('.carousel-dot').forEach(function(d,i){d.classList.toggle('active',i===currentSlide)})}
+window.moveCarousel=function(dir){currentSlide=(currentSlide+dir+totalSlides)%totalSlides;updateCarousel();resetAuto()};
+window.goToSlide=function(i){currentSlide=i;updateCarousel();resetAuto()};
+function startAuto(){autoInterval=setInterval(function(){currentSlide=(currentSlide+1)%totalSlides;updateCarousel()},5000)}
+function resetAuto(){clearInterval(autoInterval);startAuto()}
+startAuto();
+
+window.goToDemoStep=function(step){var tabs=document.querySelectorAll('.demo-step-tab'),contents=document.querySelectorAll('.demo-step-content');tabs.forEach(function(t,i){t.classList.remove('active');if(i<step)t.classList.add('completed')});contents.forEach(function(c){c.classList.remove('active')});tabs[step].classList.add('active');document.getElementById('demoStep'+step).classList.add('active');document.getElementById('demoProgressBar').style.width=((step+1)*25)+'%'};
+
+window.openModal=function(id){document.getElementById(id).classList.add('active');document.body.style.overflow='hidden';if(id==='signupModal'){var s=JSON.parse(localStorage.getItem('fs-signup')||'{}');if(s.email)document.getElementById('signupEmail').value=s.email;if(s.company)document.getElementById('signupCompany').value=s.company}};
+window.closeModal=function(id){document.getElementById(id).classList.remove('active');document.body.style.overflow=''};
+document.querySelectorAll('.modal-overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o){o.classList.remove('active');document.body.style.overflow=''}})});
+
+window.signupStep2=function(){var em=document.getElementById('signupEmail'),co=document.getElementById('signupCompany'),v=true;clearErrors();if(!em.value||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value)||isPersonalEmail(em.value)){em.classList.add('input-error');em.nextElementSibling.style.display='block';if(isPersonalEmail(em.value))em.nextElementSibling.textContent=T('signup.errorPersonalEmail');v=false}if(!co.value.trim()){co.classList.add('input-error');co.nextElementSibling.style.display='block';v=false}if(!v)return;var btn=document.querySelector('#signupStep1 .btn-primary-full');btn.classList.add('loading');localStorage.setItem('fs-signup',JSON.stringify({email:em.value,company:co.value}));setTimeout(function(){btn.classList.remove('loading');showStep('signupStep2')},1000)};
+window.signupStep3=function(){var nm=document.getElementById('signupName'),pw=document.getElementById('signupPassword'),v=true;clearErrors();if(!nm.value.trim()){nm.classList.add('input-error');nm.nextElementSibling.style.display='block';v=false}if(!pw.value||pw.value.length<8){pw.classList.add('input-error');pw.nextElementSibling.style.display='block';v=false}if(!v)return;var btn=document.querySelector('#signupStep2 .btn-primary-full');btn.classList.add('loading');var s=JSON.parse(localStorage.getItem('fs-signup')||'{}');s.name=nm.value;s.role=document.getElementById('signupRole').value;localStorage.setItem('fs-signup',JSON.stringify(s));setTimeout(function(){btn.classList.remove('loading');showStep('signupStep3');showToast(T('toast.created'),'success')},1500)};
+function showStep(id){document.querySelectorAll('.modal-step').forEach(function(s){s.classList.remove('active')});document.getElementById(id).classList.add('active')}
+function clearErrors(){document.querySelectorAll('.modal .input-error').forEach(function(el){el.classList.remove('input-error')});document.querySelectorAll('.modal .error-text').forEach(function(el){el.style.display='none'})}
+function isPersonalEmail(e){return/@(gmail|yahoo|hotmail|outlook|aol|icloud|protonmail)\./.test(e)}
+
+window.ctaSignup=function(){var e=document.getElementById('ctaEmail');if(!e.value||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value)){showToast(T('toast.email'),'warning');return}openModal('signupModal');document.getElementById('signupEmail').value=e.value};
+
+window.playDemo=function(el){el.style.background='linear-gradient(135deg,#1a1a2e,#16213e)';el.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.125rem;font-weight:600"><div style="text-align:center"><div style="font-size:3rem;margin-bottom:12px">&#x25B6;&#xFE0F;</div><p>'+T('demo.videoPlay')+'</p><p style="font-size:.8rem;opacity:.6;margin-top:8px">'+T('demo.videoEmbed')+'</p></div></div>'};
+
+window.toggleChat=function(){var w=document.getElementById('chatWidget'),b=document.getElementById('chatFloat');w.classList.toggle('active');if(w.classList.contains('active')){b.classList.remove('has-unread');if(!w.dataset.inited){w.dataset.inited='1';loadChatHistory();addBotMessage(T('chat.welcome'));setTimeout(function(){b.classList.add('has-unread')},5000)}}else{b.classList.add('has-unread')}};
+function addBotMessage(text){var m=document.getElementById('chatMessages'),d=document.createElement('div');d.className='chat-msg bot';d.textContent=text;m.appendChild(d);m.scrollTop=m.scrollHeight;saveChatHistory()}
+function addUserMessage(text){var m=document.getElementById('chatMessages'),d=document.createElement('div');d.className='chat-msg user';d.textContent=text;m.appendChild(d);m.scrollTop=m.scrollHeight;saveChatHistory()}
+var botResponses={'Pricing info':'Our plans start at $0/month for Starter, $49/month for Professional, and custom pricing for Enterprise. All plans include a 14-day free trial! Want me to help you pick the right plan?','How does AI work?':'Our AI analyzes your workflow patterns and suggests automations. It learns from your usage over time and can predict bottlenecks before they happen. The more you use FlowSync, the smarter it gets!','Enterprise plans':'Our Enterprise plan includes unlimited events, on-premise deployment, custom SLAs (99.99%), HIPAA/BAA, and 24/7 dedicated support. Want me to connect you with our sales team?'};
+window.sendQuickReply=function(text){addUserMessage(text);setTimeout(function(){var resp=botResponses[text]||'Thanks for your message! Our team will get back to you shortly. In the meantime, feel free to explore our features or start a free trial.';addBotMessage(resp)},800)};
+window.sendChat=function(){var i=document.getElementById('chatInput'),t=i.value.trim();if(!t)return;addUserMessage(t);i.value='';setTimeout(function(){var resp='Thanks for reaching out! I\'d be happy to help. Could you tell me more about what you\'re looking for, or try one of the quick options above?';if(/price|pricing|cost/i.test(t))resp=botResponses['Pricing info'];else if(/ai|automat|smart/i.test(t))resp=botResponses['How does AI work?'];else if(/enterprise|custom|deploy/i.test(t))resp=botResponses['Enterprise plans'];addBotMessage(resp)},800)};
+function saveChatHistory(){var m=document.getElementById('chatMessages');localStorage.setItem('fs-chat',m.innerHTML)}
+function loadChatHistory(){var s=localStorage.getItem('fs-chat');if(s){document.getElementById('chatMessages').innerHTML=s;document.getElementById('chatQuickReplies').style.display='none'}}
+function afterLangChange(){
+  // Navbar
+  var navLinks=document.querySelectorAll('.nav-links a');
+  var navKeys=['nav.features','nav.compare','nav.pricing','nav.faq'];
+  navLinks.forEach(function(a,i){if(navKeys[i])a.textContent=T(navKeys[i])});
+  var navCtas=document.querySelectorAll('.nav-cta');
+  navCtas.forEach(function(b){b.textContent=T('nav.start')});
+  // Mobile menu
+  var mobLinks=document.querySelectorAll('.mobile-menu a');
+  mobLinks.forEach(function(a,i){if(navKeys[i])a.textContent=T(navKeys[i])});
+  var mobCta=document.querySelector('.mobile-menu .nav-cta');
+  if(mobCta)mobCta.textContent=T('nav.start');
+  var mobTheme=document.querySelector('.mobile-menu .theme-toggle');
+  if(mobTheme)mobTheme.textContent=(document.documentElement.getAttribute('data-theme')==='light'?'\uD83C\uDF19':'\u2600\uFE0F')+' '+T('mobile.toggle');
+
+  // Hero
+  var hb=document.querySelector('.hero-badge');if(hb)hb.innerHTML='<span></span> '+T('hero.badge');
+  var h1=document.querySelector('.hero h1');if(h1)h1.innerHTML=T('hero.title')+' <span class="gradient-text">'+T('hero.titleSpan')+'</span>';
+  var hp=document.querySelector('.hero-content > p');if(hp)hp.textContent=T('hero.desc');
+  document.querySelectorAll('.hero-content .btn-text').forEach(function(s){s.textContent=T('hero.start')});
+  var watchBtn=document.querySelector('.hero-content .btn-secondary');
+  if(watchBtn){watchBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>'+T('hero.watch')}
+
+  // Stats
+  var statLabels=document.querySelectorAll('.stat-item .stat-label');
+  var statKeys=['stats.teams','stats.integrations','stats.uptime','stats.events'];
+  statLabels.forEach(function(l,i){if(statKeys[i])l.textContent=T(statKeys[i])});
+
+  // Security
+  var secLabel=document.querySelector('.security .section-label');if(secLabel)secLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> '+T('security.title');
+  var secH=document.querySelector('.security .section-title');if(secH)secH.textContent=T('security.heading');
+  var secD=document.querySelector('.security .section-desc');if(secD)secD.textContent=T('security.desc');
+  var badges=document.querySelectorAll('.compliance-badge');
+  var badgeKeys=[
+    {name:'security.soc2',desc:'security.soc2Desc'},
+    {name:'security.gdpr',desc:'security.gdprDesc'},
+    {name:'security.hipaa',desc:'security.hipaaDesc'},
+    {name:'security.iso',desc:'security.isoDesc'}
+  ];
+  badges.forEach(function(b,i){if(!badgeKeys[i])return;var bn=b.querySelector('.badge-name');var bd=b.querySelector('.badge-desc');if(bn)bn.textContent=T(badgeKeys[i].name);if(bd)bd.textContent=T(badgeKeys[i].desc)});
+  var uptimeLabels=document.querySelectorAll('.uptime-label');
+  var uptimeKeys=['security.uptime','security.incidents','security.recovery'];
+  uptimeLabels.forEach(function(l,i){if(uptimeKeys[i])l.textContent=T(uptimeKeys[i])});
+
+  // Social proof
+  var spP=document.querySelector('.social-proof p');
+  if(spP)spP.innerHTML=T('trusted')+' <strong id="customerCount">10,000+</strong> '+T('teams');
+
+  // Features
+  var featLabel=document.querySelector('.features .section-label');if(featLabel)featLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> '+T('features.title');
+  var featH=document.querySelector('.features .section-title');if(featH)featH.textContent=T('features.heading');
+  var featD=document.querySelector('.features .section-desc');if(featD)featD.textContent=T('features.desc');
+  var fCards=document.querySelectorAll('.feature-card');
+  var fKeys=['card1Title','card2Title','card3Title','card4Title','card5Title','card6Title'];
+  var fDescKeys=['card1Desc','card2Desc','card3Desc','card4Desc','card5Desc','card6Desc'];
+  fCards.forEach(function(c,i){if(!fKeys[i])return;var h3=c.querySelector('h3');var p=c.querySelector('p');if(h3)h3.textContent=T('features.'+fKeys[i]);if(p)p.textContent=T('features.'+fDescKeys[i])});
+
+  // Comparison
+  var compLabel=document.querySelector('.comparison .section-label');if(compLabel)compLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> '+T('comparison.title');
+  var compH=document.querySelector('.comparison .section-title');if(compH)compH.textContent=T('comparison.heading');
+  var compD=document.querySelector('.comparison .section-desc');if(compD)compD.textContent=T('comparison.desc');
+  var compTh=document.querySelectorAll('.comparison-table th');
+  if(compTh.length>=4){compTh[0].textContent=T('comparison.feature');compTh[1].textContent=T('comparison.our');compTh[2].textContent=T('comparison.compA');compTh[3].textContent=T('comparison.compB')}
+  var compRowKeys=['comparison.aiPower','comparison.realtime','comparison.integrations','comparison.customWf','comparison.soc2','comparison.sso','comparison.uptime','comparison.freePlan','comparison.aiBuilder','comparison.prioritySupport'];
+  document.querySelectorAll('.comparison-table tbody tr').forEach(function(tr,i){if(compRowKeys[i])tr.children[0].textContent=T(compRowKeys[i])});
+
+  // Integrations
+  var intLabel=document.querySelector('.integrations .section-label');if(intLabel)intLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> '+T('integrations.title');
+  var intH=document.querySelector('.integrations .section-title');if(intH)intH.textContent=T('integrations.heading');
+  var intD=document.querySelector('.integrations .section-desc');if(intD)intD.textContent=T('integrations.desc');
+
+  // Live Demo
+  var ldLabel=document.querySelector('.live-demo .section-label');if(ldLabel)ldLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> '+T('demo.title');
+  var ldH=document.querySelector('.live-demo .section-title');if(ldH)ldH.textContent=T('demo.heading');
+  var ldD=document.querySelector('.live-demo .section-desc');if(ldD)ldD.textContent=T('demo.desc');
+  var ldVL=document.querySelector('.demo-video-label');if(ldVL)ldVL.innerHTML='▶ '+T('demo.watch');
+  var ldBtn=document.querySelector('.live-demo .btn-text');if(ldBtn)ldBtn.textContent=T('demo.try');
+
+  // Interactive Demo
+  var idLabel=document.querySelector('.interactive-demo .section-label');if(idLabel)idLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> '+T('interact.title');
+  var idH=document.querySelector('.interactive-demo .section-title');if(idH)idH.textContent=T('interact.heading');
+  var idD=document.querySelector('.interactive-demo .section-desc');if(idD)idD.textContent=T('interact.desc');
+  var stepTabs=document.querySelectorAll('.demo-step-tab');
+  var stepKeys=['interact.step1','interact.step2','interact.step3','interact.step4'];
+  stepTabs.forEach(function(t,i){if(stepKeys[i])t.innerHTML='<span class="step-num">'+(i+1)+'</span>'+T(stepKeys[i])});
+  var sTitles=['interact.s1Title','interact.s2Title','interact.s3Title','interact.s4Title'];
+  var sDescs=['interact.s1Desc','interact.s2Desc','interact.s3Desc','interact.s4Desc'];
+  for(var si=0;si<4;si++){
+    var sEl=document.getElementById('demoStep'+si);if(!sEl)continue;
+    var sH3=sEl.querySelector('h3');if(sH3)sH3.textContent=T(sTitles[si]);
+    var sP=sEl.querySelector('.demo-step-content > p');if(sP)sP.textContent=T(sDescs[si]);
+  }
+  // Interactive demo step buttons
+  document.querySelectorAll('.demo-step-actions .btn-skip').forEach(function(b){b.textContent=T('interact.skip')});
+  var nextBtns=document.querySelectorAll('.demo-step-actions .btn-primary .btn-text');
+  var nextLabels=['interact.step2','interact.step3','interact.step4','nav.start'];
+  nextBtns.forEach(function(b,i){
+    if(i<3)b.textContent=T('interact.next')+': '+T(nextLabels[i]);
+    else b.textContent=T('nav.start');
+  });
+
+  // Pricing
+  var prLabel=document.querySelector('.pricing .section-label');if(prLabel)prLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> '+T('pricing.title');
+  var prH=document.querySelector('.pricing .section-title');if(prH)prH.textContent=T('pricing.heading');
+  var prD=document.querySelector('.pricing .section-desc');if(prD)prD.textContent=T('pricing.desc');
+  var ml=document.getElementById('monthlyLabel');if(ml)ml.textContent=T('pricing.monthly');
+  var yl=document.getElementById('yearlyLabel');if(yl)yl.textContent=T('pricing.yearly');
+  var sb=document.getElementById('saveBadge');if(sb)sb.textContent=T('pricing.save');
+  // Pricing cards
+  var prCards=document.querySelectorAll('.pricing-card');
+  var prNames=['pricing.starter','pricing.pro','pricing.enterprise'];
+  var prDescs=['pricing.starterDesc','pricing.proDesc','pricing.enterpriseDesc'];
+  var prCtas=['pricing.starterCta','pricing.proCta','pricing.enterpriseCta'];
+  var prFeatKeys=[
+    ['pricing.feat1','pricing.feat2','pricing.feat3','pricing.feat4','pricing.feat5'],
+    ['pricing.featPro1','pricing.featPro2','pricing.featPro3','pricing.featPro4','pricing.featPro5','pricing.featPro6'],
+    ['pricing.featEnt1','pricing.featEnt2','pricing.featEnt3','pricing.featEnt4','pricing.featEnt5','pricing.featEnt6']
+  ];
+  prCards.forEach(function(c,ci){
+    var ch3=c.querySelector('h3');if(ch3)ch3.textContent=T(prNames[ci]);
+    var cdesc=c.querySelector('.price-desc');if(cdesc)cdesc.textContent=T(prDescs[ci]);
+    var per=c.querySelector('.period');if(per)per.textContent=T('pricing.perMonth');
+    var cbtn=c.querySelector('button');if(cbtn){var btxt=cbtn.querySelector('.btn-text');if(btxt)btxt.textContent=T(prCtas[ci]);else cbtn.childNodes.forEach(function(n){if(n.nodeType===3)n.textContent=T(prCtas[ci])})}
+    var feats=c.querySelectorAll('.pricing-features li');
+    feats.forEach(function(f,fi){if(prFeatKeys[ci]&&prFeatKeys[ci][fi]){var txt=f.childNodes;for(var ti=0;ti<txt.length;ti++){if(txt[ti].nodeType===3){txt[ti].textContent=T(prFeatKeys[ci][fi]);break}}}});
+  });
+  var popBadge=document.querySelector('.popular-badge');if(popBadge)popBadge.textContent=T('pricing.popular');
+  var guar=document.querySelector('.guarantee-badge span');if(guar)guar.textContent=T('pricing.guarantee');
+
+  // Testimonials
+  var tLabel=document.querySelector('.testimonials .section-label');if(tLabel)tLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> '+T('testimonials.title');
+  var tH=document.querySelector('.testimonials .section-title');if(tH)tH.textContent=T('testimonials.heading');
+  var tD=document.querySelector('.testimonials .section-desc');if(tD)tD.textContent=T('testimonials.desc');
+
+  // FAQ
+  var fqLabel=document.querySelector('.faq .section-label');if(fqLabel)fqLabel.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> '+T('faq.title');
+  var fqH=document.querySelector('.faq .section-title');if(fqH)fqH.textContent=T('faq.heading');
+  var fqD=document.querySelector('.faq .section-desc');if(fqD)fqD.textContent=T('faq.desc');
+  renderFaq();
+
+  // CTA
+  var ctaH=document.querySelector('.cta-section h2');if(ctaH)ctaH.textContent=T('cta.heading');
+  var ctaP=document.querySelector('.cta-section p');if(ctaP)ctaP.textContent=T('cta.desc');
+  var ctaIn=document.getElementById('ctaEmail');if(ctaIn)ctaIn.placeholder=T('cta.placeholder');
+  var ctaBtn=document.querySelector('.cta-form button');if(ctaBtn)ctaBtn.textContent=T('cta.btn');
+
+  // Footer
+  var ftP=document.querySelector('.footer-brand p');if(ftP)ftP.textContent=T('footer.tagline');
+  var ftCols=document.querySelectorAll('.footer-col');
+  var ftColTitles=['footer.product','footer.company','footer.resources','footer.legal'];
+  var ftColLinks=[
+    ['footer.feat','footer.price','footer.integrations','footer.security','footer.changelog'],
+    ['footer.about','footer.blog','footer.careers','footer.press'],
+    ['footer.docs','footer.api','footer.community','footer.status'],
+    ['footer.privacy','footer.terms','footer.cookie','footer.dpa']
+  ];
+  ftCols.forEach(function(col,ci){
+    var h4=col.querySelector('h4');if(h4)h4.textContent=T(ftColTitles[ci]);
+    var lis=col.querySelectorAll('li a');
+    lis.forEach(function(a,ai){if(ftColLinks[ci]&&ftColLinks[ci][ai])a.textContent=T(ftColLinks[ci][ai])});
+  });
+  var ftBottom=document.querySelectorAll('.footer-bottom span');
+  if(ftBottom.length>=2){ftBottom[0].textContent=T('footer.copyright');ftBottom[1].textContent=T('footer.made')}
+
+  // Chat
+  var ctTooltip=document.querySelector('.chat-tooltip');if(ctTooltip)ctTooltip.textContent=T('chat.tooltip');
+  var ctHeader=document.querySelector('.chat-widget-header h4');if(ctHeader)ctHeader.textContent=T('chat.header');
+  var ctOnline=document.querySelector('.chat-widget-header .header-right span:last-child');if(ctOnline)ctOnline.textContent=T('chat.online');
+  var ctInput=document.getElementById('chatInput');if(ctInput)ctInput.placeholder=T('chat.placeholder');
+  var ctSendBtn=document.querySelector('.chat-widget-input button');if(ctSendBtn)ctSendBtn.textContent=T('chat.send');
+  var ctQuickBtns=document.querySelectorAll('.chat-quick-btn');
+  var quickKeys=['chat.quickPricing','chat.quickAI','chat.quickEnterprise'];
+  ctQuickBtns.forEach(function(b,i){if(quickKeys[i]){b.textContent=T(quickKeys[i]);b.setAttribute('onclick',"sendQuickReply('"+T(quickKeys[i])+"')")}});
+
+  // Signup Modal
+  var s1t=document.querySelector('#signupStep1 h2');if(s1t)s1t.textContent=T('signup.step1Title');
+  var s1s=document.querySelector('#signupStep1 .modal-sub');if(s1s)s1s.textContent=T('signup.step1Sub');
+  var s1labels=document.querySelectorAll('#signupStep1 label');
+  if(s1labels.length>=2){s1labels[0].textContent=T('signup.workEmail');s1labels[1].textContent=T('signup.company')}
+  var s1email=document.getElementById('signupEmail');if(s1email)s1email.placeholder=T('signup.emailPlaceholder');
+  var s1comp=document.getElementById('signupCompany');if(s1comp)s1comp.placeholder=T('signup.companyPlaceholder');
+  var s1btn=document.querySelector('#signupStep1 .btn-label');if(s1btn)s1btn.textContent=T('signup.continue');
+  var s2t=document.querySelector('#signupStep2 h2');if(s2t)s2t.textContent=T('signup.step2Title');
+  var s2s=document.querySelector('#signupStep2 .modal-sub');if(s2s)s2s.textContent=T('signup.step2Sub');
+  var s2labels=document.querySelectorAll('#signupStep2 label');
+  if(s2labels.length>=3){s2labels[0].textContent=T('signup.fullName');s2labels[1].textContent=T('signup.password');s2labels[2].textContent=T('signup.role')}
+  var s2name=document.getElementById('signupName');if(s2name)s2name.placeholder=T('signup.namePlaceholder');
+  var s2pass=document.getElementById('signupPassword');if(s2pass)s2pass.placeholder=T('signup.passPlaceholder');
+  var s2role=document.getElementById('signupRole');if(s2role){s2role.options[0].text=T('signup.selectRole')}
+  var s2btn=document.querySelector('#signupStep2 .btn-label');if(s2btn)s2btn.textContent=T('signup.createAccount');
+  var s3t=document.querySelector('#signupStep3 h3');if(s3t)s3t.textContent=T('signup.step3Title')+' 🎉';
+  var s3s=document.querySelector('#signupStep3 > .signup-success > p');if(s3s)s3s.textContent=T('signup.step3Sub');
+  var dpH=document.querySelector('.dashboard-preview h4');if(dpH)dpH.textContent=T('signup.dashboard');
+  var dpLbls=document.querySelectorAll('.dp-lbl');
+  var dpKeys=['signup.workflows','signup.events','signup.integrations'];
+  dpLbls.forEach(function(l,i){if(dpKeys[i])l.textContent=T(dpKeys[i])});
+  var dpBarLabels=document.querySelectorAll('.dp-bar-label');
+  if(dpBarLabels.length>=2){dpBarLabels[0].children[0].textContent=T('signup.setup');dpBarLabels[1].children[0].textContent=T('signup.accountStatus');dpBarLabels[1].children[1].textContent=T('signup.ready')}
+  var s3btn=document.querySelector('#signupStep3 .btn-text');if(s3btn)s3btn.textContent=T('signup.startBuilding');
+
+  // Demo Modal
+  var dmT=document.querySelector('#demoModal h2');if(dmT)dmT.textContent=T('demoModal.title');
+  var dmS=document.querySelector('#demoModal .modal-sub');if(dmS)dmS.textContent=T('demoModal.desc');
+  var dmBtn=document.querySelector('#demoModal .btn-label');if(dmBtn)dmBtn.textContent=T('demoModal.start');
+
+  // Cookie Banner
+  var ckP=document.querySelector('.cookie-inner p');if(ckP)ckP.innerHTML=T('cookie.text')+' <strong>'+T('cookie.learn')+'</strong>';
+  var ckCustom=document.querySelector('.cookie-customize');if(ckCustom)ckCustom.textContent=T('cookie.customize');
+  var ckAccept=document.querySelector('.cookie-accept');if(ckAccept)ckAccept.textContent=T('cookie.accept');
+  var ckCats=document.querySelectorAll('.cookie-category');
+  var ckCatKeys=[
+    {h:'cookie.essential',d:'cookie.essentialDesc'},
+    {h:'cookie.analytics',d:'cookie.analyticsDesc'},
+    {h:'cookie.marketing',d:'cookie.marketingDesc'}
+  ];
+  ckCats.forEach(function(c,i){if(!ckCatKeys[i])return;var h5=c.querySelector('h5');var p=c.querySelector('p');if(h5)h5.textContent=T(ckCatKeys[i].h);if(p)p.textContent=T(ckCatKeys[i].d)});
+
+  // Signup error texts
+  var eeE=document.getElementById('errorEmail');if(eeE)eeE.textContent=T('signup.errorEmailInvalid');
+  var eeC=document.getElementById('errorCompany');if(eeC)eeC.textContent=T('signup.errorCompanyRequired');
+  var eeN=document.getElementById('errorName');if(eeN)eeN.textContent=T('signup.errorNameRequired');
+  var eeP=document.getElementById('errorPassword');if(eeP)eeP.textContent=T('signup.errorPasswordMin');
+  var eeDpf=document.getElementById('demoPreFilled');if(eeDpf)eeDpf.textContent=T('signup.demoPreFilled');
+}
+
+window.toggleCookieDetails=function(){document.getElementById('cookieDetails').classList.toggle('visible')};
+window.acceptCookies=function(){document.getElementById('cookieBanner').classList.remove('visible');localStorage.setItem('fs-cookies','accepted');showToast(T('toast.cookie'),'success')};
+if(!localStorage.getItem('fs-cookies'))setTimeout(function(){document.getElementById('cookieBanner').classList.add('visible')},2000);
+
+window.showToast=function(msg,type){var c=document.getElementById('toastContainer'),t=document.createElement('div');t.className='toast '+(type||'info');t.textContent=msg;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(100%)';t.style.transition='all .3s';setTimeout(function(){t.remove()},300)},3000)};
+})();
+</script>
+</body>
+</html>
