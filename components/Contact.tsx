@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { fadeInUp, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -37,25 +36,6 @@ export default function Contact() {
         <ContactForm />
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-12 flex flex-col items-center gap-3"
-        >
-          <div className="w-40 h-40 rounded-2xl overflow-hidden border border-th-border bg-white p-2">
-            <Image
-              src="/whatsapp-qr.jpg"
-              alt="WhatsApp QR Code"
-              width={144}
-              height={144}
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <span className="text-xs text-th-muted">{t("portfolio.scanWhatsApp") as string}</span>
-        </motion.div>
-
-        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -63,7 +43,7 @@ export default function Contact() {
           className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-10 text-sm text-th-muted"
         >
           <a
-            href="mailto:hello@shian.studio"
+            href="mailto:x2938784260u@gmail.com"
             className="hover:text-th-text transition-colors"
           >
             {t("contact.email") as string}
