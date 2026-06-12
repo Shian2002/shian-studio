@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState, useMemo } from "react";
+import Link from "next/link";
 import { BRAND } from "@/lib/constants";
 import { useLanguage } from "@/lib/LanguageContext";
 
@@ -133,12 +134,12 @@ export default function Hero() {
             className="px-8 py-3.5 rounded-xl bg-accent text-white font-medium hover:bg-accent/85 hover:shadow-[0_12px_48px_rgba(74,158,255,0.45)] shadow-[0_4px_20px_rgba(74,158,255,0.25)] transition-all duration-300 text-sm"
           >
             {t("hero.viewWork") as string}
-          </a>          <a
+          </a>          <Link
             href="/case-studies"
             className="px-8 py-3.5 rounded-xl border border-th-border-s text-th-text font-medium hover:bg-th-bg-s hover:border-th-border-m hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm"
           >
             {t("hero.seePricing") as string}
-          </a>
+          </Link>
         </motion.div>
 
         <motion.div

@@ -5,6 +5,7 @@ import { useState, useMemo } from "react";
 import { PORTFOLIO_ITEMS } from "@/lib/constants";
 import { fadeInUp, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/LanguageContext";
+import Link from "next/link";
 import ProjectCard from "./ProjectCard";
 
 type FilterId = "all" | "web" | "mini" | "showcase";
@@ -115,12 +116,12 @@ export default function Portfolio() {
           transition={{ duration: 0.4 }}
           className="text-center mt-12"
         >
-          <a
+          <Link
             href="/case-studies"
             className="text-accent hover:text-accent/80 transition-colors font-medium text-sm"
           >
             {t("portfolio.cta") as string}
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

@@ -101,13 +101,13 @@ function renderSection(section: BlogSection, index: number) {
           className="my-8 p-5 rounded-xl bg-accent/10 border border-accent/20"
         >
           <p className="text-th-text text-sm mb-3">{section.content}</p>
-          <a
+          <Link
             href="/#contact?source=blog"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
           >
             Send Project Inquiry
             <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       );
     default:
@@ -238,13 +238,13 @@ export default async function BlogDetailPage({ params }: Props) {
           <p className="text-th-muted mb-6">
             Send a project inquiry and get a response within 24 hours.
           </p>
-          <a
+          <Link
             href="/#contact?source=blog"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
           >
             Send Project Inquiry
             <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       </section>
 

@@ -258,14 +258,14 @@ export default function ServicesPage() {
             <p className="text-th-muted mb-8">
               Let&apos;s discuss your project and find the right approach together.
             </p>
-            <a
+            <Link
               href="/#contact?source=services"
               className="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-white font-medium transition-all duration-200 hover:opacity-90"
               style={{ backgroundColor: COLOR_MAP.accent }}
             >
               Send Project Inquiry
               <span aria-hidden="true">→</span>
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>

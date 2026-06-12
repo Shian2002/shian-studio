@@ -297,7 +297,7 @@ export default function CaseStudiesPage() {
             <p className="text-th-muted mb-6 max-w-lg mx-auto">
               Send a project inquiry and let&apos;s discuss your idea.
             </p>
-            <a
+            <Link
               href="/#contact?source=case-studies"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
             >
@@ -306,7 +306,7 @@ export default function CaseStudiesPage() {
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
               </svg>
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>
