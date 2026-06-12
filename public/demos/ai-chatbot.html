@@ -72,14 +72,16 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .confirm-overlay .modal{width:400px}
 
 /* ─── Sidebar ─── */
-.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;position:relative;z-index:10;transition:transform .3s}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;position:relative;z-index:10;transition:transform .3s;height:100vh;overflow:hidden}
 .sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:100px;background:var(--accent-gradient);opacity:.05;pointer-events:none}
-.sidebar-header{padding:16px 16px 12px;border-bottom:1px solid var(--border-color);position:relative;display:flex;align-items:center;justify-content:space-between}
-.sidebar-header h2{font-size:14px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.sidebar-header h2 .logo-icon{width:24px;height:24px;border-radius:6px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:13px}
+.sidebar-header{padding:14px 14px 10px;border-bottom:1px solid var(--border-color);position:relative;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px}
+.sidebar-header h2{font-size:14px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap;min-width:0}
+.sidebar-header h2 .logo-icon{width:24px;height:24px;border-radius:6px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fff}
+.sidebar-header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .sidebar-actions{display:flex;gap:3px}
 .sidebar-actions button{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;font-size:13px;transition:all .15s}
 .sidebar-actions button:hover{color:var(--text-primary);border-color:var(--accent)}
+.sidebar-content{flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column}
 
 .sidebar-section{padding:8px 10px 2px}
 .sidebar-section-title{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:700;padding:4px 8px;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between}
@@ -95,8 +97,8 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .folder-item:hover .folder-del{display:flex;align-items:center;justify-content:center}
 
 /* Conv List */
-.conv-list{display:flex;flex-direction:column;gap:1px;max-height:260px;overflow-y:auto;padding:0 2px}
-.conv-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;position:relative;draggable:true}
+.conv-list{display:flex;flex-direction:column;gap:1px;max-height:220px;overflow-y:auto;padding:0 2px}
+.conv-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;position:relative}
 .conv-item:hover{background:var(--bg-hover)}.conv-item.active{background:var(--accent-gradient-soft)}.conv-item.active .conv-name{color:var(--accent)}
 .conv-item.pinned .conv-name::before{content:'📌';font-size:9px;margin-right:4px}
 .conv-item.drag-over{border:1px dashed var(--accent);background:rgba(139,92,246,.08)}
@@ -131,7 +133,7 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .doc-chunk{padding:6px 8px;border-left:2px solid var(--accent);margin-bottom:6px;font-size:11px;color:var(--text-secondary);line-height:1.5}
 .doc-chunk-score{font-size:10px;color:var(--accent);font-weight:600}
 
-.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border-color);display:flex;gap:6px}
+.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border-color);display:flex;gap:6px;flex-shrink:0}
 .upload-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:var(--accent-gradient);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font-main);font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s}
 .upload-btn:hover{opacity:.9}
 .footer-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;transition:all .15s;font-size:14px;flex-shrink:0}
@@ -307,8 +309,10 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
   .header-controls .slider-control{display:none}
 }
 @media(max-width:768px){
-  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);width:280px}
   .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
+  .sidebar-backdrop.active{opacity:1;pointer-events:auto}
   .chat-header{padding:8px 12px;gap:8px}
   .header-controls .slider-control{display:none}
   .token-badge{display:none}
@@ -334,44 +338,50 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 </head>
 <body>
 <div class="app">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <h2><span class="logo-icon">✦</span><span id="appTitle">AI Studio</span></h2>
-      <div style="display:flex;align-items:center;gap:6px"><div id="langSwitcher" style="position:relative;display:inline-block;"></div><div class="sidebar-actions">
-        <button id="newFolderBtn" title="New Folder">📁</button>
-        <button id="newChatBtn" title="New Chat">＋</button>
-        <button id="sidebarClose" title="Close" style="display:none">✕</button>
+      <h2><span class="logo-icon">&#x2726;</span><span id="appTitle">AI Studio</span></h2>
+      <div class="sidebar-header-right">
+        <div id="langSwitcher" style="position:relative;display:inline-block"></div>
+        <div class="sidebar-actions">
+          <button id="newFolderBtn" title="New Folder" aria-label="New Folder">&#x1F4C1;</button>
+          <button id="newChatBtn" title="New Chat" aria-label="New Chat">+</button>
+          <button id="sidebarClose" title="Close" aria-label="Close Sidebar" style="display:none">&#x2715;</button>
+        </div>
       </div>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Pinned <button id="pinFilterBtn" title="Show pinned">📌</button></div>
-      <div class="conv-list" id="pinnedList"></div>
+    <div class="sidebar-content">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Pinned <button id="pinFilterBtn" title="Show pinned">&#x1F4CC;</button></div>
+        <div class="conv-list" id="pinnedList"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Folders</div>
+        <div id="folderList"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Recent Conversations</div>
+        <div class="conv-list" id="convList"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="search-box">
+        <span class="s-icon">&#x1F50D;</span>
+        <input type="text" placeholder="Search documents..." id="searchInput">
+      </div>
+      <div class="doc-list" id="docList"></div>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Folders</div>
-      <div id="folderList"></div>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Recent Conversations</div>
-      <div class="conv-list" id="convList"></div>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div class="search-box">
-      <span class="s-icon">🔍</span>
-      <input type="text" placeholder="Search documents..." id="searchInput">
-    </div>
-    <div class="doc-list" id="docList"></div>
     <div class="sidebar-footer">
-      <button class="upload-btn" id="uploadBtn">📤 Upload</button>
-      <button class="footer-btn" id="syncBtn" title="Sync">🔄</button>
+      <button class="upload-btn" id="uploadBtn">&#x1F4E4; Upload</button>
+      <button class="footer-btn" id="syncBtn" title="Sync" aria-label="Sync">&#x1F504;</button>
     </div>
   </aside>
 
   <main class="chat-main">
     <div class="chat-header">
       <div class="chat-header-left">
-        <button class="hdr-btn" id="menuBtn" style="display:none" title="Menu">☰</button>
+        <button class="hdr-btn" id="menuBtn" style="display:none" title="Menu">&#x2630;</button>
         <h1>AI Studio</h1>
         <span class="status-dot"></span>
         <span class="model-badge" id="modelBadge"><span class="model-dot gpt"></span><span id="modelName">GPT-4 Turbo</span>▾</span>
@@ -380,22 +390,22 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
         <div class="slider-control"><label>Temp</label><input type="range" min="0" max="200" value="70" id="tempSlider"><span class="slider-val" id="tempVal">0.7</span></div>
         <div class="slider-control"><label>Max</label><input type="range" min="256" max="4096" value="2048" step="256" id="maxTokensSlider"><span class="slider-val" id="maxTokensVal">2048</span></div>
         <div class="token-badge" id="tokenBadge" title="Token usage"><span class="t-val" id="tokenCount">0</span> tokens <span class="cost-badge" id="costBadge">$0.00</span></div>
-        <button class="hdr-btn hdr-btn-icon" id="promptBuilderBtn" title="Prompt Builder">🧩</button>
-        <button class="hdr-btn hdr-btn-icon" id="exportBtn" title="Export">📥</button>
-        <button class="hdr-btn hdr-btn-icon" id="analyticsBtn" title="Analytics">📊</button>
-        <button class="hdr-btn hdr-btn-icon" id="teamBtn" title="Team">👥</button>
-        <button class="hdr-btn hdr-btn-icon" id="settingsBtn" title="Settings">⚙</button>
+        <button class="hdr-btn hdr-btn-icon" id="promptBuilderBtn" title="Prompt Builder">&#x1F9E9;</button>
+        <button class="hdr-btn hdr-btn-icon" id="exportBtn" title="Export">&#x1F4E5;</button>
+        <button class="hdr-btn hdr-btn-icon" id="analyticsBtn" title="Analytics">&#x1F4CA;</button>
+        <button class="hdr-btn hdr-btn-icon" id="teamBtn" title="Team">&#x1F465;</button>
+        <button class="hdr-btn hdr-btn-icon" id="settingsBtn" title="Settings">&#x2699;</button>
       </div>
     </div>
     <div class="messages" id="messages"></div>
     <div class="suggestions" id="suggestions"></div>
     <div class="input-bar">
       <div class="input-wrapper">
-        <button class="action-btn" id="attachBtn" title="Attach">📎</button>
+        <button class="action-btn" id="attachBtn" title="Attach">&#x1F4CE;</button>
         <textarea rows="1" placeholder="Type your message... (@ to mention team members)" id="chatInput"></textarea>
         <div class="input-actions">
-          <button class="action-btn" id="voiceBtn" title="Voice">🎙</button>
-          <button class="send-btn" id="sendBtn" title="Send">➤</button>
+          <button class="action-btn" id="voiceBtn" title="Voice">&#x1F399;</button>
+          <button class="send-btn" id="sendBtn" title="Send">&#x27A4;</button>
         </div>
       </div>
       <div class="input-hint">AI responses are simulated. Press Enter to send, Shift+Enter for new line.</div>
@@ -2041,8 +2051,16 @@ function initModals(){
     state.folders.push({id:genId(),name:name,createdAt:Date.now()});
     persist();renderFolders();toast('Folder created','success');
   };
-  document.getElementById('sidebarClose').onclick=function(){document.getElementById('sidebar').classList.remove('open')};
-  document.getElementById('menuBtn').onclick=function(){document.getElementById('sidebar').classList.add('open')};
+  document.getElementById('sidebarClose').onclick=function(){closeSidebar()};
+  document.getElementById('menuBtn').onclick=function(){openSidebar()};
+  document.getElementById('sidebarBackdrop').onclick=function(){closeSidebar()};
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeSidebar()}});
+  function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarBackdrop').classList.add('active')}
+  function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarBackdrop').classList.remove('active')}
+  window.addEventListener('resize',function(){
+    if(window.innerWidth>768){closeSidebar();document.getElementById('sidebarClose').style.display='none';document.getElementById('menuBtn').style.display='none'}
+    else{document.getElementById('sidebarClose').style.display='flex';document.getElementById('menuBtn').style.display='flex'}
+  });
 
   document.querySelectorAll('.theme-btn').forEach(function(btn){
     btn.onclick=function(){state.settings.theme=btn.dataset.themeVal;applySettings();persist();toast('Theme: '+btn.dataset.themeVal,'success')};
