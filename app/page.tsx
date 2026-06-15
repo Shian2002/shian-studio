@@ -8,6 +8,7 @@ import HireBadge from "@/components/HireBadge";
 import TranslationErrorBoundary from "@/components/TranslationErrorBoundary";
 
 const Portfolio = dynamic(() => import("@/components/Portfolio"), { ssr: true });
+const AdvisorPreview = dynamic(() => import("@/components/AdvisorPreview"), { ssr: true });
 const FAQ = dynamic(() => import("@/components/FAQ"), { ssr: true });
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
       <main id="main-content">
         <Hero />
         <Portfolio compact />
+        <AdvisorPreview />
         <FAQ compact />
       </main>
       <Footer />

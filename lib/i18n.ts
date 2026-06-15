@@ -426,6 +426,12 @@ const en: Record<string, unknown> = {
     trust3Title: "100% text-based",
     trust3Desc: "No video calls, no phone. Async chat only. Cancel anytime.",
   },
+  advisorPreview: {
+    title: "Need a Tech Advisor?",
+    subtitle: "Subscribe monthly and get async text-based technical guidance. No video calls, no phone — just expert answers when you need them.",
+    viewDetails: "View details",
+    seeAll: "See all plans & details",
+  },
   faqExtended: {
     title: "Frequently asked questions",
     subtitle: "Everything you need to know about working with SHIAN Studio. Can't find the answer? Send a message via the contact form.",

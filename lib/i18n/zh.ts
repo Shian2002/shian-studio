@@ -395,6 +395,12 @@ const zh: Record<string, unknown> = {
     trust3Title: "100% 纯文字",
     trust3Desc: "不视频、不电话，异步文字沟通，随时取消。",
   },
+  advisorPreview: {
+    title: "需要技术顾问？",
+    subtitle: "按月订阅，获得异步文字技术指导。不视频、不电话，有问题随时发消息，专业解答。",
+    viewDetails: "查看详情",
+    seeAll: "查看全部套餐与详情",
+  },
   faqExtended: {
     title: "常见问题",
     subtitle: "关于与 SHIAN Studio 合作你需要知道的全部信息。找不到答案？直接通过联系表单发消息。",
