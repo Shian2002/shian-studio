@@ -2,19 +2,5 @@
   command = "npm run build"
   publish = ".next"
 
-[build.environment]
-  NETLIFY_NEXT_PLUGIN_VERSION = "5"
-
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Redirect rules for client-side routing
-[[redirects]]
-  from = "/advisor"
-  to = "/advisor"
-  status = 200
-
-[[redirects]]
-  from = "/faq"
-  to = "/faq"
-  status = 200
