@@ -12,6 +12,7 @@ const inputClasses =
   "w-full bg-th-input border border-th-border rounded-xl px-4 py-3 text-sm text-th-text placeholder:text-th-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors";
 
 const labelClasses = "text-xs text-th-muted uppercase tracking-wider mb-2 block";
+const formSubmitEndpoint = "https://formsubmit.co/ajax/2938784260@qq.com";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -79,6 +80,34 @@ export default function ContactForm() {
     }
   };
 
+  const submitToFormSubmit = async () => {
+    const payload = new FormData();
+    payload.set("name", name);
+    payload.set("email", email);
+    payload.set("_replyto", email);
+    payload.set("_subject", `New Contact: ${name} - ${projectType}`);
+    payload.set("_template", "table");
+    payload.set("_captcha", "false");
+    payload.set("company", company);
+    payload.set("projectType", projectType);
+    payload.set("budget", budget);
+    payload.set("timeline", timeline);
+    payload.set("message", message);
+    payload.set("source", window.location.href);
+    payload.set("pagePath", window.location.pathname);
+
+    const res = await fetch(formSubmitEndpoint, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: payload,
+    });
+    const result = (await res.json().catch(() => null)) as { success?: boolean | string } | null;
+
+    if (!res.ok || !(result?.success === true || result?.success === "true")) {
+      throw new Error("FormSubmit fallback request failed");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     saveFormData(formData);
@@ -97,7 +126,7 @@ export default function ContactForm() {
       });
 
       if (!res.ok) {
-        throw new Error("Contact form request failed");
+        await submitToFormSubmit();
       }
 
       trackFormSubmit(window.location.pathname, "success");
