@@ -213,7 +213,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden backdrop-blur-xl border-t border-th-border"
+              className="relative z-10 md:hidden backdrop-blur-xl border-t border-th-border"
               style={{ backgroundColor: "var(--bg-nav)" }}
             >
               <div className="px-6 py-4 flex flex-col gap-1">
@@ -247,7 +247,11 @@ export default function Navbar() {
       </nav>
 
       {mobileOpen && (
-        <div className="fixed inset-0 -z-10 md:hidden" style={{ backgroundColor: "var(--overlay)" }} aria-hidden="true" />
+        <div
+          className="pointer-events-none fixed inset-0 -z-10 md:hidden"
+          style={{ backgroundColor: "var(--overlay)" }}
+          aria-hidden="true"
+        />
       )}
     </header>
   );

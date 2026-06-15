@@ -76,13 +76,13 @@ export default function Hero() {
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.08]" aria-hidden="true" />
 
       <div className="absolute inset-0" aria-hidden="true">
-        <div className="absolute top-1/3 left-1/4 w-[32rem] h-[32rem] bg-accent/20 rounded-full blur-[160px] animate-pulse" />
+        <div className="absolute top-1/4 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-accent/20 blur-[120px] animate-pulse sm:top-1/3 sm:left-1/4 sm:h-[32rem] sm:w-[32rem] sm:translate-x-0 sm:blur-[160px]" />
         <div
-          className="absolute bottom-1/4 right-1/4 w-[28rem] h-[28rem] bg-purple/15 rounded-full blur-[160px] animate-pulse"
+          className="absolute bottom-1/4 right-1/2 h-64 w-64 translate-x-1/2 rounded-full bg-purple/15 blur-[120px] animate-pulse sm:right-1/4 sm:h-[28rem] sm:w-[28rem] sm:translate-x-0 sm:blur-[160px]"
           style={{ animationDelay: "1.5s" }}
         />
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20rem] h-[20rem] bg-mint/10 rounded-full blur-[140px] animate-pulse"
+          className="absolute top-1/2 left-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-mint/10 blur-[110px] animate-pulse sm:h-[20rem] sm:w-[20rem] sm:blur-[140px]"
           style={{ animationDelay: "3s" }}
         />
       </div>

@@ -20,6 +20,22 @@ interface LanguageContextValue {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 const STORAGE_KEY = "shian-locale";
+const SUPPORTED_LOCALES: readonly Locale[] = ["en", "zh", "ja", "ko"];
+const DOMESTIC_HOSTS = new Set([
+  "shian-studio.netlify.app",
+  "shian.studio",
+  "www.shian.studio",
+]);
+
+function isSupportedLocale(value: string | null): value is Locale {
+  return SUPPORTED_LOCALES.includes(value as Locale);
+}
+
+function getDefaultLocaleForHost(hostname: string): Locale {
+  const normalizedHost = hostname.toLowerCase();
+  if (DOMESTIC_HOSTS.has(normalizedHost)) return "zh";
+  return "en";
+}
 
 function getNestedValue(obj: unknown, path: string): unknown {
   const keys = path.split(".");
@@ -39,9 +55,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored && (stored === "en" || stored === "zh" || stored === "ja" || stored === "ko")) {
-        loadLocale(stored as Locale).then(() => setLocaleState(stored as Locale));
-      }
+      const nextLocale = isSupportedLocale(stored)
+        ? stored
+        : getDefaultLocaleForHost(window.location.hostname);
+
+      loadLocale(nextLocale).then(() => setLocaleState(nextLocale));
     } catch {}
   }, []);
 

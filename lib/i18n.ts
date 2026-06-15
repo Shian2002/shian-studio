@@ -272,10 +272,11 @@ const en: Record<string, unknown> = {
     title1: "Let's Build Your",
     title2: "Product Together",
     description:
-      "Whether you need an MVP, a SaaS dashboard, or a technical partner — book a free project call and let's discuss.",
+      "Whether you need an MVP, a SaaS dashboard, or a technical partner — send an inquiry and let's discuss via text.",
     emailMe: "Email Me",
     whatsapp: "Email",
     email: "x2938784260u@gmail.com",
+    wechat: "Scan to add on WeChat",
     replyTime: "Usually replies within 24h",
   },
   footer: {
@@ -287,7 +288,7 @@ const en: Record<string, unknown> = {
   },
   process: {
     steps: [
-      { title: "Discovery Call", description: "Understand your needs" },
+      { title: "Text Consult", description: "Share your needs" },
       { title: "Design & Plan", description: "Wireframes + timeline" },
       { title: "AI-Powered Build", description: "Fast, quality code" },
       { title: "Launch & Support", description: "Deploy + iterate" },
@@ -317,8 +318,8 @@ const en: Record<string, unknown> = {
     whatsNextTitle: "What happens next?",
     whatsNext1Title: "Response within 24h",
     whatsNext1Desc: "I review every inquiry personally",
-    whatsNext2Title: "30-min discovery call",
-    whatsNext2Desc: "Understand your goals & timeline",
+    whatsNext2Title: "Text-based consult",
+    whatsNext2Desc: "We discuss your goals via text",
     whatsNext3Title: "Scope & quote in 48h",
     whatsNext3Desc: "Clear proposal, no surprises",
     error: "Submission failed temporarily. Please try again in a moment.",

@@ -80,7 +80,7 @@ export default function PricingCard({
       />
 
       {premium && (
-        <div className="absolute -right-12 top-6 w-40 rotate-45 bg-accent text-white text-center text-[10px] font-semibold uppercase tracking-wider py-1 shadow-lg">
+        <div className="absolute right-4 top-4 rounded-full bg-accent px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg lg:-right-12 lg:top-6 lg:w-40 lg:rotate-45 lg:rounded-none lg:px-0">
           {flagshipLabel}
         </div>
       )}

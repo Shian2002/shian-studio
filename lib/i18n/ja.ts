@@ -241,10 +241,11 @@ const ja: Record<string, unknown> = {
     title1: "一緒に",
     title2: "素晴らしいものを",
     description:
-      "フルプロダクトでも、迅速なプロトタイプでも、技術パートナーでも — あなたのプロジェクトについてぜひお聞かせください。",
+      "フルプロダクトでも、迅速なプロトタイプでも、技術パートナーでも — テキストで気軽にご相談ください。",
     emailMe: "メールする",
     whatsapp: "メール",
     email: "x2938784260u@gmail.com",
+    wechat: "WeChat QRをスキャン",
     replyTime: "通常2時間以内に返信",
   },
   footer: {
@@ -256,7 +257,7 @@ const ja: Record<string, unknown> = {
   },
   process: {
     steps: [
-      { title: "ヒアリング", description: "ニーズを理解する" },
+      { title: "テキスト相談", description: "ニーズを共有する" },
       { title: "設計・計画", description: "ワイヤーフレーム + スケジュール" },
       { title: "AI駆動開発", description: "高速かつ高品質なコード" },
       { title: "ローンチ・サポート", description: "デプロイ + 継続改善" },
@@ -286,8 +287,8 @@ const ja: Record<string, unknown> = {
     whatsNextTitle: "次のステップ",
     whatsNext1Title: "24時間以内に返信",
     whatsNext1Desc: "すべてのお問い合わせを直接確認します",
-    whatsNext2Title: "30分のヒアリング",
-    whatsNext2Desc: "目標とスケジュールを把握します",
+    whatsNext2Title: "テキスト相談",
+    whatsNext2Desc: "テキストで目標とスケジュールを共有",
     whatsNext3Title: "48時間以内に提案",
     whatsNext3Desc: "明確な提案、サプライズなし",
     error: "一時的に送信できませんでした。しばらくしてからもう一度お試しください。",

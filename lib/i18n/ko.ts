@@ -241,10 +241,11 @@ const ko: Record<string, unknown> = {
     title1: "함께 만들어요",
     title2: "훌륭한 무언가를",
     description:
-      "완전한 제품, 빠른 프로토타입, 또는 기술 파트너가 필요하시든 — 프로젝트 이야기를 들려주세요.",
+      "완전한 제품, 빠른 프로토타입, 또는 기술 파트너가 필요하시든 — 텍스트로 편하게 상담하세요.",
     emailMe: "이메일 보내기",
     whatsapp: "이메일",
     email: "x2938784260u@gmail.com",
+    wechat: "WeChat QR 스캔",
     replyTime: "보통 2시간 이내 회신",
   },
   footer: {
@@ -256,7 +257,7 @@ const ko: Record<string, unknown> = {
   },
   process: {
     steps: [
-      { title: "요구사항 미팅", description: "니즈를 파악합니다" },
+      { title: "텍스트 상담", description: "니즈를 공유하세요" },
       { title: "디자인 및 기획", description: "와이어프레임 + 일정" },
       { title: "AI 기반 개발", description: "빠르고 고품질 코드" },
       { title: "런칭 및 지원", description: "배포 + 지속 개선" },
@@ -286,8 +287,8 @@ const ko: Record<string, unknown> = {
     whatsNextTitle: "다음 단계",
     whatsNext1Title: "24시간 이내 회신",
     whatsNext1Desc: "모든 문의를 직접 검토합니다",
-    whatsNext2Title: "30분 요구사항 미팅",
-    whatsNext2Desc: "목표와 일정을 파악합니다",
+    whatsNext2Title: "텍스트 상담",
+    whatsNext2Desc: "텍스트로 목표와 일정을 공유합니다",
     whatsNext3Title: "48시간 이내 견적 제공",
     whatsNext3Desc: "명확한 제안, 예상치 못한 비용 없음",
     error: "일시적으로 제출하지 못했습니다. 잠시 후 다시 시도해주세요.",

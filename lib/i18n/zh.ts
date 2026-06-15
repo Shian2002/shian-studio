@@ -241,10 +241,11 @@ const zh: Record<string, unknown> = {
     title1: "一起打造",
     title2: "出色的产品",
     description:
-      "无论你需要完整产品、快速原型，还是技术合作伙伴 — 我很想听听你的项目。",
+      "无论你需要完整产品、快速原型，还是技术合作伙伴 — 直接留言，文字沟通，高效便捷。",
     emailMe: "发邮件",
     whatsapp: "邮箱",
     email: "x2938784260u@gmail.com",
+    wechat: "扫码加微信",
     replyTime: "通常 2 小时内回复",
   },
   footer: {
@@ -256,7 +257,7 @@ const zh: Record<string, unknown> = {
   },
   process: {
     steps: [
-      { title: "需求沟通", description: "理解你的需求" },
+      { title: "文字沟通", description: "了解你的需求" },
       { title: "设计与规划", description: "原型 + 时间线" },
       { title: "AI 驱动开发", description: "快速、高质量的代码" },
       { title: "上线与支持", description: "部署 + 持续迭代" },
@@ -286,8 +287,8 @@ const zh: Record<string, unknown> = {
     whatsNextTitle: "接下来会发生什么？",
     whatsNext1Title: "24 小时内回复",
     whatsNext1Desc: "我会亲自审阅每一条咨询",
-    whatsNext2Title: "30 分钟需求沟通",
-    whatsNext2Desc: "了解你的目标和时间线",
+    whatsNext2Title: "文字沟通需求",
+    whatsNext2Desc: "通过文字了解你的目标和时间线",
     whatsNext3Title: "48 小时内给出范围和报价",
     whatsNext3Desc: "清晰的方案，没有意外",
     error: "提交暂时失败，请稍后再试。",

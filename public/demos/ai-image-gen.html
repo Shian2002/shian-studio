@@ -150,15 +150,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .gen-time.visible{display:inline}
 
 /* Canvas */
-.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#13131a 0%,var(--bg) 70%)}
+.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:auto;background:radial-gradient(ellipse at center,#13131a 0%,var(--bg) 70%);padding:18px;min-width:0}
 .canvas-placeholder{width:520px;height:520px;border:2px dashed var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text3);transition:var(--transition)}
 .canvas-placeholder .icon{font-size:56px;opacity:.3}
 .canvas-placeholder .text{font-size:14px;font-weight:500}
 .canvas-placeholder .subtext{font-size:11px;color:var(--text3)}
 
-.generated-image{border-radius:14px;overflow:hidden;position:relative;display:none;box-shadow:var(--shadow)}
-.generated-image.visible{display:block}
-.generated-image .img-canvas{display:block;border-radius:14px}
+.generated-image{border-radius:14px;overflow:hidden;position:relative;display:none;box-shadow:var(--shadow);max-width:100%;max-height:calc(100vh - 170px)}
+.generated-image.visible{display:inline-block}
+.generated-image canvas{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100vh - 170px);border-radius:14px}
 
 .image-actions{position:absolute;bottom:14px;right:14px;display:none;gap:7px;z-index:5}
 .generated-image:hover .image-actions{display:flex}
@@ -201,7 +201,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .comparison-before,.comparison-after{position:absolute;inset:0}
 .comparison-before{clip-path:inset(0 50% 0 0)}
 .comparison-after{clip-path:inset(0 0 0 50%)}
-.comparison-before canvas,.comparison-after canvas{display:block}
+.comparison-before canvas,.comparison-after canvas{display:block;width:100%;height:auto}
 .comparison-slider{position:absolute;top:0;bottom:0;width:3px;background:#fff;left:50%;transform:translateX(-50%);z-index:5;cursor:ew-resize;box-shadow:0 0 12px rgba(0,0,0,.6)}
 .comparison-slider::before{content:'\21d4';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30px;height:30px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#000;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.4)}
 .comparison-label{position:absolute;bottom:14px;padding:4px 10px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:6px;font-size:10px;font-weight:600;color:#fff;z-index:4}
@@ -445,6 +445,31 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 @media(max-width:1200px){#right-panel{width:240px}#left-panel{width:340px}}
 @media(max-width:900px){#right-panel{display:none}#left-panel{width:300px}}
+
+@media(max-width:640px){
+  #app{height:100dvh;flex-direction:column;min-width:0;overflow:hidden}
+  #left-panel{width:100%;max-width:100%;height:48dvh;min-height:320px;border-right:0;border-bottom:1px solid var(--border)}
+  #main-area{width:100%;min-width:0;min-height:52dvh}
+  .panel-header{padding:10px 12px;gap:8px}
+  .panel-header h1{font-size:15px}
+  .panel-header .version,.credits-badge{display:none}
+  .nav-tabs{padding:0 10px;overflow-x:auto}
+  .nav-tab{padding:9px 12px}
+  .section,.generate-section{padding-left:12px;padding-right:12px}
+  .canvas-toolbar{height:auto;min-height:44px;padding:6px 10px;gap:6px;overflow-x:auto}
+  .toolbar-btn{padding:6px 10px;font-size:10px}
+  .toolbar-spacer{min-width:6px}
+  .canvas-area{padding:14px;align-items:center;justify-content:center;min-height:260px}
+  .canvas-placeholder{width:min(100%,320px);height:auto;aspect-ratio:1;padding:18px;text-align:center}
+  .generated-image{max-width:100%;max-height:none}
+  .generated-image canvas{max-width:100%;max-height:none}
+  .image-actions{display:flex;bottom:10px;right:10px}
+  .image-action-btn{width:32px;height:32px;font-size:12px}
+  .image-info-overlay{left:10px;right:10px;top:10px}
+  .progress-stages,.progress-bar{width:min(280px,calc(100vw - 64px))}
+  .gallery-section{max-height:34dvh;overflow-y:auto}
+  .masonry-grid{column-count:2}
+}
 
 @media print{
   #left-panel,#right-panel,.canvas-toolbar,.toast-container,.modal-overlay{display:none!important}

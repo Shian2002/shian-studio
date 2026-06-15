@@ -1029,7 +1029,7 @@ var panel=document.getElementById('chatPanel');
 var fab=document.getElementById('chatFab');
 var badge=document.getElementById('chatBadge');
 if(forceOpen||!panel.classList.contains('open')){panel.classList.add('open');badge.style.display='none';
-if(chatHistory.length===0){addChatMsg('bot',T('chat.prompt'));chatQuickItems.forEach(function(q){addChatMsg('bot',null,true)});
+if(chatHistory.length===0){addChatMsg('bot',T('chat.prompt'));
 chatHistory.push({type:'bot',text:T('chat.prompt'),time:Date.now()});}
 }else{panel.classList.remove('open')}
 }
@@ -1041,7 +1041,8 @@ var div=document.createElement('div');div.className='chat-msg '+type;div.textCon
 }
 
 function sendChatMessage(text){
-if(!text.trim())return;
+text = String(text || '').trim();
+if(!text)return;
 var c=document.getElementById('chatMessages');
 var uDiv=document.createElement('div');uDiv.className='chat-msg user';uDiv.textContent=text;c.appendChild(uDiv);
 chatHistory.push({type:'user',text:text,time:Date.now()});

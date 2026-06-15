@@ -19,13 +19,13 @@ export default function Footer() {
   return (
     <footer className="bg-th-footer border-t border-th-border">
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="md:col-span-2"
+            className="lg:col-span-2"
           >
             <h3 className="text-th-text text-lg font-light tracking-brand mb-3">
               {BRAND.name} <span className="text-[10px] text-accent/80 tracking-widest uppercase">Studio</span>
@@ -59,6 +59,14 @@ export default function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  href="/advisor"
+                  className="text-th-muted hover:text-th-text transition-colors text-sm"
+                >
+                  Tech Advisor
+                </a>
+              </li>
             </ul>
           </motion.div>
 
@@ -75,7 +83,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:x2938784260u@gmail.com"
-                  className="hover:text-th-text transition-colors"
+                  className="hover:text-th-text transition-colors break-all"
                 >
                   x2938784260u@gmail.com
                 </a>

@@ -2296,6 +2296,13 @@ var I18N={
     drawPieChart('planPieChart', pieData);
   }
 
+  function renderDashboard(){
+    renderKPIs();
+    renderDashboardCharts();
+    renderRecentTx();
+    renderFeed();
+  }
+
   function renderRevenuePage(){
     renderRevenueKPIs();
     var months = ['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
@@ -2602,6 +2609,19 @@ var I18N={
       e.stopPropagation();
       $('profileDropdown').classList.toggle('show');
       $('notifDropdown').classList.remove('show');
+    });
+    $('profileDropdown').addEventListener('click', function(e){
+      e.stopPropagation();
+      var settingsItem = e.target.closest('[data-action="settings"]');
+      var logoutItem = e.target.closest('[data-action="logout"]');
+      if(settingsItem){
+        navigateTo('Settings');
+        $('profileDropdown').classList.remove('show');
+      }
+      if(logoutItem){
+        $('profileDropdown').classList.remove('show');
+        confirm2(T('general.logOut'),T('general.logoutConfirm'),function(){ LS.set('loggedIn',false); location.reload(); });
+      }
     });
     document.addEventListener('click', function(){
       $('notifDropdown').classList.remove('show');

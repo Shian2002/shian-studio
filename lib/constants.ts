@@ -99,10 +99,10 @@ export const TECH_STACK = [
 ] as const;
 
 export const PROCESS_STEPS = [
-  { icon: "💬", title: "Discovery Call", description: "Understand your needs", step: 1 },
-  { icon: "📐", title: "Design & Plan", description: "Wireframes + timeline", step: 2 },
-  { icon: "⚡", title: "AI-Powered Build", description: "Fast, quality code", step: 3 },
-  { icon: "🚀", title: "Launch & Support", description: "Deploy + iterate", step: 4 },
+  { icon: "\u{1F4AC}", title: "Text Consult", description: "Share your needs", step: 1 },
+  { icon: "\u{1F4D0}", title: "Design & Plan", description: "Wireframes + timeline", step: 2 },
+  { icon: "\u26A1", title: "AI-Powered Build", description: "Fast, quality code", step: 3 },
+  { icon: "\u{1F680}", title: "Launch & Support", description: "Deploy + iterate", step: 4 },
 ] as const;
 
 export const TRUST_SIGNALS = [
