@@ -5,8 +5,7 @@ const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? DEFAULT_CONTACT_EMAIL;
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? '';
 const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT;
 const FORMSUBMIT_EMAIL = process.env.FORMSUBMIT_EMAIL ?? DEFAULT_CONTACT_EMAIL;
-const FORMSUBMIT_ENDPOINT =
-  process.env.FORMSUBMIT_ENDPOINT ?? `https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`;
+const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`;
 
 // --- Types ---
 
@@ -289,16 +288,12 @@ export async function POST(request: NextRequest) {
 
     if (FORMSPREE_ENDPOINT) {
       const formspreeRes = await sendFormspreeNotification(record);
-      if (!formspreeRes.ok) {
-        const errText = await formspreeRes.text().catch(() => 'Unknown error');
-        console.error('[Contact Form] Formspree API error:', formspreeRes.status, errText);
-        return NextResponse.json(
-          { success: false, error: 'Failed to send notification email. Please try again later.' },
-          { status: 500 }
-        );
+      if (formspreeRes.ok) {
+        return NextResponse.json({ success: true, id });
       }
 
-      return NextResponse.json({ success: true, id });
+      const errText = await formspreeRes.text().catch(() => 'Unknown error');
+      console.error('[Contact Form] Formspree API error:', formspreeRes.status, errText);
     }
 
     const formSubmitRes = await sendFormSubmitNotification(record);
