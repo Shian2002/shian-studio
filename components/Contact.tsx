@@ -40,19 +40,26 @@ export default function Contact() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.3 }}
-          className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-10 text-sm text-th-muted"
+          className="flex flex-col items-center gap-3 mt-8"
         >
-          <a
-            href="mailto:x2938784260u@gmail.com"
-            className="hover:text-th-text transition-colors"
-          >
-            {t("contact.email") as string}
-          </a>
-          <span className="hidden sm:inline text-th-dim">|</span>
-          <span className="flex items-center justify-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-mint animate-pulse" aria-hidden="true" />
+          <div className="flex flex-wrap justify-center gap-5 text-sm text-th-muted">
+            <a
+              href="mailto:x2938784260u@gmail.com"
+              className="hover:text-th-text transition-colors flex items-center gap-1.5"
+            >
+              {t("contact.email") as string}
+            </a>
+            <span className="text-th-dim">|</span>
+            <a
+              href="mailto:2938784260@qq.com"
+              className="hover:text-th-text transition-colors flex items-center gap-1.5"
+            >
+              QQ Mail
+            </a>
+          </div>
+          <p className="text-[11px] text-th-subtle max-w-md">
             {t("contact.replyTime") as string}
-          </span>
+          </p>
         </motion.div>
       </div>
     </section>

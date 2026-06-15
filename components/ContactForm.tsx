@@ -1,17 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/LanguageContext";
 import { fadeIn, viewportOnce } from "@/lib/animations";
 import { trackFormStart, trackFormSubmit } from "@/lib/analytics";
+
+const FORM_STORAGE_KEY = "shian_contact_form_data";
 
 const inputClasses =
   "w-full bg-th-input border border-th-border rounded-xl px-4 py-3 text-sm text-th-text placeholder:text-th-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors";
 
 const labelClasses = "text-xs text-th-muted uppercase tracking-wider mb-2 block";
 const formSubmitAction = "https://formsubmit.co/x2938784260u@gmail.com";
-const formSubmitReturnUrl = "https://shian-studio.vercel.app/contact";
+
+function saveFormData(data: Record<string, string>) {
+  try {
+    sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(data));
+  } catch {}
+}
+
+function loadFormData(): Record<string, string> | null {
+  try {
+    const raw = sessionStorage.getItem(FORM_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearFormData() {
+  try {
+    sessionStorage.removeItem(FORM_STORAGE_KEY);
+  } catch {}
+}
 
 export default function ContactForm() {
   const { t } = useLanguage();
@@ -25,6 +47,20 @@ export default function ContactForm() {
   const [message, setMessage] = useState("");
   const [formTouched, setFormTouched] = useState(false);
 
+  // Restore saved form data on mount (user pressed back from FormSubmit)
+  useEffect(() => {
+    const saved = loadFormData();
+    if (saved) {
+      if (saved.name) setName(saved.name);
+      if (saved.email) setEmail(saved.email);
+      if (saved.company) setCompany(saved.company);
+      if (saved.projectType) setProjectType(saved.projectType);
+      if (saved.budget) setBudget(saved.budget);
+      if (saved.timeline) setTimeline(saved.timeline);
+      if (saved.message) setMessage(saved.message);
+    }
+  }, []);
+
   const handleFormInteraction = () => {
     if (!formTouched) {
       setFormTouched(true);
@@ -32,7 +68,9 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = () => {
+  // Save form data to sessionStorage before native form submission
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    saveFormData({ name, email, company, projectType, budget, timeline, message });
     trackFormSubmit(window.location.pathname, "success");
   };
 
@@ -56,7 +94,6 @@ export default function ContactForm() {
         <input type="hidden" name="_subject" value="New SHIAN Studio Project Inquiry" />
         <input type="hidden" name="_template" value="table" />
         <input type="hidden" name="_captcha" value="false" />
-        <input type="hidden" name="_next" value={formSubmitReturnUrl} />
         <input type="text" name="_honey" className="hidden" tabIndex={-1} autoComplete="off" />
 
         {/* What happens next */}
