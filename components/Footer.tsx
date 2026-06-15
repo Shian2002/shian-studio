@@ -67,6 +67,14 @@ export default function Footer() {
                   Tech Advisor
                 </a>
               </li>
+              <li>
+                <a
+                  href="/faq"
+                  className="text-th-muted hover:text-th-text transition-colors text-sm"
+                >
+                  FAQ
+                </a>
+              </li>
             </ul>
           </motion.div>
 
