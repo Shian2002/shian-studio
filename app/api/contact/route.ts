@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? '';
+const DEFAULT_CONTACT_EMAIL = '2938784260@qq.com';
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? DEFAULT_CONTACT_EMAIL;
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? '';
 const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT;
 const FORMSUBMIT_ENDPOINT =
@@ -232,7 +233,7 @@ async function sendEmailNotification(record: ContactRecord): Promise<Response> {
     },
     body: JSON.stringify({
       from: RESEND_FROM_EMAIL,
-      to: [CONTACT_EMAIL],
+      to: CONTACT_EMAIL.split(',').map((email) => email.trim()).filter(Boolean),
       reply_to: record.email,
       subject: `New Contact: ${record.name} - ${record.projectType}`,
       text: emailBody,
@@ -247,15 +248,6 @@ async function sendEmailNotification(record: ContactRecord): Promise<Response> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check email service configuration
-    if (!CONTACT_EMAIL) {
-      console.error('[Contact Form] CONTACT_EMAIL env var not set');
-      return NextResponse.json(
-        { success: false, error: 'Email service not configured.' },
-        { status: 503 }
-      );
-    }
-
     // Parse body
     let body: Record<string, unknown>;
     try {
