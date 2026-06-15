@@ -215,9 +215,25 @@ async function sendFormSubmitNotification(record: ContactRecord): Promise<Respon
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/x-www-form-urlencoded',
+      Origin: 'https://shian-studio.vercel.app',
+      Referer: 'https://shian-studio.vercel.app/contact',
     },
     body: payload.toString(),
   });
+}
+
+async function isSuccessfulFormSubmitResponse(response: Response): Promise<boolean> {
+  if (!response.ok) return false;
+
+  const text = await response.text().catch(() => '');
+  if (!text) return true;
+
+  try {
+    const result = JSON.parse(text) as { success?: boolean | string };
+    return result.success === true || result.success === 'true';
+  } catch {
+    return true;
+  }
 }
 
 // --- Email via Resend ---
@@ -297,7 +313,7 @@ export async function POST(request: NextRequest) {
     }
 
     const formSubmitRes = await sendFormSubmitNotification(record);
-    if (formSubmitRes.ok) {
+    if (await isSuccessfulFormSubmitResponse(formSubmitRes)) {
       return NextResponse.json({ success: true, id });
     }
 
