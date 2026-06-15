@@ -11,6 +11,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 const NAV_I18N_KEYS: Record<string, string> = {
   "/services": "nav.services",
   "/case-studies": "nav.portfolio",
+  "/advisor": "nav.advisor",
   "/blog": "nav.blog",
   "/contact": "nav.contact",
 };
@@ -30,7 +31,7 @@ export default function Navbar() {
         ticking.current = true;
         requestAnimationFrame(() => {
           setScrolled(window.scrollY > 50);
-          const sections = ["hero", "portfolio", "faq"];
+          const sections = ["hero", "portfolio", "advisor", "faq"];
           const pos = window.scrollY + 140;
           let current = sections[0];
           for (const id of sections) {

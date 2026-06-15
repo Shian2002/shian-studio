@@ -7,6 +7,7 @@ const ko: Record<string, unknown> = {
     about: "소개",
     faq: "FAQ",
     contact: "문의",
+    advisor: "기술 자문",
     getQuote: "문의하기",
   },
   hero: {

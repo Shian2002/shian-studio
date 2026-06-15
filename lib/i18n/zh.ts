@@ -7,6 +7,7 @@ const zh: Record<string, unknown> = {
     about: "关于",
     faq: "常见问题",
     contact: "联系",
+    advisor: "技术顾问",
     getQuote: "提交咨询",
   },
   hero: {

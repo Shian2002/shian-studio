@@ -8,6 +8,7 @@ import SocialLinks from "./SocialLinks";
 const NAV_I18N_KEYS: Record<string, string> = {
   "/services": "nav.services",
   "/case-studies": "nav.portfolio",
+  "/advisor": "nav.advisor",
   "/blog": "nav.blog",
   "#about": "nav.about",
   "/contact": "nav.contact",

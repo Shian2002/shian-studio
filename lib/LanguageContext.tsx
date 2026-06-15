@@ -38,6 +38,7 @@ function getDefaultLocaleForHost(hostname: string): Locale {
 }
 
 function getNestedValue(obj: unknown, path: string): unknown {
+  if (!path || typeof path !== "string") return undefined;
   const keys = path.split(".");
   let current: unknown = obj;
   for (const key of keys) {

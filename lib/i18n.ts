@@ -16,6 +16,7 @@ const en: Record<string, unknown> = {
     about: "About",
     faq: "FAQ",
     contact: "Contact",
+    advisor: "Tech Advisor",
     getQuote: "Send Inquiry",
   },
   hero: {

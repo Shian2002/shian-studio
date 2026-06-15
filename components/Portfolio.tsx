@@ -43,7 +43,7 @@ export default function Portfolio({ compact = false }: { compact?: boolean }) {
 
   if (compact) {
     return (
-      <section id="portfolio" aria-label={t("portfolio.title") as string} className="py-14 px-6 bg-th-bg3">
+      <section id="portfolio" aria-label={t("portfolio.title") as string} className="py-20 px-6 bg-th-bg3">
         <div className="max-w-7xl mx-auto">
           <motion.div
             variants={fadeInUp}
@@ -51,7 +51,7 @@ export default function Portfolio({ compact = false }: { compact?: boolean }) {
             whileInView="visible"
             viewport={viewportOnce}
             transition={{ duration: 0.5 }}
-            className="text-center mb-8"
+            className="text-center mb-10"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true" />

@@ -7,6 +7,7 @@ const ja: Record<string, unknown> = {
     about: "プロフィール",
     faq: "FAQ",
     contact: "お問い合わせ",
+    advisor: "技術アドバイザー",
     getQuote: "お問い合わせ",
   },
   hero: {

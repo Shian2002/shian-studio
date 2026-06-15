@@ -68,7 +68,7 @@ export default function FAQ({ compact = false }: { compact?: boolean }) {
       <section
         id="faq"
         aria-label={t("nav.faq") as string}
-        className="py-16 px-6 bg-th-bg2"
+        className="py-20 px-6 bg-th-bg"
       >
         <div className="max-w-3xl mx-auto">
           <motion.div
