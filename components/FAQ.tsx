@@ -8,13 +8,11 @@ import { useLanguage } from "@/lib/LanguageContext";
 function FAQItem({
   q,
   a,
-  defaultOpen = false,
 }: {
   q: string;
   a: string;
-  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(false);
   return (
     <div className="border border-th-border rounded-xl overflow-hidden bg-th-card transition-colors hover:border-th-border-m">
       <button
@@ -49,102 +47,15 @@ function FAQItem({
   );
 }
 
-type ExtraQA = { q: string; a: string };
-type ExtraCategory = { title: string; icon: string; items: ExtraQA[] };
-
-const EXTRA_CATEGORIES: ExtraCategory[] = [
-  {
-    title: "Pricing & Payment",
-    icon: "\u{1F4B0}",
-    items: [
-      {
-        q: "How much does a typical project cost?",
-        a: "Project pricing depends on scope. MVP Sprints start at $2,000, full SaaS builds range $5,000-$10,000+, and mini programs start at $1,500. After a quick text consult, you'll get an exact quote — no surprises.",
-      },
-      {
-        q: "Do you offer monthly subscriptions?",
-        a: "Yes. Our Tech Advisor subscription starts at $290/month for async text-based technical guidance. No video calls, no phone — just Slack/WeChat/email. Check out the /advisor page for details.",
-      },
-      {
-        q: "What payment methods do you accept?",
-        a: "International clients: Stripe, PayPal, or wire transfer. CN clients: WeChat Pay, Alipay, or bank transfer. For projects, 50% upfront and 50% on delivery is standard. Subscriptions are billed monthly.",
-      },
-      {
-        q: "Can I get a refund if I'm not satisfied?",
-        a: "For project work: if you're not happy with the initial design/wireframe phase, you get a full refund of your deposit. For subscriptions: cancel anytime, no questions asked — you just won't be billed for the next cycle.",
-      },
-    ],
-  },
-  {
-    title: "Process & Timeline",
-    icon: "\u{1F4C5}",
-    items: [
-      {
-        q: "How long does a typical MVP take?",
-        a: "2-4 weeks for most MVPs. Simple landing pages can be done in 3-5 days. Full SaaS dashboards with auth, payments, and dashboards typically take 3-4 weeks. The exact timeline is confirmed after our initial text discussion.",
-      },
-      {
-        q: "What's your development process?",
-        a: "Four steps: (1) Text consult to understand your needs, (2) Design & planning — wireframes + timeline, (3) AI-powered build — fast, quality code using Codex/GPT-5.5, (4) Launch & support — deploy + iterate. The entire process is text-based, no meetings required.",
-      },
-      {
-        q: "Do you work with clients in different time zones?",
-        a: "Absolutely. Our entire workflow is async and text-based, specifically designed for cross-timezone collaboration. You'll never need to wake up early for a meeting — just send a message and get a reply within 24h.",
-      },
-      {
-        q: "How do I communicate with you during the project?",
-        a: "Slack, WeChat, or email — your choice. All communication is text-based. No video calls, no phone calls. This keeps everything documented and efficient. You can expect responses within 24h (12h for active sprint phases).",
-      },
-    ],
-  },
-  {
-    title: "Tech & Capabilities",
-    icon: "\u26A1",
-    items: [
-      {
-        q: "What tech stack do you use?",
-        a: "Next.js + TypeScript + Tailwind CSS for frontend. Node.js / Python for backend. PostgreSQL / Supabase / MongoDB for databases. Vercel / Netlify for deployment. We also work with WeChat Mini Programs, AI integrations (OpenAI, Claude), and Stripe payments.",
-      },
-      {
-        q: "Do you use AI tools in development?",
-        a: "Yes — this is a core advantage. We use Codex/GPT-5.5 to accelerate development without sacrificing quality. This means faster delivery, lower costs, and cleaner code. The AI assists; all architectural decisions are made by an experienced developer.",
-      },
-      {
-        q: "Can you work with my existing codebase?",
-        a: "Yes. We can review your codebase, add features, fix bugs, or migrate to a new architecture. For subscription clients, code reviews are included (1/month for Tier 1, unlimited for Tier 2+).",
-      },
-      {
-        q: "Do you provide ongoing maintenance after launch?",
-        a: "Yes. Post-launch support is included for 30 days on all projects (bug fixes, small tweaks). For long-term support, the Tech Advisor subscription covers ongoing maintenance, updates, and new features.",
-      },
-    ],
-  },
-  {
-    title: "Getting Started",
-    icon: "\u{1F680}",
-    items: [
-      {
-        q: "How do I start a project?",
-        a: "Simple: (1) Fill out the contact form on the Contact page, or (2) Add us on WeChat (scan the QR code). Share your idea, timeline, and budget. You'll get a response within 24h with next steps — no sales calls.",
-      },
-      {
-        q: "Do you sign NDAs?",
-        a: "Yes. If you need an NDA before sharing project details, just ask. We're happy to sign before the initial discussion. Your ideas and data are always kept confidential.",
-      },
-      {
-        q: "What information should I prepare before contacting?",
-        a: "Helpful but not required: a brief description of what you want to build, your target users, your timeline, and your budget range. If you have wireframes, mockups, or competitor links, even better. If you have nothing — that's fine too, we'll figure it out together.",
-      },
-      {
-        q: "Can you help with just a small task or bug fix?",
-        a: "Yes. For one-off tasks (bug fix, small feature, deployment help), the Tech Advisor Tier 1 ($290/month) is the most cost-effective option. You get up to 10 messages/month and a code review session.",
-      },
-    ],
-  },
+const CATEGORY_ICONS = [
+  "\u{1F4B0}",
+  "\u{1F4C5}",
+  "\u26A1",
+  "\u{1F680}",
 ];
 
 export default function FAQ({ compact = false }: { compact?: boolean }) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   if (compact) {
     const itemCount = 4;
@@ -193,7 +104,7 @@ export default function FAQ({ compact = false }: { compact?: boolean }) {
           >
             {t("faq.stillQuestions") as string}{" "}
             <a href="/faq" className="text-accent hover:underline">
-              View all FAQs
+              {locale === "zh" ? "查看全部 FAQ" : "View all FAQs"}
             </a>{" "}
             {t("faq.footer") as string}
           </motion.p>
@@ -201,6 +112,11 @@ export default function FAQ({ compact = false }: { compact?: boolean }) {
       </section>
     );
   }
+
+  const categories = (t("faqExtended.categories") as Array<{
+    title: string;
+    items: Array<{ q: string; a: string }>;
+  }>) || [];
 
   return (
     <section className="py-16 px-6 bg-th-bg">
@@ -214,28 +130,28 @@ export default function FAQ({ compact = false }: { compact?: boolean }) {
           className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs mb-6">
-            FAQ
+            {(t("faqExtended.badge") as string) || "FAQ"}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-th-text mb-4">
-            Frequently asked questions
+            {(t("faqExtended.title") as string) || "Frequently asked questions"}
           </h2>
           <p className="text-th-muted max-w-xl mx-auto">
-            Everything you need to know about working with SHIAN Studio.
-            Can&apos;t find the answer? Send a message via the contact form.
+            {(t("faqExtended.subtitle") as string) ||
+              "Everything you need to know about working with SHIAN Studio."}
           </p>
         </motion.div>
 
         <div className="space-y-10">
-          {EXTRA_CATEGORIES.map((category, catIdx) => (
+          {categories.map((category, catIdx) => (
             <motion.div
-              key={category.title}
+              key={catIdx}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: catIdx * 0.1, duration: 0.4 }}
             >
               <h3 className="flex items-center gap-2 text-lg font-semibold text-th-text mb-4 pb-2 border-b border-th-border">
-                <span aria-hidden="true">{category.icon}</span>
+                <span aria-hidden="true">{CATEGORY_ICONS[catIdx] || "\u2753"}</span>
                 {category.title}
               </h3>
 
@@ -260,12 +176,14 @@ export default function FAQ({ compact = false }: { compact?: boolean }) {
           className="mt-12 text-center"
         >
           <div className="inline-block bg-th-card border border-th-border rounded-xl px-6 py-4">
-            <p className="text-sm text-th-muted mb-3">Still have questions?</p>
+            <p className="text-sm text-th-muted mb-3">
+              {(t("faqExtended.stillQuestions") as string) || "Still have questions?"}
+            </p>
             <a
               href="/contact?source=faq"
               className="inline-block rounded-lg bg-accent px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
             >
-              Get in touch
+              {(t("faqExtended.getInTouch") as string) || "Get in touch"}
             </a>
           </div>
         </motion.div>
