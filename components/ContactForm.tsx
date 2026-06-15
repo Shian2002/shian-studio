@@ -12,7 +12,6 @@ const inputClasses =
   "w-full bg-th-input border border-th-border rounded-xl px-4 py-3 text-sm text-th-text placeholder:text-th-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors";
 
 const labelClasses = "text-xs text-th-muted uppercase tracking-wider mb-2 block";
-const fallbackEmail = "2938784260@qq.com";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -55,27 +54,6 @@ export default function ContactForm() {
     () => ({ name, email, company, projectType, budget, timeline, message }),
     [name, email, company, projectType, budget, timeline, message]
   );
-
-  const fallbackMailto = useMemo(() => {
-    const subject = encodeURIComponent(`Project inquiry from ${name || "SHIAN Studio website"}`);
-    const body = encodeURIComponent(
-      [
-        `Name: ${name}`,
-        `Email: ${email}`,
-        company ? `Company: ${company}` : null,
-        `Project type: ${projectType}`,
-        `Budget: ${budget}`,
-        `Timeline: ${timeline}`,
-        "",
-        "Message:",
-        message,
-      ]
-        .filter((line): line is string => line !== null)
-        .join("\n")
-    );
-
-    return `mailto:${fallbackEmail}?subject=${subject}&body=${body}`;
-  }, [name, email, company, projectType, budget, timeline, message]);
 
   useEffect(() => {
     const saved = loadFormData();
@@ -125,7 +103,7 @@ export default function ContactForm() {
       trackFormSubmit(window.location.pathname, "success");
       clearFormData();
       setSubmitState("success");
-      setSubmitMessage(String(t("form.successNext")));
+      setSubmitMessage(String(t("form.success")));
       setName("");
       setEmail("");
       setCompany("");
@@ -349,23 +327,14 @@ export default function ContactForm() {
         </button>
 
         {submitMessage ? (
-          <div role="status" className="space-y-2 text-center">
-            <p
-              className={`text-sm ${
-                submitState === "success" ? "text-mint" : "text-red-500"
-              }`}
-            >
-              {submitMessage}
-            </p>
-            {submitState === "error" ? (
-              <a
-                href={fallbackMailto}
-                className="inline-flex items-center justify-center rounded-lg border border-th-border px-3 py-2 text-sm text-th-text hover:border-accent hover:text-accent transition-colors"
-              >
-                {String(t("form.emailFallback"))}
-              </a>
-            ) : null}
-          </div>
+          <p
+            role="status"
+            className={`text-sm text-center ${
+              submitState === "success" ? "text-mint" : "text-red-500"
+            }`}
+          >
+            {submitMessage}
+          </p>
         ) : null}
       </form>
     </motion.div>

@@ -4,8 +4,9 @@ const DEFAULT_CONTACT_EMAIL = '2938784260@qq.com';
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? DEFAULT_CONTACT_EMAIL;
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? '';
 const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT;
+const FORMSUBMIT_EMAIL = process.env.FORMSUBMIT_EMAIL ?? DEFAULT_CONTACT_EMAIL;
 const FORMSUBMIT_ENDPOINT =
-  process.env.FORMSUBMIT_ENDPOINT ?? (CONTACT_EMAIL ? `https://formsubmit.co/ajax/${CONTACT_EMAIL}` : '');
+  process.env.FORMSUBMIT_ENDPOINT ?? `https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`;
 
 // --- Types ---
 
