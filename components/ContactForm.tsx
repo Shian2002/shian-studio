@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/LanguageContext";
 import { fadeIn, viewportOnce } from "@/lib/animations";
@@ -12,7 +12,8 @@ const inputClasses =
   "w-full bg-th-input border border-th-border rounded-xl px-4 py-3 text-sm text-th-text placeholder:text-th-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors";
 
 const labelClasses = "text-xs text-th-muted uppercase tracking-wider mb-2 block";
-const formSubmitAction = "https://formsubmit.co/x2938784260u@gmail.com";
+
+type SubmitState = "idle" | "submitting" | "success" | "error";
 
 function saveFormData(data: Record<string, string>) {
   try {
@@ -46,20 +47,30 @@ export default function ContactForm() {
   const [timeline, setTimeline] = useState("");
   const [message, setMessage] = useState("");
   const [formTouched, setFormTouched] = useState(false);
+  const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
 
-  // Restore saved form data on mount (user pressed back from FormSubmit)
+  const formData = useMemo(
+    () => ({ name, email, company, projectType, budget, timeline, message }),
+    [name, email, company, projectType, budget, timeline, message]
+  );
+
   useEffect(() => {
     const saved = loadFormData();
-    if (saved) {
-      if (saved.name) setName(saved.name);
-      if (saved.email) setEmail(saved.email);
-      if (saved.company) setCompany(saved.company);
-      if (saved.projectType) setProjectType(saved.projectType);
-      if (saved.budget) setBudget(saved.budget);
-      if (saved.timeline) setTimeline(saved.timeline);
-      if (saved.message) setMessage(saved.message);
-    }
+    if (!saved) return;
+
+    setName(saved.name ?? "");
+    setEmail(saved.email ?? "");
+    setCompany(saved.company ?? "");
+    setProjectType(saved.projectType ?? "");
+    setBudget(saved.budget ?? "");
+    setTimeline(saved.timeline ?? "");
+    setMessage(saved.message ?? "");
   }, []);
+
+  useEffect(() => {
+    saveFormData(formData);
+  }, [formData]);
 
   const handleFormInteraction = () => {
     if (!formTouched) {
@@ -68,10 +79,43 @@ export default function ContactForm() {
     }
   };
 
-  // Save form data to sessionStorage before native form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    saveFormData({ name, email, company, projectType, budget, timeline, message });
-    trackFormSubmit(window.location.pathname, "success");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    saveFormData(formData);
+    setSubmitState("submitting");
+    setSubmitMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          source: window.location.href,
+          pagePath: window.location.pathname,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Contact form request failed");
+      }
+
+      trackFormSubmit(window.location.pathname, "success");
+      clearFormData();
+      setSubmitState("success");
+      setSubmitMessage(String(t("form.successNext")));
+      setName("");
+      setEmail("");
+      setCompany("");
+      setProjectType("");
+      setBudget("");
+      setTimeline("");
+      setMessage("");
+    } catch {
+      trackFormSubmit(window.location.pathname, "error");
+      setSubmitState("error");
+      setSubmitMessage(String(t("form.error")));
+    }
   };
 
   return (
@@ -84,49 +128,52 @@ export default function ContactForm() {
       className="max-w-2xl mx-auto"
     >
       <form
-        action={formSubmitAction}
-        method="POST"
         onSubmit={handleSubmit}
         noValidate={false}
         className="bg-th-card border border-th-border rounded-2xl p-6 md:p-8 space-y-5"
         onFocus={handleFormInteraction}
       >
-        <input type="hidden" name="_subject" value="New SHIAN Studio Project Inquiry" />
-        <input type="hidden" name="_template" value="table" />
-        <input type="hidden" name="_captcha" value="false" />
-        <input type="text" name="_honey" className="hidden" tabIndex={-1} autoComplete="off" />
-
-        {/* What happens next */}
         <div className="mb-6 p-4 rounded-xl bg-th-bg2 border border-th-border">
           <h3 className="text-sm font-semibold text-th-text mb-3">
             {String(t("form.whatsNextTitle"))}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="flex items-start gap-2">
-              <span className="text-accent text-sm shrink-0 mt-0.5">①</span>
+              <span className="text-accent text-sm shrink-0 mt-0.5">1</span>
               <div>
-                <p className="text-xs font-medium text-th-text">{String(t("form.whatsNext1Title"))}</p>
-                <p className="text-[11px] text-th-muted">{String(t("form.whatsNext1Desc"))}</p>
+                <p className="text-xs font-medium text-th-text">
+                  {String(t("form.whatsNext1Title"))}
+                </p>
+                <p className="text-[11px] text-th-muted">
+                  {String(t("form.whatsNext1Desc"))}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-accent text-sm shrink-0 mt-0.5">②</span>
+              <span className="text-accent text-sm shrink-0 mt-0.5">2</span>
               <div>
-                <p className="text-xs font-medium text-th-text">{String(t("form.whatsNext2Title"))}</p>
-                <p className="text-[11px] text-th-muted">{String(t("form.whatsNext2Desc"))}</p>
+                <p className="text-xs font-medium text-th-text">
+                  {String(t("form.whatsNext2Title"))}
+                </p>
+                <p className="text-[11px] text-th-muted">
+                  {String(t("form.whatsNext2Desc"))}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-accent text-sm shrink-0 mt-0.5">③</span>
+              <span className="text-accent text-sm shrink-0 mt-0.5">3</span>
               <div>
-                <p className="text-xs font-medium text-th-text">{String(t("form.whatsNext3Title"))}</p>
-                <p className="text-[11px] text-th-muted">{String(t("form.whatsNext3Desc"))}</p>
+                <p className="text-xs font-medium text-th-text">
+                  {String(t("form.whatsNext3Title"))}
+                </p>
+                <p className="text-[11px] text-th-muted">
+                  {String(t("form.whatsNext3Desc"))}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Row 1: Name + Work Email */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label htmlFor="contact-name" className={labelClasses}>
@@ -163,7 +210,6 @@ export default function ContactForm() {
           </div>
         </div>
 
-        {/* Row 2: Company/Website + Project Type */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label htmlFor="contact-company" className={labelClasses}>
@@ -206,7 +252,6 @@ export default function ContactForm() {
           </div>
         </div>
 
-        {/* Row 3: Budget + Timeline */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label htmlFor="contact-budget" className={labelClasses}>
@@ -257,7 +302,6 @@ export default function ContactForm() {
           </div>
         </div>
 
-        {/* Row 4: Message/Additional Details */}
         <div>
           <label htmlFor="contact-message" className={labelClasses}>
             {String(t("form.message"))}
@@ -276,10 +320,22 @@ export default function ContactForm() {
 
         <button
           type="submit"
-          className="w-full bg-accent text-white hover:bg-accent/85 transition-all duration-300 rounded-xl py-3 font-medium"
+          disabled={submitState === "submitting"}
+          className="w-full bg-accent text-white hover:bg-accent/85 disabled:cursor-not-allowed disabled:opacity-70 transition-all duration-300 rounded-xl py-3 font-medium"
         >
-          {String(t("form.submit"))}
+          {submitState === "submitting" ? "Sending..." : String(t("form.submit"))}
         </button>
+
+        {submitMessage ? (
+          <p
+            role="status"
+            className={`text-sm text-center ${
+              submitState === "success" ? "text-mint" : "text-red-500"
+            }`}
+          >
+            {submitMessage}
+          </p>
+        ) : null}
       </form>
     </motion.div>
   );
