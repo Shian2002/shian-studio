@@ -17,7 +17,7 @@ export default function ServicesRoute() {
       <ScrollProgress />
       <Navbar />
       <main id="main-content" className="pt-16">
-        <Services />
+        <Services compact includeSubscription />
       </main>
       <Footer />
       <BackToTop />
