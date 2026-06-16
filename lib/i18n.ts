@@ -20,15 +20,20 @@ const en: Record<string, unknown> = {
     getQuote: "Send Inquiry",
   },
   hero: {
-    badge: "Available for MVP & SaaS projects · Q2 2026",
-    titlePrefix: "Launch Your MVP or SaaS",
-    titleSuffix: "Product in Weeks, Not Months",
-    words: ["ship faster.", "deliver quality.", "scale reliably.", "iterate smarter."],
+    badge: "Product delivery for founders & teams",
+    titlePrefix: "Turn your idea into",
+    titleSuffix: "a launched product.",
+    words: [
+      "a product people can use.",
+      "a website that converts.",
+      "an internal system your team can run.",
+      "an online service ready to sell.",
+    ],
     description:
-      "SHIAN Studio delivers production-ready MVPs, SaaS products, and dashboards for startups and SMBs — powered by AI-assisted full-stack workflows. From idea to launch, in as fast as 2 weeks.",
+      "I help teams deliver real products online: websites, landing pages, MVPs, SaaS systems, dashboards, mini programs, and business automation tools. From requirements to deployment, I handle design, development, and iteration.",
     viewWork: "Send Project Inquiry",
     seePricing: "View Portfolio",
-    trustPoints: ["MVP in 2-4 Weeks", "Full-Stack Delivery", "AI-Accelerated Workflow", "Post-Launch Support"],
+    trustPoints: ["Clear Scope", "One Owner End-to-End", "Demo-Ready Delivery", "Post-Launch Iteration"],
     techList: ["Next.js", "React", "Node.js", "Python", "Mini Programs", "SaaS"],
   },
   services: {
@@ -77,13 +82,13 @@ const en: Record<string, unknown> = {
         bestFor: "SaaS founders & growing businesses",
       },
       {
-        name: "AI Dashboard",
+        name: "Operations Dashboard",
         subtitle: "For businesses that need internal tools",
         description: "Custom dashboards, admin panels, and internal tools",
         features: [
           "Custom dashboard development",
           "Real-time data visualization",
-          "AI-powered analytics",
+          "Behavior and trend analytics",
           "IoT monitoring & alerts",
           "Role management & audit logs",
           "2-4 week delivery",
@@ -107,9 +112,9 @@ const en: Record<string, unknown> = {
   },
   portfolio: {
     badge: "Portfolio",
-    title: "Work Portfolio",
+    title: "What I Can Build",
     description:
-      "Explore 12 interactive demos across SaaS, AI, dashboards, mini programs, education, IoT, real estate, and landing pages.",
+      "From idea to shipped project: web platforms, SaaS systems, dashboards, mini programs, and business tools that can be used immediately.",
     filters: {
       all: "All Projects",
       web: "Web Apps",
@@ -125,18 +130,18 @@ const en: Record<string, unknown> = {
     demoProject: "Demo Project",
     moreProjects: "Demo Projects",
     items: [
-      { title: "AI SaaS Analytics Dashboard", description: "Real-time data visualization with role-based access control and AI-powered insights." },
-      { title: "AI Chatbot Integration", description: "Intelligent customer service chatbot with knowledge base, streaming responses, and multi-language support." },
-      { title: "AI Image Generation Studio", description: "Prompt-based image generation, editing workflow, and style presets for creative teams." },
-      { title: "Online Education Platform", description: "Course marketplace with video learning, structured learning paths, and certification system. Competes with Udemy and Coursera." },
-      { title: "E-Commerce Admin Panel", description: "Complete back-office management with product CRUD, order processing, and sales analytics." },
-      { title: "Project Management Workspace", description: "Kanban tasks, team planning, timelines, and delivery tracking in one workspace." },
-      { title: "IoT Monitoring Dashboard", description: "Real-time IoT device monitoring with live sensor data, alerts, and trend analysis." },
-      { title: "Real Estate Property Platform", description: "Full-featured property listing platform with interactive map, advanced search, and agent management. Built for modern real estate agencies." },
-      { title: "AI Speed Coding Challenge", description: "From zero to deployed in record time — a time-lapse of AI-powered full-stack development." },
-      { title: "WeChat E-Commerce Mini Program", description: "Full shopping experience with product browsing, cart, checkout, and WeChat Pay." },
-      { title: "Cross-Platform App (UniApp)", description: "One codebase running on WeChat Mini Program, H5, iOS, and Android." },
-      { title: "High-Conversion Landing Page", description: "SEO-optimized template with Lighthouse 95+ scores, A/B testing support." },
+      { title: "SaaS Analytics Dashboard", description: "A real-time business dashboard with role-based access and exportable reports for operations teams." },
+      { title: "Customer Service Integration", description: "A customer support flow with FAQ search, handoff rules, and multi-language response handling." },
+      { title: "Creative Studio Workflow", description: "A content workflow for image assets, editing, and style management for small teams." },
+      { title: "Online Education Platform", description: "A course platform with structured learning paths, certification flow, and progress tracking." },
+      { title: "E-Commerce Admin Panel", description: "A full back-office system with product lifecycle, order flows, and sales overview." },
+      { title: "Project Management Workspace", description: "Team planning with boards, timelines, delivery tracking, and status reporting." },
+      { title: "IoT Monitoring Dashboard", description: "Live monitoring for device data, alert rules, trend charts, and status dashboards." },
+      { title: "Property Listing Platform", description: "A property and lead management system with map search, filters, and agent workflows." },
+      { title: "Fast MVP Challenge", description: "A rapid MVP build that turns raw requirements into a verifiable product." },
+      { title: "WeChat E-Commerce Mini Program", description: "A complete commerce mini program with browsing, cart, checkout, and payment flow." },
+      { title: "Cross-Platform App", description: "One codebase for mini program, H5, iOS, and Android with shared product logic." },
+      { title: "High-Conversion Landing Page", description: "A marketing page designed for lead conversion with SEO structure and experimentation support." },
     ],
   },
   caseStudies: {
@@ -181,7 +186,7 @@ const en: Record<string, unknown> = {
     processBadge: "Workflow",
     processTitle: "How I Work",
     processDescription:
-      "A lean, AI-powered process — from first call to production deployment.",
+      "A lean delivery process — from first text to production deployment.",
     stats: ["Faster delivery", "Response time", "Core technologies", "Post-launch support"],
   },
   testimonials: {
@@ -201,7 +206,7 @@ const en: Record<string, unknown> = {
         role: "Founder, SaaSify",
       },
       {
-        text: "From wireframe to working mini program in 10 days. The AI-powered workflow really does make a difference — highly recommend for anyone who needs to move fast.",
+        text: "From wireframe to working mini program in 10 days. The workflow and execution pace made the difference.",
         name: "Yuki Tanaka",
         role: "Product Lead, QuickCart",
       },
@@ -213,7 +218,7 @@ const en: Record<string, unknown> = {
     description:
       "A full-stack engineer with a bias for shipping and an obsession with quality.",
     bioTitle: "Bio",
-    bio: "CS graduate with IoT specialization. I build MVPs and SaaS products for startups and SMBs worldwide. AI-powered full-stack delivery — from idea to production in weeks, not months.",
+    bio: "CS graduate with IoT specialization. I build MVPs and SaaS products for startups and SMBs worldwide, from idea to production in weeks, not months.",
     competencies: "Core Competencies",
     connect: "Let's Connect",
     preferEmail: "Prefer email? x2938784260u@gmail.com",
@@ -226,14 +231,14 @@ const en: Record<string, unknown> = {
       "Backend (Node.js / Python)",
       "Mini Programs (WeChat / UniApp)",
       "DevOps & Deployment",
-      "AI-Powered Coding Workflow",
+      "Quality-first full-stack delivery",
     ],
   },
   faq: {
     badge: "FAQ",
     title: "Common Questions",
     description: "Quick answers to things clients usually ask before we start.",
-    footer: "— I typically respond within a few hours.",
+    footer: "I typically respond within a few hours.",
     stillQuestions: "Still have questions?",
     reachOut: "Reach out directly",
     items: [
@@ -245,12 +250,12 @@ const en: Record<string, unknown> = {
       {
         question: "How fast can you deliver?",
         answer:
-          "Landing pages: 3 days. Full websites or mini programs: 7 days. Enterprise SaaS products: 2-4 weeks. AI-powered workflows enable 3-5x faster delivery than traditional development.",
+          "Landing pages: 3 days. Full websites or mini programs: 7 days. Enterprise SaaS products: 2-4 weeks. We keep this fast by using reusable components and short iteration cycles.",
       },
       {
-        question: "What is AI-powered development?",
+        question: "How do you keep delivery fast and safe?",
         answer:
-          "We use cutting-edge AI coding tools like Claude Code, Codex, and Cursor to accelerate development without sacrificing quality. This means faster delivery, fewer bugs, and more competitive pricing.",
+          "I use clear delivery milestones, reusable templates, and mandatory release checklists. The result is faster progress with less rework and stable execution.",
       },
       {
         question: "Do you offer post-launch support?",
@@ -271,9 +276,9 @@ const en: Record<string, unknown> = {
   },
   contact: {
     title1: "Let's Build Your",
-    title2: "Product Together",
+    title2: "Product",
     description:
-      "Whether you need an MVP, a SaaS dashboard, or a technical partner — send an inquiry and let's discuss via text.",
+      "Tell me what you want to build, your target users, and timeline. I'll turn that into a clear implementation plan, milestone list, and estimate.",
     emailMe: "Email Me",
     whatsapp: "Email",
     email: "x2938784260u@gmail.com",
@@ -281,17 +286,17 @@ const en: Record<string, unknown> = {
     replyTime: "Usually replies within 24h",
   },
   footer: {
-    tagline: "MVP & SaaS delivery for startups and SMBs.",
+    tagline: "From idea to launch-ready web products for startups and SMBs.",
     navigation: "Navigation",
     contactHeading: "Get in Touch",
     remoteFirst: "Remote-first · Worldwide",
-    builtWith: "Built with Next.js · Tailwind CSS · AI-First Workflow",
+    builtWith: "Built with Next.js · Tailwind CSS · Delivery Workflow",
   },
   process: {
     steps: [
       { title: "Text Consult", description: "Share your needs" },
       { title: "Design & Plan", description: "Wireframes + timeline" },
-      { title: "AI-Powered Build", description: "Fast, quality code" },
+      { title: "Build", description: "Implementation and integration" },
       { title: "Launch & Support", description: "Deploy + iterate" },
     ],
   },
@@ -299,7 +304,7 @@ const en: Record<string, unknown> = {
     signals: [
       { label: "Degree Holder" },
       { label: "Stack Dev" },
-      { label: "Native Workflow" },
+      { label: "Product Delivery" },
       { label: "Faster Delivery" },
     ],
   },
@@ -373,7 +378,7 @@ const en: Record<string, unknown> = {
           "48h response window",
           "Text-only async (Slack / WeChat / Email)",
           "1 code review session / month",
-          "AI-powered first response",
+          "Fast first response",
           "Full FAQ knowledge base access",
         ],
         cta: "Get started",
@@ -393,7 +398,7 @@ const en: Record<string, unknown> = {
           "Unlimited code reviews",
           "Sprint planning feedback",
           "Architecture template library",
-          "AI-powered first response",
+          "Fast first response",
           "Monthly tech audit report",
         ],
         cta: "Get started",
@@ -413,7 +418,7 @@ const en: Record<string, unknown> = {
           "Tech decision deep-dive",
           "Hiring & vendor evaluation",
           "Roadmap co-creation",
-          "Priority AI-assisted drafting",
+          "Priority draft review",
           "Weekly async check-ins",
         ],
         cta: "Get started",
@@ -422,8 +427,8 @@ const en: Record<string, unknown> = {
     popular: "Most popular",
     trust1Title: "Bounded workload",
     trust1Desc: "Monthly message limits prevent overload. You control your time.",
-    trust2Title: "AI-powered triage",
-    trust2Desc: "An AI assistant handles common questions before they reach you.",
+    trust2Title: "Structured triage",
+    trust2Desc: "Common questions are filtered and grouped before each response for faster progress.",
     trust3Title: "100% text-based",
     trust3Desc: "No video calls, no phone. Async chat only. Cancel anytime.",
   },
@@ -451,7 +456,7 @@ const en: Record<string, unknown> = {
         title: "Process & Timeline",
         items: [
           { q: "How long does a typical MVP take?", a: "2-4 weeks for most MVPs. Simple landing pages can be done in 3-5 days. Full SaaS dashboards with auth, payments, and dashboards typically take 3-4 weeks. The exact timeline is confirmed after our initial text discussion." },
-          { q: "What's your development process?", a: "Four steps: (1) Text consult to understand your needs, (2) Design & planning — wireframes + timeline, (3) AI-powered build — fast, quality code using Codex/GPT-5.5, (4) Launch & support — deploy + iterate. The entire process is text-based, no meetings required." },
+          { q: "What's your development process?", a: "Four steps: (1) Text consult to understand your needs, (2) Design & planning — wireframes + timeline, (3) Build & integration with quality review points, (4) Launch & support — deploy + iterate. The entire process is text-based, no meetings required." },
           { q: "Do you work with clients in different time zones?", a: "Absolutely. Our entire workflow is async and text-based, specifically designed for cross-timezone collaboration. You'll never need to wake up early for a meeting — just send a message and get a reply within 24h." },
           { q: "How do I communicate with you during the project?", a: "Slack, WeChat, or email — your choice. All communication is text-based. No video calls, no phone calls. This keeps everything documented and efficient. You can expect responses within 24h (12h for active sprint phases)." },
         ],
@@ -459,8 +464,8 @@ const en: Record<string, unknown> = {
       {
         title: "Tech & Capabilities",
         items: [
-          { q: "What tech stack do you use?", a: "Next.js + TypeScript + Tailwind CSS for frontend. Node.js / Python for backend. PostgreSQL / Supabase / MongoDB for databases. Vercel / Netlify for deployment. We also work with WeChat Mini Programs, AI integrations (OpenAI, Claude), and Stripe payments." },
-          { q: "Do you use AI tools in development?", a: "Yes — this is a core advantage. We use Codex/GPT-5.5 to accelerate development without sacrificing quality. This means faster delivery, lower costs, and cleaner code. The AI assists; all architectural decisions are made by an experienced developer." },
+          { q: "What tech stack do you use?", a: "Next.js + TypeScript + Tailwind CSS for frontend. Node.js / Python for backend. PostgreSQL / Supabase / MongoDB for databases. Vercel / Netlify for deployment. We also build integrations with WeChat Mini Programs, AI services, and Stripe payments." },
+          { q: "Do you use AI tools in development?", a: "I use productivity tooling where it helps, but every project is planned, reviewed, and finalized through a human-led process focused on security and maintainability." },
           { q: "Can you work with my existing codebase?", a: "Yes. We can review your codebase, add features, fix bugs, or migrate to a new architecture. For subscription clients, code reviews are included (1/month for Tier 1, unlimited for Tier 2+)." },
           { q: "Do you provide ongoing maintenance after launch?", a: "Yes. Post-launch support is included for 30 days on all projects (bug fixes, small tweaks). For long-term support, the Tech Advisor subscription covers ongoing maintenance, updates, and new features." },
         ],
