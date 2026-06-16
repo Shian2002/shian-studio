@@ -5,9 +5,9 @@ import { fadeInUp, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/LanguageContext";
 
 const TIER_META = [
-  { id: "async", price: "$290", priceCN: "1,999", accent: "#50e3c2", popular: false },
-  { id: "standard", price: "$690", priceCN: "4,999", accent: "#4a9eff", popular: true },
-  { id: "embedded", price: "$1,490", priceCN: "10,999", accent: "#bd10e0", popular: false },
+  { id: "plus", label: "Plus", price: "$290", priceCN: "1,999", accent: "#50e3c2", popular: false },
+  { id: "pro", label: "Pro", price: "$690", priceCN: "4,999", accent: "#4a9eff", popular: true },
+  { id: "max", label: "Max", price: "$1,490", priceCN: "10,999", accent: "#bd10e0", popular: false },
 ];
 
 export default function AdvisorPreview() {
@@ -83,7 +83,7 @@ export default function AdvisorPreview() {
                 {/* Tier name + price */}
                 <div className="flex items-baseline justify-between mb-2">
                   <h3 className="text-sm font-semibold" style={{ color: meta.accent }}>
-                    {tier.name}
+                    {meta.label}
                   </h3>
                   <div className="text-right">
                     <span className="text-lg font-bold text-th-text">{displayPrice}</span>

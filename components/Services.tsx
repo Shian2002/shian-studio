@@ -10,21 +10,24 @@ const SERVICE_ORDER = ["landing-page", "mvp-sprint", "ai-dashboard", "saas-build
 const STAIR_OFFSETS = ["lg:mt-8", "lg:mt-6", "lg:mt-4", "lg:mt-0"];
 const ADVISOR_TIERS = [
   {
-    id: "async",
+    id: "plus",
+    label: "Plus",
     price: "$290",
     priceCN: "1,999",
     accent: "#50e3c2",
     popular: false,
   },
   {
-    id: "standard",
+    id: "pro",
+    label: "Pro",
     price: "$690",
     priceCN: "4,999",
     accent: "#4a9eff",
     popular: true,
   },
   {
-    id: "embedded",
+    id: "max",
+    label: "Max",
     price: "$1,490",
     priceCN: "10,999",
     accent: "#bd10e0",
@@ -199,7 +202,7 @@ export default function Services({
                     <div className={`flex items-start justify-between gap-4 mb-3 ${featured ? "pt-8" : "pt-1"}`}>
                       <div>
                         <h4 className="text-lg font-semibold leading-tight" style={{ color: meta.accent }}>
-                          {tier.name}
+                          {meta.label}
                         </h4>
                         <p className="text-xs text-th-muted mt-1 leading-relaxed max-w-xs">
                           {tier.description}

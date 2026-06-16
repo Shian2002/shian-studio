@@ -6,21 +6,24 @@ import { useLanguage } from "@/lib/LanguageContext";
 
 const TIER_META = [
   {
-    id: "async",
+    id: "plus",
+    label: "Plus",
     price: "$290",
     priceCN: "\u00a51,999",
     accent: "#50e3c2",
     popular: false,
   },
   {
-    id: "standard",
+    id: "pro",
+    label: "Pro",
     price: "$690",
     priceCN: "\u00a54,999",
     accent: "#4a9eff",
     popular: true,
   },
   {
-    id: "embedded",
+    id: "max",
+    label: "Max",
     price: "$1,490",
     priceCN: "\u00a510,999",
     accent: "#bd10e0",
@@ -107,7 +110,7 @@ export default function Advisor() {
                     className="text-lg font-semibold mb-1"
                     style={{ color: meta.accent }}
                   >
-                    {tier.name}
+                    {meta.label}
                   </h3>
                   <p className="text-th-muted text-xs leading-relaxed">
                     {tier.description}
