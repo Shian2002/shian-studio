@@ -47,6 +47,7 @@ export default function PricingCard({
 }: Props) {
   const { t } = useLanguage();
   const color = resolveColor(accentColor);
+  const isHighlighted = Boolean(highlight || premium);
 
   const translatedPriceNote = priceNote === "per project"
     ? (t("pricing.perProject") as string)
@@ -70,11 +71,30 @@ export default function PricingCard({
           : undefined,
       }}
     >
+      {isHighlighted && (
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-80"
+          style={{
+            background: `linear-gradient(160deg, ${color}30 0%, rgba(255,255,255,0.03) 45%, transparent 68%)`,
+            mixBlendMode: "screen",
+          }}
+          aria-hidden="true"
+        />
+      )}
+
+      {isHighlighted && (
+        <div
+          className="pointer-events-none absolute inset-[1px] rounded-[14px] border"
+          style={{ borderImage: `linear-gradient(145deg, ${color}99, transparent) 1` }}
+          aria-hidden="true"
+        />
+      )}
+
       <div
         className="absolute inset-x-0 top-0 h-1"
         style={{
           background: `linear-gradient(90deg, ${tierLevel === 0 ? "transparent" : color}, ${color}, ${premium ? "#50e3c2" : "transparent"})`,
-          opacity: premium ? 1 : 0.55,
+          opacity: premium ? 1 : 0.7,
         }}
         aria-hidden="true"
       />
