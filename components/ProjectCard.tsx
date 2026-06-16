@@ -83,9 +83,9 @@ export default function ProjectCard({
   return (
     <>
       <motion.article
-        whileHover={{ y: -4 }}
+        whileHover={{ y: -3 }}
         transition={{ duration: 0.2 }}
-        className="group cursor-pointer overflow-hidden rounded-2xl border border-th-border bg-th-card transition-all duration-300 hover:border-th-border-m"
+        className="group cursor-pointer overflow-hidden rounded-xl border border-th-border bg-th-card transition-all duration-300 hover:border-th-border-m"
         onClick={handleCardClick}
       >
         <div className="relative aspect-video overflow-hidden">
@@ -129,7 +129,7 @@ export default function ProjectCard({
                   </svg>
                 </div>
               )}
-              <div className="pointer-events-none absolute inset-0 bg-th-text/20 transition-colors group-hover:bg-th-text/30" />
+              <div className="pointer-events-none absolute inset-0 bg-black/10 transition-colors group-hover:bg-black/5" />
             </>
           )}
         </div>

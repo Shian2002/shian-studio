@@ -170,33 +170,42 @@ export default function Services({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1, duration: 0.4 }}
-                    className={`relative rounded-xl p-5 border transition-all duration-300 ${
+                    className={`relative rounded-xl p-5 border transition-all duration-300 overflow-hidden ${
                       featured
-                        ? "bg-th-card border-accent/60 shadow-[0_16px_64px_rgba(74,158,255,0.24)]"
-                        : "bg-th-card/75 border-th-border hover:border-th-border-m"
+                        ? "bg-th-card border-th-border-s shadow-[0_18px_48px_rgba(0,0,0,0.18)]"
+                        : "bg-th-card/80 border-th-border hover:border-th-border-m"
                     }`}
                     style={{
                       background: featured
-                        ? `linear-gradient(150deg, ${meta.accent}22 0%, ${meta.accent}18 38%, rgba(24,24,36,0.86) 78%)`
-                        : `linear-gradient(165deg, ${meta.accent}0f, rgba(24,24,36,0.88))`,
+                        ? `linear-gradient(150deg, ${meta.accent}24 0%, rgba(255,255,255,0.035) 34%, var(--bg-card) 76%)`
+                        : `linear-gradient(150deg, ${meta.accent}10 0%, var(--bg-card) 72%)`,
                     }}
                   >
+                    <div
+                      className="absolute inset-x-0 top-0 h-1"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${meta.accent}, transparent)`,
+                        opacity: featured ? 0.9 : 0.45,
+                      }}
+                      aria-hidden="true"
+                    />
+
                     {featured && (
-                      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white whitespace-nowrap">
+                      <div className="absolute left-5 top-4 rounded-md bg-th-bg-s border border-th-border-m px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-th-text whitespace-nowrap">
                         {(t("advisor.popular") as string) || "Popular"}
                       </div>
                     )}
 
-                    <div className="flex items-start justify-between mb-3">
+                    <div className={`flex items-start justify-between gap-4 mb-3 ${featured ? "pt-8" : "pt-1"}`}>
                       <div>
-                        <h4 className="text-lg font-semibold" style={{ color: meta.accent }}>
+                        <h4 className="text-lg font-semibold leading-tight" style={{ color: meta.accent }}>
                           {tier.name}
                         </h4>
                         <p className="text-xs text-th-muted mt-1 leading-relaxed max-w-xs">
                           {tier.description}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <p className="text-2xl font-bold text-th-text">{localPrice}</p>
                         <p className="text-th-subtle text-xs leading-none">{tier.priceNote}</p>
                       </div>
@@ -204,22 +213,22 @@ export default function Services({
 
                     <div className="flex flex-wrap gap-2 mb-4">
                       {tier.timeCommit && (
-                        <span className="text-[11px] rounded-full bg-th-bg-s px-3 py-1 border border-th-border text-th-muted">
+                          <span className="text-[11px] rounded-md bg-th-bg-s px-3 py-1 border border-th-border text-th-muted">
                           {tier.timeCommit}
                         </span>
                       )}
                       {tier.hourlyRate && (
-                        <span className="text-[11px] rounded-full bg-th-bg-s px-3 py-1 border border-th-border text-th-muted">
+                          <span className="text-[11px] rounded-md bg-th-bg-s px-3 py-1 border border-th-border text-th-muted">
                           {tier.hourlyRate}
                         </span>
                       )}
                       {tier.cnPrice && (
-                        <span className="text-[11px] rounded-full bg-th-bg-s px-3 py-1 border border-th-border text-th-muted">
+                          <span className="text-[11px] rounded-md bg-th-bg-s px-3 py-1 border border-th-border text-th-muted">
                           {tier.cnPrice}
                         </span>
                       )}
                       {tier.seatsLeft && (
-                        <span className="text-[11px] rounded-full bg-coral/10 text-coral border border-coral/20 px-3 py-1">
+                          <span className="text-[11px] rounded-md bg-coral/10 text-coral border border-coral/20 px-3 py-1">
                           {tier.seatsLeft}
                         </span>
                       )}
@@ -229,12 +238,10 @@ export default function Services({
                       {(tier.features || []).map((feature) => (
                         <li key={feature} className="flex items-start gap-2 text-sm text-th-text2">
                           <span
-                            className="mt-1 shrink-0 text-xs"
-                            style={{ color: meta.accent }}
+                            className="mt-2 shrink-0 h-1.5 w-1.5 rounded-full"
+                            style={{ backgroundColor: meta.accent }}
                             aria-hidden="true"
-                          >
-                            •
-                          </span>
+                          />
                           <span>{feature}</span>
                         </li>
                       ))}
